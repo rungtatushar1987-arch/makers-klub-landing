@@ -1,0 +1,22 @@
+{
+  "name": "makers-klub-landing",
+  "version": "1.0.0",
+  "description": "Makers Klub - Premium networking platform for creative professionals",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["networking", "creatives", "berlin", "community"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "resend": "^3.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.12"
+  }
+}
