@@ -1,4 +1,4 @@
-import { checkEmailExists, addToWaitlist, getWaitlistCount } from './supabase.js'
+import { addToWaitlist, getWaitlistCount } from './supabase.js'
 
 const LIMIT = 100
 
@@ -72,17 +72,16 @@ async function submitWaitlist(name, email, role, isHeroForm) {
     button.textContent = 'Joining...'
     button.disabled = true
 
-    // Check for duplicate email
-    const emailExists = await checkEmailExists(email)
-    if (emailExists) {
+    // Add to Supabase
+    const { data, error } = await addToWaitlist(name, email, role)
+
+    if (error === 'duplicate') {
       alert('This email is already on the waitlist!')
       button.textContent = originalText
       button.disabled = false
       return
     }
 
-    // Add to Supabase
-    const { data, error } = await addToWaitlist(name, email, role)
     if (error) {
       console.error('Supabase error:', error)
       alert('Something went wrong. Please try again.')
