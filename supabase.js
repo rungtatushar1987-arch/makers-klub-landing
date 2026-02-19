@@ -8,24 +8,34 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 /**
  * Check if an email already exists in the waitlist
  */
-export async function checkEmailExists(email) {
+export async function addToWaitlist(name, email, role) {
   try {
     const { data, error } = await supabase
       .from('waitlist')
-      .select('email')
-      .eq('email', email.toLowerCase())
-      .single()
+      .insert([
+        { 
+          name: name.trim(), 
+          email: email.toLowerCase().trim(), 
+          role: role,
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select()
 
-    if (error && error.code !== 'PGRST116') {
+    if (error) {
+      if (error.code === '23505') {
+        return { data: null, error: 'duplicate' }
+      }
       throw error
     }
 
-    return !!data
+    return { data, error: null }
   } catch (error) {
-    console.error('Error checking email:', error)
-    throw error
+    console.error('Error adding to waitlist:', error)
+    return { data: null, error }
   }
 }
+
 
 /**
  * Add a new person to the waitlist
