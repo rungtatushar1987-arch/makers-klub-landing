@@ -21,71 +21,220 @@
 </nav>
 
 <!-- HERO -->
+<!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-bg-circle"></div>
-  <div class="hero-content">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Now accepting founding members · Berlin
+  
+  <div class="hero-content-wrapper">
+    <!-- Left side: Copy + CTA -->
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Now accepting founding members · Berlin
+      </div>
+
+      <h1>
+        The network built for<br/><em>serious creatives</em>
+      </h1>
+
+      <p class="hero-sub">
+        Meet your next collaborator at a curated event. Never lose track of who you met. Build a network that actually moves your career forward.
+      </p>
+
+      <form class="waitlist-form" onsubmit="handleHeroSubmit(event)">
+        <input 
+          type="text" 
+          id="hero-name" 
+          placeholder="Your name" 
+          required 
+          minlength="2"
+          maxlength="100"
+        />
+        <input 
+          type="email" 
+          id="hero-email" 
+          placeholder="your@email.com" 
+          required 
+          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+          title="Please enter a valid email address (e.g., name@example.com)"
+        />
+        <div class="select-wrap">
+          <select id="hero-role" required>
+            <option value="" disabled selected>What do you work as?</option>
+            <option>UX / UI Designer</option>
+            <option>Brand Strategist</option>
+            <option>Creative Director</option>
+            <option>Copywriter</option>
+            <option>Content Strategist</option>
+            <option>Motion Designer</option>
+            <option>Art Director</option>
+            <option>Product Designer</option>
+            <option>Commercial Photographer</option>
+            <option>Video Producer</option>
+            <option>Agency / Studio</option>
+            <option>Founder</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Join the Waitlist →</button>
+      </form>
+
+      <p class="hero-note">Free to join. <span>Berlin launch coming soon.</span></p>
+
+      <div class="social-proof">
+        <div class="avatar-stack">
+          <div class="avatar avatar-1">M</div>
+          <div class="avatar avatar-2">S</div>
+          <div class="avatar avatar-3">A</div>
+          <div class="avatar avatar-4">K</div>
+        </div>
+        <span class="social-text"><strong><span id="hero-counter">12 creatives</span></strong> already on the waitlist</span>
+      </div>
     </div>
 
-    <h1>
-      The network built for<br/><em>serious creatives</em>
-    </h1>
+    <!-- Right side: Product Previews -->
+    <div class="hero-product-preview">
+      <!-- Desktop Preview -->
+      <div class="desktop-preview">
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="browser-url">makersklub.com/events</div>
+        </div>
+        <div class="desktop-screen">
+          <div class="desktop-content">
+            <div class="desktop-header">
+              <div class="desktop-nav">
+                <span style="font-weight: 700; color: var(--blue);">Makers Klub</span>
+                <div style="display: flex; gap: 20px; font-size: 14px; color: var(--ink-light);">
+                  <span>Events</span>
+                  <span>Network</span>
+                  <span>Opportunities</span>
+                </div>
+              </div>
+            </div>
 
-    <p class="hero-sub">
-      Meet your next collaborator at a curated event. Never lose track of who you met. Build a network that actually moves your career forward.
-    </p>
+            <div class="event-grid">
+              <div class="event-mini-card">
+                <div class="event-mini-tag">🎪 Tonight</div>
+                <div class="event-mini-title">Brand & Identity Review</div>
+                <div class="event-mini-meta">
+                  <span>📍 Mitte</span>
+                  <span>👥 18</span>
+                </div>
+              </div>
 
-    <form class="waitlist-form" onsubmit="handleHeroSubmit(event)">
-      <input 
-        type="text" 
-        id="hero-name" 
-        placeholder="Your name" 
-        required 
-        minlength="2"
-        maxlength="100"
-      />
-      <input 
-        type="email" 
-        id="hero-email" 
-        placeholder="your@email.com" 
-        required 
-        pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
-        title="Please enter a valid email address (e.g., name@example.com)"
-      />
-      <div class="select-wrap">
-        <select id="hero-role" required>
-          <option value="" disabled selected>What do you work as?</option>
-          <option>UX / UI Designer</option>
-          <option>Brand Strategist</option>
-          <option>Creative Director</option>
-          <option>Copywriter</option>
-          <option>Content Strategist</option>
-          <option>Motion Designer</option>
-          <option>Art Director</option>
-          <option>Product Designer</option>
-          <option>Commercial Photographer</option>
-          <option>Video Producer</option>
-          <option>Agency / Studio</option>
-          <option>Founder</option>
-          <option>Other</option>
-        </select>
+              <div class="event-mini-card">
+                <div class="event-mini-tag">📅 Friday</div>
+                <div class="event-mini-title">Motion Design Mixer</div>
+                <div class="event-mini-meta">
+                  <span>📍 Kreuzberg</span>
+                  <span>👥 24</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="connections-preview">
+              <div style="font-size: 11px; color: var(--ink-light); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Recent Activity</div>
+              
+              <div class="connection-activity">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 11px;">S</div>
+                <div style="flex: 1;">
+                  <div style="font-size: 12px; color: var(--ink);"><strong>Sarah</strong> posted new work</div>
+                  <div style="font-size: 11px; color: var(--ink-light);">Brand identity for tech startup</div>
+                </div>
+                <div style="font-size: 11px; color: var(--ink-light);">2h ago</div>
+              </div>
+
+              <div class="connection-activity">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #0891b2; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 11px;">A</div>
+                <div style="flex: 1;">
+                  <div style="font-size: 12px; color: var(--ink);"><strong>Alex</strong> shared an opportunity</div>
+                  <div style="font-size: 11px; color: var(--ink-light);">Looking for UX designer for Q2 project</div>
+                </div>
+                <div style="font-size: 11px; color: var(--ink-light);">4h ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <button type="submit" class="btn-primary">Join the Waitlist →</button>
-    </form>
 
-    <p class="hero-note">Free to join. <span>Berlin launch coming soon.</span></p>
+      <!-- Mobile Preview -->
+      <div class="mobile-preview">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen-hero">
+            <div class="phone-header-hero">
+              <span style="font-size: 13px; font-weight: 700; color: white;">Makers Klub</span>
+              <span style="font-size: 12px; color: rgba(255,255,255,0.5);">⭐ Member</span>
+            </div>
 
-    <div class="social-proof">
-      <div class="avatar-stack">
-        <div class="avatar avatar-1">M</div>
-        <div class="avatar avatar-2">S</div>
-        <div class="avatar avatar-3">A</div>
-        <div class="avatar avatar-4">K</div>
+            <div class="event-card-hero">
+              <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--lavender); margin-bottom: 8px; font-weight: 700;">🎪 Tonight · 7PM</div>
+              <div style="font-size: 14px; font-weight: 600; color: white; margin-bottom: 8px;">Brand & Identity Night</div>
+              <div style="font-size: 11px; color: rgba(255,255,255,0.4); display: flex; gap: 12px;">
+                <span>📍 Berlin Mitte</span>
+                <span>👥 18 attending</span>
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: rgba(255,255,255,0.3); margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 1px;">Who's coming</div>
+
+            <div class="attendee-hero">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: #7c3aed; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">S</div>
+              <div style="flex: 1;">
+                <div style="font-size: 12px; font-weight: 600; color: white;">Sarah K.</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Brand Strategist</div>
+              </div>
+              <button style="background: var(--blue); color: white; border: none; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600;">Connect</button>
+            </div>
+
+            <div class="attendee-hero">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: #0891b2; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 12px;">A</div>
+              <div style="flex: 1;">
+                <div style="font-size: 12px; font-weight: 600; color: white;">Alex M.</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Creative Director</div>
+              </div>
+              <button style="background: var(--blue); color: white; border: none; padding: 5px 12px; border-radius: 100px; font-size: 10px; font-weight: 600;">Connect</button>
+            </div>
+
+            <div class="qr-hero">
+              <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Scan to connect</div>
+              <div style="width: 50px; height: 50px; background: white; margin: 0 auto; border-radius: 6px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 1px; padding: 4px;">
+                <div style="background: var(--ink); border-radius: 1px;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: transparent;"></div>
+                <div style="background: var(--ink);"></div>
+                <div style="background: var(--ink);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <span class="social-text"><strong><span id="hero-counter">12 creatives</span></strong> already on the waitlist</span>
     </div>
   </div>
 </section>
