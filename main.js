@@ -90,10 +90,6 @@ async function submitWaitlist(name, email, role, isHeroForm) {
       return
     }
 
-    // Send confirmation email (simple mailto for now since we don't have serverless yet)
-    // This will be upgraded when we add the API endpoint
-    console.log('User signed up:', { name, email, role })
-
     // Get updated count and update UI
     const newCount = await getWaitlistCount()
     updateCounterUI(newCount)
