@@ -6,66 +6,47 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 /**
- * Check if an email already exists in the waitlist
+ * Add user to waitlist
+ * Duplicate protection handled by UNIQUE constraint in database
  */
-export async function checkEmailExists(email) {
-  try {
-    const { data, error } = await supabase
-      .from('waitlist')
-      .select('email')
-      .eq('email', email.toLowerCase().trim())
-      .maybeSingle()
-
-    if (error) throw error
-
-    return !!data
-  } catch (error) {
-    console.error('Error checking email:', error)
-    throw error
-  }
-}
-
-
 export async function addToWaitlist(name, email, role) {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('waitlist')
       .insert([
         { 
           name: name.trim(), 
           email: email.toLowerCase().trim(), 
-          role: role,
+          role,
           created_at: new Date().toISOString()
         }
       ])
-      .select()
 
     if (error) {
       if (error.code === '23505') {
-        return { data: null, error: 'duplicate' }
+        return { error: 'duplicate' }
       }
       throw error
     }
 
-    return { data, error: null }
+    return { error: null }
   } catch (error) {
     console.error('Error adding to waitlist:', error)
-    return { data: null, error }
+    return { error }
   }
 }
 
 /**
  * Get total waitlist count
+ * Uses secure RPC function (no direct SELECT access)
  */
 export async function getWaitlistCount() {
   try {
-    const { count, error } = await supabase
-      .from('waitlist')
-      .select('*', { count: 'exact', head: true })
+    const { data, error } = await supabase.rpc('get_waitlist_count')
 
     if (error) throw error
 
-    return count || 0
+    return data || 0
   } catch (error) {
     console.error('Error getting count:', error)
     return 0
