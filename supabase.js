@@ -8,6 +8,24 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 /**
  * Check if an email already exists in the waitlist
  */
+export async function checkEmailExists(email) {
+  try {
+    const { data, error } = await supabase
+      .from('waitlist')
+      .select('email')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
+
+    if (error) throw error
+
+    return !!data
+  } catch (error) {
+    console.error('Error checking email:', error)
+    throw error
+  }
+}
+
+
 export async function addToWaitlist(name, email, role) {
   try {
     const { data, error } = await supabase
@@ -30,31 +48,6 @@ export async function addToWaitlist(name, email, role) {
     }
 
     return { data, error: null }
-  } catch (error) {
-    console.error('Error adding to waitlist:', error)
-    return { data: null, error }
-  }
-}
-
-
-/**
- * Add a new person to the waitlist
- */
-export async function addToWaitlist(name, email, role) {
-  try {
-    const { data, error } = await supabase
-      .from('waitlist')
-      .insert([
-        { 
-          name: name.trim(), 
-          email: email.toLowerCase().trim(), 
-          role: role,
-          created_at: new Date().toISOString()
-        }
-      ])
-      .select()
-
-    return { data, error }
   } catch (error) {
     console.error('Error adding to waitlist:', error)
     return { data: null, error }
