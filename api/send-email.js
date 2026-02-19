@@ -1,23 +1,23 @@
-const { Resend } = require('resend');
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const { email, name } = req.body;
 
     if (!email || !name) {
-      return res.status(400).json({ error: 'Email and name are required' });
+      return res.status(400).json({ error: "Email and name are required" });
     }
 
-    console.log('Attempting to send email to:', email);
+    console.log("Attempting to send email to:", email);
 
-    const result = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+    const data = await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: email,
       subject: "You're on the Makers Klub waitlist! 🎉",
       html: `
@@ -35,20 +35,18 @@ module.exports = async (req, res) => {
       `
     });
 
-    if (result.error) {
-      console.error('Resend error:', result.error);
-      return res.status(500).json({ error: 'Failed to send email', details: result.error });
-    }
+    console.log("Email sent successfully:", data);
 
-    console.log('Email sent successfully:', result.data);
-    return res.status(200).json({ success: true, id: result.data.id });
-    
+    return res.status(200).json({
+      success: true,
+      id: data.id
+    });
+
   } catch (error) {
-    console.error('Handler error:', error.message, error.stack);
-    return res.status(500).json({ 
-      error: 'Internal server error', 
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    console.error("Handler error:", error);
+    return res.status(500).json({
+      error: "Internal server error",
+      message: error.message
     });
   }
-};
+}
