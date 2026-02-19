@@ -4,10 +4,20 @@ export default defineConfig({
   root: './',
   build: {
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
   },
   server: {
     port: 5173,
     open: true
+  },
+  resolve: {
+    alias: {
+      './supabase.js': './supabase.js'
+    }
   }
 })
