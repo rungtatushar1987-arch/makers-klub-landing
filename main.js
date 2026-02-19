@@ -73,7 +73,7 @@ async function submitWaitlist(name, email, role, isHeroForm) {
     button.disabled = true
 
     // Add to Supabase
-    const { data, error } = await addToWaitlist(name, email, role)
+    const { error } = await addToWaitlist(name, email, role)
 
     if (error === 'duplicate') {
       alert('This email is already on the waitlist!')
@@ -88,6 +88,18 @@ async function submitWaitlist(name, email, role, isHeroForm) {
       button.textContent = originalText
       button.disabled = false
       return
+    }
+
+    // Send confirmation email
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name })
+      });
+    } catch (emailError) {
+      console.error('Email send failed:', emailError);
+      // Don't block signup if email fails
     }
 
     // Get updated count and update UI
