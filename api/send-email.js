@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     console.log("Attempting to send email to:", email);
 
     const data = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "hello@makersklub.com",
       to: email,
       subject: "You're on the Makers Klub waitlist! 🎉",
       html: `
