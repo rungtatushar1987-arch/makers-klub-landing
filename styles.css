@@ -1657,6 +1657,104 @@
       }
     }
 
+    .feature-select-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 16px;
+      display: block;
+      text-align: center;
+    }
+
+    .feature-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .feature-option {
+      position: relative;
+    }
+
+    .feature-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .feature-option label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .feature-option input[type="checkbox"]:checked + label {
+      background: var(--blue-light);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .feature-option input[type="checkbox"]:focus + label {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(1, 61, 196, 0.08);
+    }
+
+    .feature-option label:hover {
+      border-color: var(--blue);
+    }
+
+    /* Custom checkbox visual */
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .feature-option input[type="checkbox"]:checked + label .custom-checkbox {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .custom-checkbox::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.2s;
+    }
+
+    .feature-option input[type="checkbox"]:checked + label .custom-checkbox::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .feature-select-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       nav { padding: 16px 20px; }

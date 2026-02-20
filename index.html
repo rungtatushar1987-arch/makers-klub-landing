@@ -42,43 +42,7 @@
         Meet your next collaborator at a curated event. Never lose track of who you met. Build a network that actually moves your career forward.
       </p>
 
-      <form class="waitlist-form" onsubmit="handleHeroSubmit(event)">
-        <input 
-          type="text" 
-          id="hero-name" 
-          placeholder="Your name" 
-          required 
-          minlength="2"
-          maxlength="100"
-        />
-        <input 
-          type="email" 
-          id="hero-email" 
-          placeholder="your@email.com" 
-          required 
-          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
-          title="Please enter a valid email address (e.g., name@example.com)"
-        />
-        <div class="select-wrap">
-          <select id="hero-role" required>
-            <option value="" disabled selected>What do you work as?</option>
-            <option>UX / UI Designer</option>
-            <option>Brand Strategist</option>
-            <option>Creative Director</option>
-            <option>Copywriter</option>
-            <option>Content Strategist</option>
-            <option>Motion Designer</option>
-            <option>Art Director</option>
-            <option>Product Designer</option>
-            <option>Commercial Photographer</option>
-            <option>Video Producer</option>
-            <option>Agency / Studio</option>
-            <option>Founder</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-primary">Join the Waitlist →</button>
-      </form>
+      <button type="submit" class="btn-primary">Join the Waitlist →</button>
 
       <p class="hero-note">Free to join. <span>Berlin launch coming soon.</span></p>
 
@@ -535,14 +499,40 @@
           <option>Other</option>
         </select>
       </div>
-      <div class="multi-select-wrap">
-        <label class="multi-label">Which MakersKlub feature will you find most useful?</label>
-      
-        <div class="checkbox-group">
-          <label><input type="checkbox" name="hero-features" value="Curated Events"> Free Curated events</label>
-          <label><input type="checkbox" name="hero-features" value="QR Networking"> QR code networking</label>
-          <label><input type="checkbox" name="hero-features" value="Opportunities Feed"> Opportunities feed</label>
-          <label><input type="checkbox" name="hero-features" value="Reputation System"> Reputation & levels</label>
+
+      <label class="feature-select-label">Which MakersKlub feature will you find most useful?</label>
+
+      <div class="feature-select-grid">
+        <div class="feature-option">
+          <input type="checkbox" id="feature-events" name="features" value="Curated events">
+          <label for="feature-events">
+            <span class="custom-checkbox"></span>
+            <span>Free Curated events</span>
+          </label>
+        </div>
+
+        <div class="feature-option">
+          <input type="checkbox" id="feature-qr" name="features" value="QR networking">
+          <label for="feature-qr">
+            <span class="custom-checkbox"></span>
+            <span>QR code networking</span>
+          </label>
+        </div>
+
+        <div class="feature-option">
+          <input type="checkbox" id="feature-opportunities" name="features" value="Opportunities feed">
+          <label for="feature-opportunities">
+            <span class="custom-checkbox"></span>
+            <span>Opportunities feed</span>
+          </label>
+        </div>
+
+        <div class="feature-option">
+          <input type="checkbox" id="feature-reputation" name="features" value="Reputation & levels">
+          <label for="feature-reputation">
+            <span class="custom-checkbox"></span>
+            <span>Reputation & levels</span>
+          </label>
         </div>
       </div>
       <button type="submit" class="btn-primary">Join the Waitlist — It's Free →</button>
