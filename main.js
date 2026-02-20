@@ -60,9 +60,14 @@ function updateCounterUI(count) {
     if (heroForm) heroForm.style.display = 'none'
   }
 }
-
+// Get selected features from checkboxes
+function getSelectedFeatures() {
+  const checkboxes = document.querySelectorAll('input[name="features"]:checked')
+  const features = Array.from(checkboxes).map(cb => cb.value)
+  return features.join(', ') || 'None selected'
+}
 // Core submission logic
-async function submitWaitlist(name, email, role, isHeroForm) {
+async function submitWaitlist(name, email, role, features, isHeroForm) {
   try {
     const button = isHeroForm 
       ? document.querySelector('.waitlist-form .btn-primary')
@@ -73,7 +78,7 @@ async function submitWaitlist(name, email, role, isHeroForm) {
     button.disabled = true
 
     // Add to Supabase
-    const { error } = await addToWaitlist(name, email, role)
+    const { error } = await addToWaitlist(name, email, role, features)
 
     if (error === 'duplicate') {
       alert('This email is already on the waitlist!')
@@ -99,7 +104,6 @@ async function submitWaitlist(name, email, role, isHeroForm) {
       });
     } catch (emailError) {
       console.error('Email send failed:', emailError);
-      // Don't block signup if email fails
     }
 
     // Get updated count and update UI
@@ -140,8 +144,9 @@ window.handleHeroSubmit = async function(e) {
   const name = document.getElementById('hero-name').value.trim()
   const email = document.getElementById('hero-email').value.trim()
   const role = document.getElementById('hero-role').value
+  const features = getSelectedFeatures()
   
-  await submitWaitlist(name, email, role, true)
+  await submitWaitlist(name, email, role, features, true)
 }
 
 // Handle CTA form submission
@@ -151,8 +156,9 @@ window.handleWaitlistSubmit = async function(e) {
   const name = document.getElementById('cta-name').value.trim()
   const email = document.getElementById('cta-email').value.trim()
   const role = document.getElementById('cta-role').value
+  const features = getSelectedFeatures()
   
-  await submitWaitlist(name, email, role, false)
+  await submitWaitlist(name, email, role, features, false)
 }
 
 // Initialize on page load

@@ -1697,6 +1697,7 @@
       cursor: pointer;
       transition: all 0.2s;
       user-select: none;
+      text-align: left;
     }
 
     .feature-option input[type="checkbox"]:checked + label {

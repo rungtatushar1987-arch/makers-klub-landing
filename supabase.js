@@ -9,7 +9,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
  * Add user to waitlist
  * Duplicate protection handled by UNIQUE constraint in database
  */
-export async function addToWaitlist(name, email, role) {
+export async function addToWaitlist(name, email, role, features) {
   try {
     const { error } = await supabase
       .from('waitlist')
@@ -18,6 +18,7 @@ export async function addToWaitlist(name, email, role) {
           name: name.trim(), 
           email: email.toLowerCase().trim(), 
           role,
+          features: features || null,
           created_at: new Date().toISOString()
         }
       ])
