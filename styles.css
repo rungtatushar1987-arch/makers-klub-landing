@@ -1084,7 +1084,6 @@
 
     /* CTA SECTION */
     .cta-section {
-      padding: 120px 40px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -1256,96 +1255,6 @@
     /* COUNTER */
     .counter-wrap {
       margin-bottom: 28px;
-    }
-
-    .counter-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: white;
-      border: 1.5px solid var(--border);
-      padding: 8px 20px;
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--ink-light);
-      margin-bottom: 12px;
-      transition: border-color 0.3s;
-    }
-
-    .counter-badge.warn {
-      border-color: #f59e0b;
-      background: #fffbeb;
-    }
-
-    .counter-badge.danger {
-      border-color: #ef4444;
-      background: #fef2f2;
-    }
-
-    .counter-badge strong {
-      color: var(--ink);
-      font-weight: 700;
-    }
-
-    .counter-badge.warn strong { color: #b45309; }
-    .counter-badge.danger strong { color: #dc2626; }
-
-    .progress-bar-wrap {
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      background: var(--border);
-      border-radius: 100px;
-      height: 6px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: var(--blue);
-      transition: width 0.6s ease, background 0.3s;
-    }
-
-    .progress-bar-fill.warn { background: #f59e0b; }
-    .progress-bar-fill.danger { background: #ef4444; }
-
-    .progress-label {
-      font-size: 12px;
-      color: var(--ink-light);
-      margin-top: 8px;
-    }
-
-    .progress-label span {
-      font-weight: 600;
-      color: var(--ink);
-    }
-
-    /* CLOSED STATE */
-    .waitlist-closed {
-      display: none;
-      padding: 40px;
-      background: white;
-      border-radius: 24px;
-      border: 1.5px solid var(--border);
-      max-width: 420px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .waitlist-closed.visible { display: block; }
-
-    .waitlist-closed h3 {
-      font-family: 'Fraunces', serif;
-      font-size: 24px;
-      font-weight: 300;
-      color: var(--ink);
-      margin-bottom: 8px;
-    }
-
-    .waitlist-closed p {
-      font-size: 15px;
-      color: var(--ink-light);
     }
 
     /* FEATURE SHOWCASE */

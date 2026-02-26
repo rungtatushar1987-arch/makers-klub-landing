@@ -1,7 +1,5 @@
 import { addToWaitlist, getWaitlistCount } from './supabase.js'
 
-const LIMIT = 100
-
 // Initialize counter on page load
 async function initCounter() {
   try {
@@ -15,50 +13,9 @@ async function initCounter() {
 
 // Update all counter UI elements
 function updateCounterUI(count) {
-  const pct = Math.min((count / LIMIT) * 100, 100)
-  const spotsLeft = Math.max(LIMIT - count, 0)
-
-  const counterNum = document.getElementById('counter-num')
   const heroCounter = document.getElementById('hero-counter')
-  
-  if (counterNum) counterNum.textContent = count
-  if (heroCounter) heroCounter.textContent = `${count} creative${count !== 1 ? 's' : ''}`
-
-  const spotsLeftEl = document.getElementById('spots-left')
-  if (spotsLeftEl) {
-    spotsLeftEl.textContent = spotsLeft === 0
-      ? 'No spots remaining'
-      : `${spotsLeft} spot${spotsLeft !== 1 ? 's' : ''} remaining`
-  }
-
-  const fill = document.getElementById('progress-fill')
-  if (fill) fill.style.width = `${pct}%`
-
-  const badge = document.getElementById('counter-badge')
-  if (badge) {
-    badge.classList.remove('warn', 'danger')
-    if (fill) fill.classList.remove('warn', 'danger')
-
-    if (count >= 81) {
-      badge.classList.add('danger')
-      if (fill) fill.classList.add('danger')
-    } else if (count >= 51) {
-      badge.classList.add('warn')
-      if (fill) fill.classList.add('warn')
-    }
-  }
-
-  if (count >= LIMIT) {
-    const waitlistForm = document.getElementById('waitlist-form')
-    const successMsg = document.getElementById('success-msg')
-    const closedMsg = document.getElementById('waitlist-closed')
-    const heroForm = document.querySelector('.waitlist-form')
-
-    if (waitlistForm) waitlistForm.style.display = 'none'
-    if (successMsg) successMsg.style.display = 'none'
-    if (closedMsg) closedMsg.classList.add('visible')
-    if (heroForm) heroForm.style.display = 'none'
-  }
+  console.log(count)
+  if (heroCounter) heroCounter.textContent = `${count}`
 }
 // Get selected features from checkboxes
 function getSelectedFeatures() {
