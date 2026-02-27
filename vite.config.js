@@ -16,8 +16,6 @@ export default defineConfig({
     open: true
   },
   resolve: {
-    alias: {
-      './supabase.js': './supabase.js'
-    }
-  }
+    extensions: ['.js', '.mjs', '.json']
+  },
 })

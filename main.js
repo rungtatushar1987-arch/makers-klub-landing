@@ -1,4 +1,4 @@
-import { addToWaitlist, getWaitlistCount } from './supabase.js'
+import { addToWaitlist, getWaitlistCount } from './supabase'
 
 // Initialize counter on page load
 async function initCounter() {
