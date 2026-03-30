@@ -306,18 +306,18 @@
     </div>
     <div class="contact-form-box">
       <h3>Send a Message</h3>
-      <form onsubmit="handleSubmit(event)">
+      <form id="contact-form">
         <div class="form-group">
           <label>Your Name</label>
-          <input type="text" placeholder="e.g. Alex Chen" required>
+          <input type="text" name="name" placeholder="e.g. Alex Chen" required>
         </div>
         <div class="form-group">
           <label>Email Address</label>
-          <input type="email" placeholder="alex@yourstartup.com" required>
+          <input type="email" name="email" placeholder="alex@yourstartup.com" required>
         </div>
         <div class="form-group">
           <label>I am interested in</label>
-          <select required>
+          <select name="interest" required>
             <option value="" disabled selected>Select an option...</option>
             <option>Founder Lite — €697 (30 days)</option>
             <option>Founder Pro — €1,297 (60 days)</option>
@@ -327,7 +327,7 @@
         </div>
         <div class="form-group">
           <label>What are you building?</label>
-          <textarea placeholder="Tell us about your startup, where you are in the journey, and what feels stuck..." required></textarea>
+          <textarea name="message" placeholder="Tell us about your startup, where you are in the journey, and what feels stuck..." required></textarea>
         </div>
         <button type="submit" class="form-submit">Send Message →</button>
       </form>
