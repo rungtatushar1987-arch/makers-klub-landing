@@ -1,14 +1,8 @@
 export const config = {
-  api: {
-    bodyParser: true,
-  },
+  api: { bodyParser: true },
 };
 
 export default async function handler(req, res) {
-  console.log("Handler called, method:", req.method);
-  console.log("Body:", JSON.stringify(req.body));
-  console.log("KEY present:", !!process.env.WEB3FORMS_KEY);
-
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -20,29 +14,35 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const response = await fetch("https://api.web3forms.com/submit", {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      },
       body: JSON.stringify({
-        access_key: process.env.WEB3FORMS_KEY,
+        from: "Makers Klub <hello@makersklub.com>",
+        to: "hello@makersklub.com",
         subject: "New Enquiry — Makers Klub",
-        name,
-        email,
-        interest: interest || "Not specified",
-        message,
+        html: `
+          <h2>New Enquiry from ${name}</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Interested in:</strong> ${interest || "Not specified"}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message}</p>
+        `,
       }),
     });
 
     const data = await response.json();
-    console.log("Web3Forms response:", JSON.stringify(data));
 
-    if (data.success) {
+    if (data.id) {
       return res.status(200).json({ success: true });
     } else {
-      return res.status(500).json({ error: "Submission failed", details: data });
+      return res.status(500).json({ error: "Failed to send email", details: data });
     }
   } catch (err) {
-    console.log("Caught error:", err.message);
     return res.status(500).json({ error: "Server error", details: err.message });
   }
 }
