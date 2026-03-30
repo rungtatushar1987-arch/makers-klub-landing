@@ -21,8 +21,9 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Makers Klub <hello@makersklub.com>",
-        to: "hello@makersklub.com",
+        from: "Makers Klub Website <hello@makersklub.com>",
+        to: "contact@tusharrungta.com",
+        reply_to: email,
         subject: "New Enquiry — Makers Klub",
         html: `
           <h2>New Enquiry from ${name}</h2>
