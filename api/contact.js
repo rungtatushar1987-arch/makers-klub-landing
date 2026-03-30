@@ -1,13 +1,20 @@
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
 export default async function handler(req, res) {
+  console.log("Handler called, method:", req.method);
+  console.log("Body:", JSON.stringify(req.body));
+  console.log("KEY present:", !!process.env.WEB3FORMS_KEY);
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { name, email, interest, message } = req.body;
-
-    console.log("Form submission received:", { name, email, interest });
-    console.log("WEB3FORMS_KEY present:", !!process.env.WEB3FORMS_KEY);
+    const { name, email, interest, message } = req.body || {};
 
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -21,19 +28,21 @@ export default async function handler(req, res) {
         subject: "New Enquiry — Makers Klub",
         name,
         email,
-        interest,
+        interest: interest || "Not specified",
         message,
       }),
     });
 
     const data = await response.json();
+    console.log("Web3Forms response:", JSON.stringify(data));
 
     if (data.success) {
       return res.status(200).json({ success: true });
     } else {
-      return res.status(500).json({ error: "Submission failed" });
+      return res.status(500).json({ error: "Submission failed", details: data });
     }
   } catch (err) {
-    return res.status(500).json({ error: "Server error" });
+    console.log("Caught error:", err.message);
+    return res.status(500).json({ error: "Server error", details: err.message });
   }
 }
