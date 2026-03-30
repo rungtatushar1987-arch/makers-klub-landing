@@ -1,3 +1,4 @@
+// ── Cal.com Embed Initialisation ──
 (function (C, A, L) {
   let p = function (a, ar) { a.q.push(ar); };
   let d = C.document;
@@ -32,48 +33,55 @@ Cal.ns["free-discovery-call"]("ui", {
   layout: "month_view"
 });
 
-// Smooth scroll with offset for fixed nav
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        const offset = 68;
-        const top = target.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }
-    });
-  });
+// ── Nav scroll effect ──
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+});
 
-  window.addEventListener('scroll', () => {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
-  });
-  function toggleFaq(btn) {
-    const answer = btn.nextElementSibling;
-    const isOpen = answer.classList.contains('open');
-    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
-    document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
-    if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
-  }
-  function handleSubmit(e) {
-    e.preventDefault();
-    document.getElementById('success-msg').style.display = 'block';
-    e.target.reset();
-    setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 6000);
-  }
+// ── Smooth scroll with offset for fixed nav ──
+// Excludes booking buttons (no href target to scroll to)
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const href = this.getAttribute('href');
 
-// Cal.com booking button
-document.addEventListener('DOMContentLoaded', function() {
-  var btns = document.querySelectorAll('#cal-booking-btn, .cal-booking-btn');
-  btns.forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
+    // Skip if this is a booking button
+    if (this.id === 'cal-booking-btn' || this.classList.contains('cal-booking-btn')) return;
+
+    const target = document.querySelector(href);
+    if (target) {
       e.preventDefault();
-      Cal.ns['free-discovery-call']('ui', {
-        styles: { branding: { brandColor: '#013dc4' } },
-        hideEventTypeDetails: false,
-        layout: 'month_view'
-      });
-      Cal.ns['free-discovery-call']('openModal', { calLink: 'makersklub/free-discovery-call' });
+      const offset = 68;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+});
+
+// ── Cal.com booking button ──
+document.querySelectorAll('#cal-booking-btn, .cal-booking-btn').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    Cal.ns["free-discovery-call"]("showPopup", {
+      calLink: "makersklub/free-discovery-call",
+      config: { layout: "month_view" }
     });
   });
 });
+
+// ── FAQ accordion ──
+function toggleFaq(btn) {
+  const answer = btn.nextElementSibling;
+  const isOpen = answer.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+  if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
+}
+
+// ── Contact form ──
+function handleSubmit(e) {
+  e.preventDefault();
+  document.getElementById('success-msg').style.display = 'block';
+  e.target.reset();
+  setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 6000);
+}
