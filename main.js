@@ -4,8 +4,6 @@
 Cal("init", "free-discovery-call", { origin: "https://app.cal.eu" });
 Cal.ns["free-discovery-call"]("ui", { hideEventTypeDetails: false, layout: "month_view" });
 
-});
-
 // ── Nav scroll effect ──
 window.addEventListener("scroll", function () {
   document.getElementById("nav").classList.toggle("scrolled", window.scrollY > 40);
@@ -14,7 +12,6 @@ window.addEventListener("scroll", function () {
 // ── Smooth scroll with offset for fixed nav ──
 document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
   anchor.addEventListener("click", function (e) {
-    if (this.id === "cal-booking-btn" || this.classList.contains("cal-booking-btn")) return;
     var target = document.querySelector(this.getAttribute("href"));
     if (target) {
       e.preventDefault();
