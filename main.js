@@ -16,20 +16,17 @@ document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
 });
 
 // ── FAQ accordion ──
-function toggleFaq(btn) {
+window.toggleFaq = function (btn) {
   var answer = btn.nextElementSibling;
   var isOpen = answer.classList.contains("open");
   document.querySelectorAll(".faq-a").forEach(function (a) { a.classList.remove("open"); });
   document.querySelectorAll(".faq-q").forEach(function (q) { q.classList.remove("open"); });
   if (!isOpen) { answer.classList.add("open"); btn.classList.add("open"); }
-}
+};
 
-// ── Contact form (Web3Forms) ──
 // ── Contact form ──
-document.addEventListener("DOMContentLoaded", function () {
-  var form = document.getElementById("contact-form");
-  if (!form) return;
-
+var form = document.getElementById("contact-form");
+if (form) {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var btn = form.querySelector(".form-submit");
@@ -67,4 +64,4 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.textContent = "Send Message →";
     });
   });
-});
+}

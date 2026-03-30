@@ -306,7 +306,10 @@
     </div>
     <div class="contact-form-box">
       <h3>Send a Message</h3>
-      <form id="contact-form">
+      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="09bb1988-cb19-4c28-89c4-c3bafe2ed273">
+        <input type="hidden" name="subject" value="New Enquiry — Makers Klub">
+        <input type="hidden" name="redirect" value="false">
         <div class="form-group">
           <label>Your Name</label>
           <input type="text" name="name" placeholder="e.g. Alex Chen" required>
@@ -351,16 +354,7 @@
   <p>© 2026 Makers Klub</p>
 </footer>
 
-  <script src="main.js"></script>
-  <script>
-    window.addEventListener("load", function() {
-      if (window.Cal && Cal.ns && Cal.ns["free-discovery-call"]) {
-        Cal.ns["free-discovery-call"]("on", {
-          action: "eventTypeSelected",
-          callback: function() {}
-        });
-      }
-    });
-  </script>
+  <script type="module" src="main.js"></script>
+  
 </body>
 </html>
