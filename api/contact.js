@@ -6,6 +6,9 @@ export default async function handler(req, res) {
   try {
     const { name, email, interest, message } = req.body;
 
+    console.log("Form submission received:", { name, email, interest });
+    console.log("WEB3FORMS_KEY present:", !!process.env.WEB3FORMS_KEY);
+
     if (!name || !email || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
