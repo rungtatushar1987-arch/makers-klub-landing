@@ -1,122 +1,79 @@
-import { addToWaitlist, getWaitlistCount } from './supabase'
+(function (C, A, L) {
+  let p = function (a, ar) { a.q.push(ar); };
+  let d = C.document;
+  C.Cal = C.Cal || function () {
+    let cal = C.Cal;
+    let ar = arguments;
+    if (!cal.loaded) {
+      cal.ns = {};
+      cal.q = cal.q || [];
+      d.head.appendChild(d.createElement("script")).src = A;
+      cal.loaded = true;
+    }
+    if (ar[0] === L) {
+      const api = function () { p(api, arguments); };
+      const namespace = ar[1];
+      api.q = api.q || [];
+      if (typeof namespace === "string") {
+        cal.ns[namespace] = cal.ns[namespace] || api;
+        p(cal.ns[namespace], ar);
+        p(cal, ["initNamespace", namespace]);
+      } else p(cal, ar);
+      return;
+    }
+    p(cal, ar);
+  };
+})(window, "https://app.cal.com/embed/embed.js", "init");
 
-// Initialize counter on page load
-async function initCounter() {
-  try {
-    const count = await getWaitlistCount()
-    updateCounterUI(count)
-  } catch (error) {
-    console.error('Error loading counter:', error)
-    updateCounterUI(12) // Fallback
+Cal("init", "free-discovery-call", { origin: "https://cal.eu" });
+Cal.ns["free-discovery-call"]("ui", {
+  styles: { branding: { brandColor: "#013dc4" } },
+  hideEventTypeDetails: false,
+  layout: "month_view"
+});
+
+// Smooth scroll with offset for fixed nav
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const offset = 68;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+  });
+  function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
+    if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
   }
-}
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.getElementById('success-msg').style.display = 'block';
+    e.target.reset();
+    setTimeout(() => { document.getElementById('success-msg').style.display = 'none'; }, 6000);
+  }
 
-// Update all counter UI elements
-function updateCounterUI(count) {
-  const heroCounter = document.getElementById('hero-counter')
-  console.log(count)
-  if (heroCounter) heroCounter.textContent = `${count}`
-}
-// Get selected features from checkboxes
-function getSelectedFeatures() {
-  const checkboxes = document.querySelectorAll('input[name="features"]:checked')
-  const features = Array.from(checkboxes).map(cb => cb.value)
-  return features.join(', ') || 'None selected'
-}
-// Core submission logic
-async function submitWaitlist(name, email, role, features, isHeroForm) {
-  try {
-    const button = isHeroForm 
-      ? document.querySelector('.waitlist-form .btn-primary')
-      : document.querySelector('#waitlist-form .btn-primary')
-    
-    const originalText = button.textContent
-    button.textContent = 'Joining...'
-    button.disabled = true
-
-    // Add to Supabase
-    const { error } = await addToWaitlist(name, email, role, features)
-
-    if (error === 'duplicate') {
-      alert('This email is already on the waitlist!')
-      button.textContent = originalText
-      button.disabled = false
-      return
-    }
-
-    if (error) {
-      console.error('Supabase error:', error)
-      alert('Something went wrong. Please try again.')
-      button.textContent = originalText
-      button.disabled = false
-      return
-    }
-
-    // Send confirmation email
-    try {
-      await fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name })
+// Cal.com booking button
+document.addEventListener('DOMContentLoaded', function() {
+  var btns = document.querySelectorAll('#cal-booking-btn, .cal-booking-btn');
+  btns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      Cal.ns['free-discovery-call']('ui', {
+        styles: { branding: { brandColor: '#013dc4' } },
+        hideEventTypeDetails: false,
+        layout: 'month_view'
       });
-    } catch (emailError) {
-      console.error('Email send failed:', emailError);
-    }
-
-    // Get updated count and update UI
-    const newCount = await getWaitlistCount()
-    updateCounterUI(newCount)
-
-    // Show success message
-    if (isHeroForm) {
-      const heroForm = document.querySelector('.waitlist-form')
-      heroForm.style.display = 'none'
-      
-      const heroContent = document.querySelector('.hero-content')
-      const successDiv = document.createElement('div')
-      successDiv.className = 'success-message visible'
-      successDiv.innerHTML = `
-        <div class="success-icon">🎉</div>
-        <h3>You're on the list!</h3>
-        <p>We'll be in touch personally when Makers Klub launches in Berlin. Keep doing great work.</p>
-      `
-      heroContent.appendChild(successDiv)
-    } else {
-      const form = document.getElementById('waitlist-form')
-      const success = document.getElementById('success-msg')
-      form.style.display = 'none'
-      success.classList.add('visible')
-    }
-
-  } catch (error) {
-    console.error('Submission error:', error)
-    alert('Something went wrong. Please try again.')
-  }
-}
-
-// Handle hero form submission
-window.handleHeroSubmit = async function(e) {
-  e.preventDefault()
-  
-  const name = document.getElementById('hero-name').value.trim()
-  const email = document.getElementById('hero-email').value.trim()
-  const role = document.getElementById('hero-role').value
-  const features = getSelectedFeatures()
-  
-  await submitWaitlist(name, email, role, features, true)
-}
-
-// Handle CTA form submission
-window.handleWaitlistSubmit = async function(e) {
-  e.preventDefault()
-  
-  const name = document.getElementById('cta-name').value.trim()
-  const email = document.getElementById('cta-email').value.trim()
-  const role = document.getElementById('cta-role').value
-  const features = getSelectedFeatures()
-  
-  await submitWaitlist(name, email, role, features, false)
-}
-
-// Initialize on page load
-initCounter()
+      Cal.ns['free-discovery-call']('openModal', { calLink: 'makersklub/free-discovery-call' });
+    });
+  });
+});
