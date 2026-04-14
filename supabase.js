@@ -11,6 +11,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
  */
 export async function addToWaitlist(name, email, role, features) {
   try {
+    console.log(supabase)
+    console.log("addToWaitlist", await supabase.from('waitlist'))
     const { error } = await supabase
       .from('waitlist')
       .insert([
