@@ -1,542 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Makers Klub — Monthly Co-working for Founders & Creatives</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="styles.css"/>
-  </head>
+  <title>Makers Klub — Monthly Co-Working Matchmaking for Founders & Creatives</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="main.js" />
+</head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
 
-<!-- ══ NAV ══ -->
-<nav>
+<!-- NAV -->
+<nav id="nav">
   <a href="#" class="nav-logo">
-    <img src="logo.svg" alt="Makers Klub" class="nav-logo-img"/>
-    <span class="nav-logo-text">Makers Klub</span>
+    <img src="logo.svg" alt="Makers Klub" style="height: 64px; width: auto;" />
   </a>
   <div class="nav-right">
-    <a href="#about">About</a>
-    <a href="#events">Events</a>
-    <a href="#how">How It Works</a>
-    <a href="https://tally.so/r/J9JAjJ" target="_blank" class="nav-join">Join Us</a>
+    <span class="nav-location">Berlin, DE</span>
+    <a href="#" class="nav-cta" onclick="openTally(event)">Join Waitlist</a>
   </div>
 </nav>
 
-<!-- ══ HERO ══ -->
-<section class="hero" id="about">
+<!-- HERO -->
+<section class="hero">
   <div class="hero-left">
-    <div class="hero-pill">
-      <span class="pill-dot"></span>
-      Monthly co-working · Berlin
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">Now accepting founding members · Berlin</span>
     </div>
+
     <h1>
-      The co-working platform<br/>
-      <span class="accent">built for builders.</span>
+      Meet your<br/>
+      creative co-founder.<br/>
+      <em>Once a month.</em>
     </h1>
-    <p class="hero-desc">
-      A monthly platform matching founders and creative professionals for curated in-person co-working sessions — based on what you're actually building.
+
+    <p class="hero-sub">
+      Makers Klub matches founders and creative professionals into small groups for a monthly in-person co-working session — based on a brief you fill out at signup.
     </p>
-    <div class="hero-btns">
-      <a href="#about-more" class="btn-solid">Learn more</a>
-      <a href="#how" class="btn-outline">How it works</a>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-hero" onclick="openTally(event)">Join the Waitlist →</a>
+      <a href="#how" class="hero-secondary-link">How it works <span>→</span></a>
     </div>
   </div>
 
   <div class="hero-right">
-    <div class="hero-photo">
-      <svg viewBox="0 0 480 640" xmlns="http://www.w3.org/2000/svg" fill="none" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
-        <rect width="480" height="640" fill="#c8bce8"/>
-        <ellipse cx="240" cy="200" rx="240" ry="220" fill="rgba(226,211,244,0.5)"/>
-        <ellipse cx="100" cy="500" rx="180" ry="160" fill="rgba(1,61,196,0.12)"/>
-        <ellipse cx="400" cy="520" rx="160" ry="140" fill="rgba(249,115,22,0.1)"/>
-        <rect x="40" y="390" width="400" height="10" rx="5" fill="rgba(255,255,255,0.5)"/>
-        <circle cx="140" cy="290" r="44" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-        <circle cx="140" cy="276" r="17" fill="rgba(196,174,232,0.7)"/>
-        <path d="M108 312 Q140 298 172 312" fill="rgba(196,174,232,0.5)"/>
-        <circle cx="132" cy="272" r="4.5" fill="white" opacity="0.8"/>
-        <circle cx="148" cy="272" r="4.5" fill="white" opacity="0.8"/>
-        <path d="M134 284 Q140 290 146 284" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
-        <rect x="90"  y="336" width="104" height="60" rx="10" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
-        <rect x="98"  y="344" width="88"  height="44" rx="6" fill="rgba(255,255,255,0.2)"/>
-        <rect x="105" y="352" width="52"  height="4" rx="2" fill="rgba(1,61,196,0.5)"/>
-        <rect x="105" y="360" width="66"  height="3" rx="1.5" fill="rgba(255,255,255,0.4)"/>
-        <rect x="105" y="366" width="48"  height="3" rx="1.5" fill="rgba(255,255,255,0.3)"/>
-        <rect x="68"  y="396" width="148" height="6" rx="3" fill="rgba(255,255,255,0.3)"/>
-        <circle cx="280" cy="270" r="52" fill="rgba(255,255,255,0.28)" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
-        <circle cx="280" cy="252" r="20" fill="rgba(1,61,196,0.3)"/>
-        <path d="M242 300 Q280 284 318 300" fill="rgba(1,61,196,0.2)"/>
-        <circle cx="270" cy="247" r="5" fill="white" opacity="0.8"/>
-        <circle cx="290" cy="247" r="5" fill="white" opacity="0.8"/>
-        <path d="M272 262 Q280 268 288 262" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
-        <rect x="222" y="326" width="118" height="68" rx="10" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
-        <rect x="230" y="334" width="102" height="52" rx="6" fill="rgba(255,255,255,0.2)"/>
-        <rect x="238" y="342" width="40" height="4" rx="2" fill="rgba(1,61,196,0.5)"/>
-        <rect x="238" y="350" width="80" height="3" rx="1.5" fill="rgba(255,255,255,0.4)"/>
-        <rect x="238" y="357" width="60" height="3" rx="1.5" fill="rgba(255,255,255,0.3)"/>
-        <rect x="238" y="364" width="72" height="3" rx="1.5" fill="rgba(255,255,255,0.3)"/>
-        <rect x="198" y="394" width="166" height="6" rx="3" fill="rgba(255,255,255,0.3)"/>
-        <rect x="182" y="360" width="28" height="34" rx="5" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-        <rect x="186" y="355" width="20" height="8" rx="4" fill="rgba(253,232,216,0.6)"/>
-        <path d="M194 356 Q235 338 230 336" stroke="rgba(1,61,196,0.3)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
-        <rect x="100" y="120" width="200" height="44" rx="22" fill="rgba(255,255,255,0.85)"/>
-        <circle cx="125" cy="142" r="12" fill="rgba(1,61,196,0.15)"/>
-        <circle cx="125" cy="142" r="7" fill="rgba(1,61,196,0.4)"/>
-        <text x="143" y="138" font-family="sans-serif" font-size="10" font-weight="700" fill="#013dc4" opacity="0.7" letter-spacing="0.5">MATCHED</text>
-        <text x="143" y="152" font-family="sans-serif" font-size="11" fill="#4e4d63">Berlin · Wednesday</text>
-        <text x="380" y="180" font-size="20" fill="rgba(255,255,255,0.4)">✦</text>
-        <text x="48"  y="240" font-size="14" fill="rgba(255,255,255,0.35)">✦</text>
-        <text x="400" y="340" font-size="12" fill="rgba(255,255,255,0.25)">✦</text>
-        <defs>
-          <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="70%" stop-color="rgba(200,188,232,0)" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#c8bce8" stop-opacity="0.6"/>
-          </linearGradient>
-        </defs>
-        <rect width="480" height="640" fill="url(#fade)"/>
-      </svg>
-    </div>
-    <div class="float-card float-card-1">
-      <div class="fc-icon-wrap">🎯</div>
-      <div>
-        <div class="fc-label">Curated matches</div>
-        <div class="fc-sub">Relevant people, every time</div>
+    <div class="hero-right-bg"></div>
+    <div class="hero-right-grid"></div>
+    <div class="hero-right-glow"></div>
+
+    <div class="hero-float-card">
+      <div class="float-card-top">
+        <span class="float-card-label">April Match · Group of 4</span>
+        <div class="float-live-dot">
+          <div class="live-dot"></div>
+          Matched
+        </div>
       </div>
-    </div>
-    <div class="float-card float-card-2">
-      <div class="fc-icon-wrap">👥</div>
-      <div>
-        <div class="fc-label">Meet new people</div>
-        <div class="fc-sub">Connect with peers</div>
+      <div class="float-event-title">Monthly Co-Work<br/>Session #12</div>
+      <div class="float-event-meta">📍 Berlin Mitte · Saturday, 10:00</div>
+      <div class="float-attendees">
+        <div class="float-attendee">
+          <div class="f-av f-av-1">T</div>
+          <div>
+            <div class="f-av-name">Tushar R.</div>
+            <div class="f-av-role">Founder</div>
+          </div>
+        </div>
+        <div class="float-attendee">
+          <div class="f-av f-av-2">S</div>
+          <div>
+            <div class="f-av-name">Sarah K.</div>
+            <div class="f-av-role">Brand Designer</div>
+          </div>
+        </div>
+        <div class="float-attendee">
+          <div class="f-av f-av-3">J</div>
+          <div>
+            <div class="f-av-name">Jana R.</div>
+            <div class="f-av-role">UX Lead</div>
+          </div>
+        </div>
+      </div>
+      <div class="float-qr-row">
+        <div class="mini-qr">
+          <div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
+          <div class="mini-dot e"></div><div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div>
+          <div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
+          <div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
+        </div>
+        <div class="float-qr-text">Matched based on your brief · Berlin</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ ABOUT ══ -->
-<section class="about-section" id="about-more">
-  <div class="about-card rv">
-    <h2>A monthly co-working platform for founders and creative professionals.</h2>
-    <p>Every month, we match you with the right people based on what you're building — and bring you together for a focused, in-person co-working session in Berlin. No cold outreach. No random networking. Just the right people in the room.</p>
-    <p>You fill a brief. We handle the matching. You just show up.</p>
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item"><span class="ticker-dot"></span> Monthly Co-Working</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Brief-Based Matching</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Founders & Creatives</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Curated Community</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Find Your Co-Founder</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> In-Person Sessions</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Premium Co-Working Spaces</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Coffee & Snacks Included</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Monthly Co-Working</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Brief-Based Matching</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Founders & Creatives</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Curated Community</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Find Your Co-Founder</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> In-Person Sessions</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Premium Co-Working Spaces</div>
+    <div class="ticker-item"><span class="ticker-dot"></span> Coffee & Snacks Included</div>
   </div>
-</section>
-
-<!-- ══ PROBLEM / SOLUTION ══ -->
-<section class="problem-section" id="problem">
-  <div class="problem-inner rv">
-    <div class="problem-left">
-      <p class="section-label">The Problem</p>
-      <h2>Working alone is the default.<br/><em>It shouldn't be.</em></h2>
-      <div class="problem-list">
-        <div class="problem-item">
-          <span class="pi-num">01</span>
-          <div>
-            <strong>Co-working spaces feel isolating</strong>
-            <p>You're surrounded by people but connected to none of them. Nobody knows what you're building. Nobody can help.</p>
-          </div>
-        </div>
-        <div class="problem-item">
-          <span class="pi-num">02</span>
-          <div>
-            <strong>Networking events go nowhere</strong>
-            <p>You collect business cards, exchange pleasantries, and follow up with people you'll never actually work with.</p>
-          </div>
-        </div>
-        <div class="problem-item">
-          <span class="pi-num">03</span>
-          <div>
-            <strong>The right people are hard to find</strong>
-            <p>Finding a designer who gets your vision, or a founder worth backing, shouldn't require scrolling LinkedIn for hours.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="problem-right">
-      <p class="section-label">The Solution</p>
-      <h2>We put the <em>right people</em><br/>in the same room.</h2>
-      <p>Makers Klub matches founders and creative professionals based on what they're actively building — then brings them together for monthly in-person co-working sessions.</p>
-      <p>No forced networking. No awkward intros. Just focused people doing real work, with the option to help each other along the way.</p>
-      <div class="solution-pills">
-        <span class="sol-pill">✦ Matched by brief</span>
-        <span class="sol-pill">✦ In-person sessions</span>
-        <span class="sol-pill">✦ Vetted community</span>
-        <span class="sol-pill">✦ Berlin-based</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ HOW IT WORKS ══ -->
-<section class="how-section" id="how">
-  <h2 class="rv">How It Works</h2>
-  <div class="how-steps">
-
-    <div class="how-step rv">
-      <div class="step-illustration">
-        <svg viewBox="0 0 360 270" xmlns="http://www.w3.org/2000/svg" fill="none">
-          <rect width="360" height="270" fill="#f0ede8"/>
-          <ellipse cx="180" cy="135" rx="160" ry="120" fill="rgba(226,211,244,0.3)"/>
-          <rect x="90" y="36" width="180" height="210" rx="14" fill="white" stroke="#e2d3f4" stroke-width="1.5"/>
-          <rect x="90" y="36" width="180" height="48" rx="14" fill="#e8eeff"/>
-          <rect x="90" y="68" width="180" height="16" rx="0" fill="#e8eeff"/>
-          <rect x="110" y="50" width="100" height="8" rx="4" fill="#013dc4" opacity="0.4"/>
-          <rect x="110" y="62" width="72" height="5" rx="2.5" fill="#013dc4" opacity="0.2"/>
-          <rect x="108" y="100" width="144" height="28" rx="7" fill="#f7f5ff" stroke="#e2d3f4" stroke-width="1"/>
-          <rect x="116" y="112" width="60" height="4" rx="2" fill="#9998b0" opacity="0.5"/>
-          <rect x="108" y="138" width="144" height="28" rx="7" fill="#f7f5ff" stroke="#e2d3f4" stroke-width="1"/>
-          <rect x="116" y="150" width="88" height="4" rx="2" fill="#9998b0" opacity="0.5"/>
-          <rect x="108" y="176" width="144" height="44" rx="7" fill="#f7f5ff" stroke="#e2d3f4" stroke-width="1"/>
-          <rect x="116" y="188" width="96" height="4" rx="2" fill="#9998b0" opacity="0.5"/>
-          <rect x="116" y="198" width="72" height="4" rx="2" fill="#9998b0" opacity="0.3"/>
-          <rect x="116" y="208" width="80" height="4" rx="2" fill="#9998b0" opacity="0.2"/>
-          <rect x="204" y="146" width="2" height="14" rx="1" fill="#013dc4" opacity="0.7">
-            <animate attributeName="opacity" values="0.7;0;0.7" dur="1.2s" repeatCount="indefinite"/>
-          </rect>
-          <rect x="108" y="92" width="36" height="4" rx="2" fill="#013dc4" opacity="0.3"/>
-          <rect x="108" y="130" width="52" height="4" rx="2" fill="#013dc4" opacity="0.3"/>
-          <rect x="108" y="168" width="44" height="4" rx="2" fill="#013dc4" opacity="0.3"/>
-        </svg>
-      </div>
-      <h3>Fill your brief</h3>
-      <p>Tell us who you are and what you're working on. We use this to make the right match.</p>
-    </div>
-
-    <div class="how-step rv">
-      <div class="step-illustration">
-        <svg viewBox="0 0 360 270" xmlns="http://www.w3.org/2000/svg" fill="none">
-          <rect width="360" height="270" fill="#f0ede8"/>
-          <ellipse cx="180" cy="135" rx="160" ry="120" fill="rgba(232,238,255,0.4)"/>
-          <circle cx="180" cy="135" r="36" fill="#013dc4"/>
-          <text x="180" y="141" text-anchor="middle" font-family="sans-serif" font-size="20" fill="white">✦</text>
-          <circle cx="180" cy="135" r="48" stroke="#013dc4" stroke-width="1.5" opacity="0.2">
-            <animate attributeName="r" values="48;60;48" dur="2.5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.2;0;0.2" dur="2.5s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="180" cy="135" r="56" stroke="#013dc4" stroke-width="1" opacity="0.1">
-            <animate attributeName="r" values="56;72;56" dur="2.5s" begin="0.4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.12;0;0.12" dur="2.5s" begin="0.4s" repeatCount="indefinite"/>
-          </circle>
-          <line x1="180" y1="99" x2="180" y2="72" stroke="#013dc4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-          <circle cx="180" cy="54" r="18" fill="#e8eeff" stroke="#013dc4" stroke-width="1.5"/>
-          <circle cx="180" cy="50" r="7" fill="#013dc4" opacity="0.4"/>
-          <path d="M166 66 Q180 60 194 66" fill="#013dc4" opacity="0.25"/>
-          <text x="180" y="96" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#013dc4" opacity="0.6">FOUNDER</text>
-          <line x1="155" y1="161" x2="126" y2="196" stroke="#7c4fd4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-          <circle cx="114" cy="210" r="18" fill="#e2d3f4" stroke="#7c4fd4" stroke-width="1.5"/>
-          <circle cx="114" cy="206" r="7" fill="#7c4fd4" opacity="0.4"/>
-          <path d="M100 222 Q114 216 128 222" fill="#7c4fd4" opacity="0.25"/>
-          <text x="114" y="236" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#7c4fd4" opacity="0.6">CREATIVE</text>
-          <line x1="205" y1="161" x2="234" y2="196" stroke="#0891b2" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-          <circle cx="246" cy="210" r="18" fill="#ddf1f7" stroke="#0891b2" stroke-width="1.5"/>
-          <circle cx="246" cy="206" r="7" fill="#0891b2" opacity="0.4"/>
-          <path d="M232 222 Q246 216 260 222" fill="#0891b2" opacity="0.25"/>
-          <text x="246" y="236" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#0891b2" opacity="0.6">CREATIVE</text>
-          <line x1="144" y1="122" x2="86" y2="110" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-          <circle cx="68" cy="106" r="18" fill="#fde8d8" stroke="#b45309" stroke-width="1.5"/>
-          <circle cx="68" cy="102" r="7" fill="#b45309" opacity="0.4"/>
-          <path d="M54 118 Q68 112 82 118" fill="#b45309" opacity="0.25"/>
-          <text x="68" y="132" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#b45309" opacity="0.6">CREATIVE</text>
-          <line x1="216" y1="122" x2="274" y2="110" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-          <circle cx="292" cy="106" r="18" fill="#d4f0e8" stroke="#059669" stroke-width="1.5"/>
-          <circle cx="292" cy="102" r="7" fill="#059669" opacity="0.4"/>
-          <path d="M278 118 Q292 112 306 118" fill="#059669" opacity="0.25"/>
-          <text x="292" y="132" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="600" fill="#059669" opacity="0.6">CREATIVE</text>
-        </svg>
-      </div>
-      <h3>Get matched</h3>
-      <p>We pair each founder with 4 creatives relevant to what they're actually building right now.</p>
-    </div>
-
-    <div class="how-step rv">
-      <div class="step-illustration">
-        <svg viewBox="0 0 360 270" xmlns="http://www.w3.org/2000/svg" fill="none">
-          <rect width="360" height="270" fill="#f0ede8"/>
-          <ellipse cx="180" cy="180" rx="170" ry="110" fill="rgba(226,211,244,0.25)"/>
-          <rect x="40" y="188" width="280" height="10" rx="5" fill="rgba(196,174,232,0.4)"/>
-          <rect x="72"  y="198" width="8" height="40" rx="4" fill="rgba(196,174,232,0.3)"/>
-          <rect x="280" y="198" width="8" height="40" rx="4" fill="rgba(196,174,232,0.3)"/>
-          <circle cx="100" cy="128" r="30" fill="#e8eeff" stroke="#c4aee8" stroke-width="1.5"/>
-          <circle cx="100" cy="118" r="12" fill="#013dc4" opacity="0.3"/>
-          <path d="M78 148 Q100 136 122 148" fill="#013dc4" opacity="0.2"/>
-          <circle cx="93"  cy="114" r="3.5" fill="#013dc4" opacity="0.5"/>
-          <circle cx="107" cy="114" r="3.5" fill="#013dc4" opacity="0.5"/>
-          <path d="M95 126 Q100 131 105 126" stroke="#013dc4" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
-          <rect x="68" y="156" width="66" height="38" rx="7" fill="white" stroke="#e2d3f4" stroke-width="1.5"/>
-          <rect x="74" y="162" width="54" height="26" rx="4" fill="#eef1ff"/>
-          <rect x="79" y="168" width="28" height="3" rx="1.5" fill="#013dc4" opacity="0.4"/>
-          <rect x="79" y="175" width="40" height="2.5" rx="1.25" fill="#e2d3f4"/>
-          <rect x="79" y="181" width="32" height="2.5" rx="1.25" fill="#e2d3f4"/>
-          <rect x="52" y="194" width="98" height="5" rx="2.5" fill="#e2d3f4"/>
-          <circle cx="180" cy="116" r="34" fill="#f5f0fc" stroke="#c4aee8" stroke-width="1.5"/>
-          <circle cx="180" cy="104" r="14" fill="#7c4fd4" opacity="0.25"/>
-          <path d="M156 138 Q180 124 204 138" fill="#7c4fd4" opacity="0.15"/>
-          <circle cx="173" cy="100" r="4" fill="#7c4fd4" opacity="0.5"/>
-          <circle cx="187" cy="100" r="4" fill="#7c4fd4" opacity="0.5"/>
-          <path d="M175 114 Q180 119 185 114" stroke="#7c4fd4" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
-          <rect x="144" y="148" width="72" height="44" rx="7" fill="white" stroke="#e2d3f4" stroke-width="1.5"/>
-          <rect x="150" y="154" width="60" height="32" rx="4" fill="#f5f0fc"/>
-          <rect x="156" y="161" width="22" height="3" rx="1.5" fill="#7c4fd4" opacity="0.4"/>
-          <rect x="156" y="168" width="44" height="2.5" rx="1.25" fill="#e2d3f4"/>
-          <rect x="156" y="175" width="36" height="2.5" rx="1.25" fill="#e2d3f4"/>
-          <rect x="128" y="192" width="104" height="5" rx="2.5" fill="#e2d3f4"/>
-          <circle cx="260" cy="128" r="30" fill="#fde8d8" stroke="#f97316" stroke-width="1.5" opacity="0.8"/>
-          <circle cx="260" cy="118" r="12" fill="#f97316" opacity="0.25"/>
-          <path d="M238 148 Q260 136 282 148" fill="#f97316" opacity="0.15"/>
-          <circle cx="253" cy="114" r="3.5" fill="#f97316" opacity="0.5"/>
-          <circle cx="267" cy="114" r="3.5" fill="#f97316" opacity="0.5"/>
-          <path d="M255 126 Q260 131 265 126" stroke="#f97316" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
-          <rect x="226" y="156" width="66" height="38" rx="7" fill="white" stroke="#fde8d8" stroke-width="1.5"/>
-          <rect x="232" y="162" width="54" height="26" rx="4" fill="#fff8f4"/>
-          <rect x="237" y="168" width="28" height="3" rx="1.5" fill="#f97316" opacity="0.35"/>
-          <rect x="237" y="175" width="40" height="2.5" rx="1.25" fill="#fde8d8"/>
-          <rect x="237" y="181" width="28" height="2.5" rx="1.25" fill="#fde8d8"/>
-          <rect x="210" y="194" width="98" height="5" rx="2.5" fill="#fde8d8"/>
-          <rect x="125" y="168" width="18" height="22" rx="4" fill="white" stroke="#e2d3f4" stroke-width="1"/>
-          <rect x="128" y="164" width="12" height="6" rx="3" fill="#fde8d8"/>
-          <rect x="148" y="66" width="64" height="30" rx="10" fill="white" stroke="#e2d3f4" stroke-width="1.5"/>
-          <polygon points="172,96 180,106 188,96" fill="white" stroke="#e2d3f4" stroke-width="1.5"/>
-          <polygon points="173,95 180,104 187,95" fill="white"/>
-          <rect x="156" y="75" width="36" height="3" rx="1.5" fill="#e2d3f4"/>
-          <rect x="156" y="82" width="28" height="3" rx="1.5" fill="#e2d3f4"/>
-          <text x="34"  y="80"  font-size="14" fill="rgba(196,174,232,0.5)">✦</text>
-          <text x="320" y="155" font-size="12" fill="rgba(249,115,22,0.3)">✦</text>
-        </svg>
-      </div>
-      <h3>Show up & connect</h3>
-      <p>Meet and work alongside people who get what you're building. Keep the connection after.</p>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══ FOR FOUNDERS ══ -->
-<section class="for-section for-founders" id="for-founders">
-  <div class="for-inner rv">
-    <div class="for-text">
-      <p class="section-label">For Founders</p>
-      <h2>Your next breakthrough<br/>is in the <em>room.</em></h2>
-      <p class="for-intro">You're building something. You have the vision, the drive — but sometimes you just need the right creative mind next to you. Not a freelancer to hire. Not a mentor to impress. Just someone who gets it, working alongside you.</p>
-      <div class="for-benefits">
-        <div class="for-benefit">
-          <div class="fb-icon">🎯</div>
-          <div>
-            <strong>Matched to your current needs</strong>
-            <p>Every month your match is based on what you're working on right now — not a generic profile.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">💡</div>
-          <div>
-            <strong>Get unstuck faster</strong>
-            <p>A brand strategist, designer, or copywriter in the room can unblock in 10 minutes what takes you weeks alone.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">🤝</div>
-          <div>
-            <strong>No agency fees, no commitments</strong>
-            <p>This isn't a hiring platform. You're not paying for deliverables. You're paying for the right environment and the right people.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">🔄</div>
-          <div>
-            <strong>A fresh perspective every month</strong>
-            <p>New match, new energy. Build a growing network of creatives who know your work and your journey.</p>
-          </div>
-        </div>
-      </div>
-      <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-solid">Join as a Founder</a>
-    </div>
-    <div class="for-visual founders-visual">
-      <div class="fv-placeholder">
-        <span class="fv-label">Image coming soon</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ FOR CREATIVES ══ -->
-<section class="for-section for-creatives" id="for-creatives">
-  <div class="for-inner rv">
-    <div class="for-visual creatives-visual">
-      <div class="fv-placeholder">
-        <span class="fv-label">Image coming soon</span>
-      </div>
-    </div>
-    <div class="for-text">
-      <p class="section-label">For Creative Professionals</p>
-      <h2>A community that<br/><em>takes you seriously.</em></h2>
-      <p class="for-intro">You're good at what you do. You want to be around people who are building real things — not just collecting contacts. Makers Klub is a community of serious creatives doing serious work.</p>
-      <div class="for-benefits">
-        <div class="for-benefit">
-          <div class="fb-icon">🌱</div>
-          <div>
-            <strong>Work that inspires you</strong>
-            <p>Get matched with founders building interesting things. Offer your perspective, sharpen your thinking, expand your world.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">👥</div>
-          <div>
-            <strong>Peers at your level</strong>
-            <p>Connect with other designers, strategists, writers, and makers who take their craft as seriously as you do.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">📍</div>
-          <div>
-            <strong>A proper place to work</strong>
-            <p>Curated venues, good coffee, no distractions. A productive environment with people worth being around.</p>
-          </div>
-        </div>
-        <div class="for-benefit">
-          <div class="fb-icon">🚀</div>
-          <div>
-            <strong>Early access to the platform</strong>
-            <p>Founding members get priority matching and first access when the full platform launches later this year.</p>
-          </div>
-        </div>
-      </div>
-      <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-solid">Join as a Creative</a>
-    </div>
-  </div>
-</section>
-
-<!-- ══ MATCHED SECTION ══ -->
-<section class="matched-section">
-  <div class="matched-card rv">
-    <div class="matched-grid">
-      <div class="matched-img-placeholder">
-        <span class="mph-label">Image coming soon</span>
-      </div>
-      <div class="matched-text">
-        <p class="section-label">The Session</p>
-        <h2>Every session is <em>intentional.</em></h2>
-        <p>One founder. Four matched creatives. 90 minutes of real work, side by side. Same subscription for everyone — skin in the game on both sides.</p>
-        <div class="session-details">
-          <div class="sd-row"><span class="sd-icon">👥</span><span>1 founder + 4 matched creatives</span></div>
-          <div class="sd-row"><span class="sd-icon">⏱</span><span>90 minutes, in person</span></div>
-          <div class="sd-row"><span class="sd-icon">📍</span><span>Berlin — curated venues</span></div>
-          <div class="sd-row"><span class="sd-icon">🔄</span><span>New match every month</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ WHO IT'S FOR ══ -->
-<section class="who-section">
-  <div class="who-inner rv">
-    <p class="section-label">Who it's for</p>
-    <h2>Built for people <em>actively building.</em></h2>
-    <div class="who-cards">
-      <div class="who-card rv">
-        <div class="wc-icon">🚀</div>
-        <h3>Founders</h3>
-        <p>Building a product or growing a business. You need relevant creative minds around you — matched to what you're working on right now.</p>
-      </div>
-      <div class="who-card accent rv">
-        <div class="wc-icon">🎨</div>
-        <h3>Creatives</h3>
-        <p>Designers, copywriters, strategists. You do serious work and want to be around serious people. A platform at your level.</p>
-      </div>
-      <div class="who-card rv">
-        <div class="wc-icon">🧭</div>
-        <h3>Makers</h3>
-        <p>Working on something actively. Tired of working alone. Open to relevant connections. Prefer focus and depth over noise.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ COMMUNITY SECTION ══ -->
-<section class="community-section" id="events">
-  <div class="community-card rv">
-    <div class="community-left">
-      <p class="section-label">The Community</p>
-      <h2>We already<br/><em>host events.</em></h2>
-      <p>While the platform is on its way, Makers Klub is already bringing founders and creatives together in Berlin. Regular in-person events — portfolio reviews, creative mixers, project sessions — hosted in great spaces across the city.</p>
-      <p>Join the events to meet the community before the platform launches. It's the best way to get an early feel for what Makers Klub is all about.</p>
-      <div class="community-btns">
-        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-solid">See upcoming events</a>
-        <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline">Join the waitlist</a>
-      </div>
-    </div>
-    <div class="community-right">
-      <div class="event-preview">
-        <div class="ep-header">
-          <span class="ep-label">Upcoming in Berlin</span>
-          <span class="ep-live"><span class="ep-dot"></span>Live on Luma</span>
-        </div>
-        <div class="ep-events">
-          <div class="ep-event">
-            <div class="ep-event-icon">🍹</div>
-            <div class="ep-event-info">
-              <div class="ep-event-title">Creatives & Drinks: Rooftop Networking</div>
-              <div class="ep-event-meta">Bikini Berlin · networking · social</div>
-            </div>
-            <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="ep-event-badge">Open</a>
-          </div>
-          <div class="ep-event">
-            <div class="ep-event-icon">💻</div>
-            <div class="ep-event-info">
-              <div class="ep-event-title">Creatives & Co-working: work and socialise</div>
-              <div class="ep-event-meta">Nomad Day Bar · co-working · networking</div>
-            </div>
-            <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="ep-event-badge">Open</a>
-          </div>
-        </div>
-        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="ep-cta">View full calendar →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ CTA SECTION ══ -->
-<section class="cta-section" id="join">
-  <div class="cta-card">
-    <div class="cta-inner">
-      <h2>Find your<br/><em>people.</em></h2>
-      <p>Join the waitlist. We'll reach out personally when we launch in Berlin. No newsletters — just a direct invite when we're ready for you.</p>
-      <div class="cta-btns">
-        <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-cta-primary">Join the Waitlist</a>
-        <a href="#how" class="btn-cta-outline">How it works</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-  <div>
-    <div class="f-logo-row">
-      <img src="logo.svg" alt="Makers Klub" style="height:32px;width:auto;"/>
-      <span class="f-logo-text">Makers Klub</span>
-    </div>
-    <p class="f-tagline">Where founders meet creatives who get it.</p>
-  </div>
-  <div class="f-col">
-    <h4>Navigation</h4>
-    <a href="#about">About</a>
-    <a href="#events">Events</a>
-    <a href="#how">How It Works</a>
-    <a href="https://tally.so/r/J9JAjJ" target="_blank">Join Us</a>
-  </div>
-  <div class="f-col">
-    <h4>Details</h4>
-    <a href="#">Berlin, Germany</a>
-    <a href="#">Launching 2025</a>
-    <a href="#">€15–20 / month</a>
-  </div>
-</footer>
-
-<div class="footer-bottom">
-  <span>© 2025 Makers Klub. All rights reserved.</span>
-  <span>Berlin, Germany</span>
 </div>
 
-<script src="main.js" defer></script>
+<!-- ABOUT / WHY -->
+<section class="about-section fade-up">
+  <div class="about-left">
+    <p class="section-label">Why this exists</p>
+    <h2 class="about-title">Finding a co-founder<br/>is <em>hard enough</em></h2>
+    <p class="about-body">
+      Founders struggle to find creative talent they can actually work with. Creatives want more than freelance gigs — they want to build something. Makers Klub puts them in the same room, once a month, with people who match their brief.
+    </p>
+    <a href="#how" class="about-link">See how it works →</a>
+  </div>
+
+  <div class="about-right">
+    <div class="stat-block">
+      <div class="stat-block-num"><em>Meet, Work, Collaborate</em></div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-num">Curated Creative Community</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-num">Premium Co-Working Spaces</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-block-num">Coffee and snacks included</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section">
+  <div class="problem-inner">
+    <div class="problem-header fade-up">
+      <div>
+        <p class="section-label">The problem</p>
+        <h2 class="section-title">Two groups of people.<br/><em>Never in the same room.</em></h2>
+      </div>
+      <div>
+        <p class="section-body">Founders need creative co-founders. Creatives want to build something meaningful. The problem? There's no structured way for them to find each other.</p>
+      </div>
+    </div>
+
+    <div class="pain-grid fade-up">
+      <div class="pain-card">
+        <div class="pain-num">01</div>
+        <h3>Founders can't find creative talent they trust</h3>
+        <p>Hiring freelancers is transactional. Agency work is expensive. What founders actually need is a creative partner who's invested in the outcome — not just the invoice.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">02</div>
+        <h3>Creatives want more than client work</h3>
+        <p>Senior creatives are tired of executing briefs for brands they don't care about. They want to build something. But finding the right founder to build it with is nearly impossible.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-num">03</div>
+        <h3>Networking events don't create real connections</h3>
+        <p>You show up, exchange cards, never follow up. The format is broken. What actually creates trust is working alongside someone — even for just a few hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-header fade-up">
+    <div>
+      <p class="section-label">How it works</p>
+      <h2 class="section-title">Simple by design.<br/><em>Powerful by outcome.</em></h2>
+    </div>
+    <div style="display: flex; align-items: flex-end;">
+      <p class="section-body">Four steps. One monthly session. The rest is up to you and your group.</p>
+    </div>
+  </div>
+
+  <div class="steps-list fade-up">
+    <div class="step-item">
+      <div class="step-n">01</div>
+      <div class="step-body">
+        <h3>Sign up and fill out your brief</h3>
+        <p>Tell us who you are, what you're building or working on, and what you're looking for in a collaborator. Takes 5 minutes. This is what we use to match you.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-n">02</div>
+      <div class="step-body">
+        <h3>Get matched into a balanced group</h3>
+        <p>Once a month, we match founders and creative professionals into equal groups based on your briefs. Always 50/50 — the goal is genuine compatibility, not just availability.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-n">03</div>
+      <div class="step-body">
+        <h3>Meet in person for a co-working session</h3>
+        <p>Your group meets for a structured in-person co-working session in Berlin. Work together, share perspectives, and see if the chemistry is there.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-n">04</div>
+      <div class="step-body">
+        <h3>Build from there</h3>
+        <p>Some matches lead to collaborations. Some lead to a co-founder relationship. Some lead to nothing — and that's fine too. New month, new match.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="features-inner">
+    <div class="features-header fade-up">
+      <div>
+        <p class="section-label">What you get</p>
+        <h2 class="section-title">Built for both sides<br/>of the <em>table.</em></h2>
+      </div>
+      <div style="display: flex; align-items: flex-end;">
+        <p class="section-body">Whether you're a founder or a creative, Makers Klub gives you something the alternatives can't — structured access to the right person, every month.</p>
+      </div>
+    </div>
+
+    <div class="features-grid fade-up">
+      <div class="feature-card">
+        <div class="feature-icon-wrap">🎯</div>
+        <h4>Brief-Based Matching</h4>
+        <p>Fill out a short brief at signup. We use it to match you with people who actually fit — not just whoever signed up this month.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">👥</div>
+        <h4>Balanced Groups</h4>
+        <p>Every session is 50/50 — equal numbers of founders and creatives, matched on brief. No side outnumbers the other.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">📍</div>
+        <h4>In-Person, Berlin</h4>
+        <p>Every session happens in person. Because working alongside someone — even for a few hours — builds more trust than a hundred LinkedIn messages.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">🔄</div>
+        <h4>Monthly Cadence</h4>
+        <p>A new match every month. If the chemistry isn't there, no hard feelings — next month brings a new group and a fresh shot.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">🤝</div>
+        <h4>Co-Founder Potential</h4>
+        <p>Founders get a real shot at finding a creative partner. Creatives get a seat at the table — not just another brief to execute.</p>
+      </div>
+      <div class="feature-card" style="background: rgba(1,61,196,0.12); border-left: 1px solid rgba(1,61,196,0.3);">
+        <div class="feature-icon-wrap" style="border-color: rgba(1,61,196,0.4);">✦</div>
+        <h4>Founding Member Access</h4>
+        <p>Join the waitlist now and lock in founding member pricing. Early access, and a direct line to the team as we build.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="who-section">
+  <div class="who-header fade-up">
+    <div>
+      <p class="section-label">Who it's for</p>
+      <h2 class="section-title">Two sides.<br/><em>One table.</em></h2>
+    </div>
+    <div style="display: flex; align-items: flex-end;">
+      <p class="section-body">Makers Klub is built for founders who want to find a creative co-founder, and creative professionals who want to build something — not just execute briefs.</p>
+    </div>
+  </div>
+
+  <div class="who-tags fade-up">
+    <div class="who-tag">Startup Founders</div>
+    <div class="who-tag">UX / UI Designers</div>
+    <div class="who-tag">Brand Strategists</div>
+    <div class="who-tag">Creative Directors</div>
+    <div class="who-tag">Copywriters</div>
+    <div class="who-tag">Content Strategists</div>
+    <div class="who-tag">Motion Designers</div>
+    <div class="who-tag">Art Directors</div>
+    <div class="who-tag">Product Designers</div>
+    <div class="who-tag">Video Producers</div>
+  </div>
+
+  <div class="who-disclaimer fade-up">
+    <p>This is for <strong>founders building real products</strong> and <strong>creative professionals ready to go beyond client work</strong>. If you're looking for a co-founder or a meaningful collaboration — you're in the right place.</p>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section" id="join">
+  <div class="cta-inner fade-up">
+    <div class="cta-eyebrow">
+      <div class="cta-eyebrow-line"></div>
+      <span class="cta-eyebrow-text">Berlin launch · Founding members</span>
+      <div class="cta-eyebrow-line"></div>
+    </div>
+
+    <h2 class="cta-title">Your next co-founder<br/>is <em>one match away.</em></h2>
+
+    <p class="cta-body">
+      Join the waitlist. Fill out your brief when we reach out.<br/>We'll match you when we launch in Berlin.
+    </p>
+
+    <div class="cta-counter">
+      ✦ <strong>Berlin launch</strong> · Founding members only
+    </div>
+
+    <div>
+      <a href="#" class="cta-btn" onclick="openTally(event)">
+        Join the Waitlist — It's Free
+        <span>→</span>
+      </a>
+      <p class="cta-privacy">No spam. No credit card. Just your spot in the queue.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">
+    <img src="logo.svg" alt="Makers Klub" style="height: 64px; width: auto;" />
+  </a>
+  <p class="footer-mid">© 2026 Makers Klub. Berlin, Germany.</p>
+  <p class="footer-right">Where founders meet their creative co-founder.</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    ring.style.left = mx + 'px';
+    ring.style.top = my + 'px';
+  });
+
+  // Nav scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  function openTally(e) {
+    if (e) e.preventDefault();
+    window.open('https://tally.so/r/J9JAjJ', '_blank');
+  }
+</script>
+
 </body>
 </html>

@@ -1,13 +1,32 @@
-// Scroll reveal — mark elements for animation, then observe
-document.querySelectorAll('.rv').forEach(el => el.classList.add('pre-anim'));
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
 
-const obs = new IntersectionObserver(es => {
-  es.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.remove('pre-anim');
-      e.target.classList.add('on');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px';
+  ring.style.top = e.clientY + 'px';
+});
+
+// Nav scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 100);
     }
   });
-}, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+}, { threshold: 0.1 });
 
-document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Tally
+function openTally(e) {
+  if (e) e.preventDefault();
+  window.open('https://tally.so/r/J9JAjJ', '_blank');
+}
