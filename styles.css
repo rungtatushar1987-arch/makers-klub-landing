@@ -47,7 +47,7 @@ nav {
   text-decoration: none;
 }
 
-.nav-logo img { height: 30px; }
+.nav-logo img { height: 50px; }
 
 .nav-logo-text {
   font-family: 'Fraunces', serif;
@@ -113,7 +113,6 @@ nav.scrolled {
   gap: 64px;
   align-items: end;
   padding-bottom: 56px;
-  border-bottom: 1px solid var(--cream-3);
 }
 
 .eyebrow {
@@ -402,7 +401,7 @@ p.body-l {
   background: var(--cream-2);
   border: 1px solid var(--cream-3);
   border-radius: 18px;
-  padding: 40px 36px;
+  padding: 40px 32px;
 }
 
 .who-box p {
@@ -544,6 +543,9 @@ p.body-l {
   border-radius: 999px;
   margin-bottom: 24px;
 }
+
+.tier-card.free .tier-badge { background: var(--cream-2); color: var(--fg-2); }
+.tier-card.paid .tier-badge { background: rgba(244,168,51,0.15); color: var(--ochre); }
 
 .tier-name {
   font-family: 'Fraunces', serif;
