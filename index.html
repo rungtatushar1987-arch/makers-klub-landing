@@ -3,393 +3,254 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Makers Klub — Monthly Co-Working Matchmaking for Founders & Creative freelancers</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="main.js" />
+  <title>Makers Klub — Berlin's Creative Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,700;1,9..144,800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  
 </head>
 <body>
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
 
 <!-- NAV -->
-<nav id="nav">
+<nav>
   <a href="#" class="nav-logo">
-    <img src="logo.svg" alt="Makers Klub" style="height: 64px; width: auto;" />
+    <img src="logo.svg" alt="Makers Klub" />
+    <span class="nav-logo-text">Makers Klub</span>
   </a>
   <div class="nav-right">
-    <span class="nav-location">Berlin, DE</span>
-    <a href="#" class="nav-cta" onclick="openTally(event)">Join Waitlist</a>
+    <a href="#events" class="nav-link">Events</a>
+    <a href="#membership" class="nav-link">Membership</a>
+    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="nav-cta">See upcoming events →</a>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">
-      <div class="hero-eyebrow-line"></div>
-      <span class="hero-eyebrow-text">Now accepting founding members · Berlin</span>
+<div class="hero">
+  <div class="hero-top">
+    <div class="hero-left">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Berlin · Members-only community
+      </div>
+      <h1>
+        Where <em>creatives</em><br/>
+        and business owners<br/>
+        come <em>together.</em>
+      </h1>
     </div>
 
-    <h1>
-      Co-work with<br/>
-      creative freelancers<br/>
-      <em>Once a month.</em>
-    </h1>
-
-    <p class="hero-sub">
-      Business owners meet curated creative freelancers for an in-person co-working session once a month
-    </p>
-
-    <div class="hero-actions">
-      <a href="#" class="btn-hero" onclick="openTally(event)">Join the Waitlist →</a>
-      <a href="#how" class="hero-secondary-link">How it works <span>→</span></a>
-    </div>
-  </div>
-
-  <div class="hero-right">
-    <div class="hero-right-bg"></div>
-    <div class="hero-right-grid"></div>
-    <div class="hero-right-glow"></div>
-
-    <div class="hero-float-card">
-      <div class="float-card-top">
-        <span class="float-card-label">April Match · Group of 4</span>
-        <div class="float-live-dot">
-          <div class="live-dot"></div>
-          Matched
-        </div>
-      </div>
-      <div class="float-event-title">Monthly Co-Work<br/>Session #12</div>
-      <div class="float-event-meta">📍 Berlin Mitte · Saturday, 10:00</div>
-      <div class="float-attendees">
-        <div class="float-attendee">
-          <div class="f-av f-av-1">T</div>
-          <div>
-            <div class="f-av-name">Tushar R.</div>
-            <div class="f-av-role">Founder</div>
-          </div>
-        </div>
-        <div class="float-attendee">
-          <div class="f-av f-av-2">S</div>
-          <div>
-            <div class="f-av-name">Sarah K.</div>
-            <div class="f-av-role">Brand Designer</div>
-          </div>
-        </div>
-        <div class="float-attendee">
-          <div class="f-av f-av-3">J</div>
-          <div>
-            <div class="f-av-name">Jana R.</div>
-            <div class="f-av-role">UX Lead</div>
-          </div>
-        </div>
-      </div>
-      <div class="float-qr-row">
-        <div class="mini-qr">
-          <div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
-          <div class="mini-dot e"></div><div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div>
-          <div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
-          <div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot e"></div><div class="mini-dot"></div>
-        </div>
-        <div class="float-qr-text">Matched based on your brief · Berlin</div>
+    <div class="hero-right">
+      <p class="hero-body">
+        Makers Klub brings freelancers, founders, and solopreneurs in creative industries together — through curated events, shared working sessions, and the kind of introductions you can't engineer on LinkedIn.
+      </p>
+      <div class="hero-actions">
+        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming events →</a>
+        <a href="#membership" class="btn-outline">View membership</a>
       </div>
     </div>
   </div>
-</section>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-track" id="ticker">
-    <div class="ticker-item"><span class="ticker-dot"></span> Brief-Based Matching</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Business Owners & Creative Freelancers</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Monthly Co-Working</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Curated Creative Community</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Grow Your Network</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> In-Person Sessions</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Premium Co-Working Spaces</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Coffee & Snacks Included</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Brief-Based Matching</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Business Owners & Creative Freelancers</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Monthly Co-Working</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Curated Creative Community</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Grow Your Network</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> In-Person Sessions</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Premium Co-Working Spaces</div>
-    <div class="ticker-item"><span class="ticker-dot"></span> Coffee & Snacks Included</div>
+  <div class="hero-photos">
+    <div class="hero-photo">
+      <img src="DSC05077.jpg" alt="Makers Klub session — group in conversation" />
+    </div>
+    <div class="hero-photo">
+      <img src="DSC05060.jpg" alt="Makers Klub session — two members connecting" />
+    </div>
+    <div class="hero-photo">
+      <img src="DSC05098.jpg" alt="Makers Klub session — members talking" />
+    </div>
   </div>
 </div>
 
-<!-- ABOUT / WHY -->
-<section class="about-section fade-up">
-  <div class="about-left">
-    <p class="section-label">Why this exists</p>
-    <h2 class="about-title">Finding great creative talent<br/>is <em>hard and expensive</em></h2>
-    <p class="about-body">
-      Founders, Companies & Business Owners struggle to find creative talent they can actually work with. <br>Creative Freelancers struggle to find long lasting client relationships. <br>Makers Klub puts them in the same room, once a month, with people who match their brief.
-    </p>
-    <a href="#how" class="about-link">See how it works →</a>
-  </div>
+<hr class="divider" />
 
-  <div class="about-right">
-    <div class="stat-block">
-      <div class="stat-block-num"><em>Meet, Work, Collaborate</em></div>
+<!-- ABOUT -->
+<section class="section">
+  <div class="about-grid">
+    <div class="about-left">
+      <span class="label">What it is</span>
+      <h2 class="title">The room<br/>you've been<br/><em>looking for.</em></h2>
     </div>
-    <div class="stat-block">
-      <div class="stat-block-num">Curated Creative Community</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-block-num">Premium Co-Working Spaces</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-block-num">Coffee and snacks included</div>
-    </div>
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section class="problem-section">
-  <div class="problem-inner">
-    <div class="problem-header fade-up">
-      <div>
-        <p class="section-label">The problem</p>
-        <h2 class="section-title">Two groups of people.<br/><em>Never in the same room.</em></h2>
-      </div>
-      <div>
-        <p class="section-body">Founders & Business Owners need great creative talent. Creative professionals want meaningful and long-lasting relationships. The problem? There's no structured way for them to find each other.</p>
-      </div>
-    </div>
-
-    <div class="pain-grid fade-up">
-      <div class="pain-card">
-        <div class="pain-num">01</div>
-        <h3>Businesses spend time <em>they don't have</em> to hire someone <em>they don't trust</em></h3>
-        <p>Thousands of applications make it hard to spot real creative talent. Reviewing portfolios takes time, most business owners don’t have. So hiring becomes slow, overwhelming, and easy to get wrong.</p>
-      </div>
-      <div class="pain-card">
-        <div class="pain-num">02</div>
-        <h3>Creative Talent struggles to get hired <em>even when they’re good</em></h3>
-        <p>Creative freelancers struggle to stand out in a crowded market, especially without reviews or social proof. Clients often rely on ratings or price over real quality, so even great talent gets overlooked. This creates a cycle of inconsistent work, underpaid gigs, and difficulty breaking in.</p>
-      </div>
-      <div class="pain-card">
-        <div class="pain-num">03</div>
-        <h3>Networking events don't create real connections</h3>
-        <p>You show up, exchange cards, never follow up. The format is broken. What actually creates trust is working alongside someone — even for just a few hours.</p>
+    <div class="about-right">
+      <p class="about-pull">
+        "Both sides of the table — in the same room. That's where the interesting things happen."
+      </p>
+      <div class="about-body">
+        <p>Makers Klub is a members-only community in Berlin for creative freelancers and the business owners who want to work with them. We run regular events — socials, co-working days, and curated lunches — designed to close the gap between two groups who need each other but rarely find each other well.</p>
+        <p>This is not a networking platform. There are no algorithms, no cold DMs, no performance. Just a well-curated room, a good coffee, and people who are serious about what they do.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-  <div class="how-header fade-up">
-    <div>
-      <p class="section-label">How it works</p>
-      <h2 class="section-title">Simple by design.<br/><em>Powerful by outcome.</em></h2>
-    </div>
-    <div style="display: flex; align-items: flex-end;">
-      <p class="section-body">Four steps. One monthly session. <br> Business Owners actually meet & work with problem-solving creatives — someone who understands marketing, audiences, and business goals — not just aesthetics.</p>
-    </div>
-  </div>
-
-  <div class="steps-list fade-up">
-    <div class="step-item">
-      <div class="step-n">01</div>
-      <div class="step-body">
-        <h3>Sign up and fill out your brief</h3>
-        <p>Tell us who you are, what is your business, and what you're looking for in a creative professional. Takes 5 minutes. This is what we use to match you.</p>
+<!-- VALUES -->
+<section class="values-section">
+  <div class="values-inner">
+    <span class="label">How we run things</span>
+    <h2 class="title">Small, <em>intentional,</em><br/>worth attending.</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <span class="value-icon">🎯</span>
+        <h3>Quality over quantity</h3>
+        <p>We're not trying to scale to thousands of members. Every event should feel considered. Every introduction should feel worth making. The value is in the curation, not the numbers.</p>
       </div>
-    </div>
-    <div class="step-item">
-      <div class="step-n">02</div>
-      <div class="step-body">
-        <h3>Get matched into a balanced group</h3>
-        <p>Once a month, get matched with curated creative professionals based on your briefs — the goal is genuine compatibility, not just availability.</p>
+      <div class="value-card">
+        <span class="value-icon">🤝</span>
+        <h3>Both sides of the table</h3>
+        <p>A community of only creatives is a support group. A community of only clients is a pitch fest. Makers Klub works because it holds both — and keeps the ratio honest.</p>
       </div>
-    </div>
-    <div class="step-item">
-      <div class="step-n">03</div>
-      <div class="step-body">
-        <h3>Meet in person for a co-working session</h3>
-        <p>Meet and co-work in a focused yet friendly at a premium co-working location. Work together, share perspectives, and see if the chemistry is there.</p>
-      </div>
-    </div>
-    <div class="step-item">
-      <div class="step-n">04</div>
-      <div class="step-body">
-        <h3>Build from there</h3>
-        <p>We set the stage. You turn it into something real.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features-section">
-  <div class="features-inner">
-    <div class="features-header fade-up">
-      <div>
-        <p class="section-label">What you get</p>
-        <h2 class="section-title">Built for both sides<br/>of the <em>table.</em></h2>
-      </div>
-      <div style="display: flex; align-items: flex-end;">
-        <p class="section-body">Makers Klub gives you something the alternatives can't — structured access to the right person, every month.</p>
-      </div>
-    </div>
-
-    <div class="features-grid fade-up">
-      <div class="feature-card">
-        <div class="feature-icon-wrap">🎯</div>
-        <h4>Brief-Based Matching</h4>
-        <p>Fill out a short brief at signup. We use it to match you with people who actually fit — not just whoever signed up this month.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon-wrap">👥</div>
-        <h4>Balanced Groups</h4>
-        <p>Every session is 50/50 — equal numbers of founders, business owners and creatives, matched on brief. No side outnumbers the other.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon-wrap">📍</div>
-        <h4>In-Person</h4>
-        <p>Every session happens in person. Because working alongside someone — even for a few hours — builds more trust than a hundred LinkedIn messages.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon-wrap">🔄</div>
-        <h4>Monthly Cadence</h4>
-        <p>A new match every month. If the chemistry isn't there, no hard feelings — next month brings a new group and a fresh shot.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon-wrap">🤝</div>
-        <h4>Real Outcomes</h4>
-        <p>Business owners get a real shot at finding great creative talent. Creative freelancers get a chance to showcase talent without restrictions</p>
-      </div>
-      <div class="feature-card" style="background: rgba(1,61,196,0.12); border-left: 1px solid rgba(1,61,196,0.3);">
-        <div class="feature-icon-wrap" style="border-color: rgba(1,61,196,0.4);">✦</div>
-        <h4>Founding Member Access</h4>
-        <p>Join the waitlist now and lock in founding member pricing. Early access, and a direct line to the team as we build.</p>
+      <div class="value-card">
+        <span class="value-icon">🏙️</span>
+        <h3>Real work, not performance</h3>
+        <p>No panels, no thought leadership, no building-in-public theatre. Members show up with actual problems and leave with actual leads. Berlin-rooted, internationally minded.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- WHO IT'S FOR -->
-<section class="who-section">
-  <div class="who-header fade-up">
-    <div>
-      <p class="section-label">Who it's for</p>
-      <h2 class="section-title">Two sides.<br/><em>One table.</em></h2>
+<section class="section">
+  <div class="who-grid">
+    <div class="who-left">
+      <span class="label">Who it's for</span>
+      <h2 class="title">The right room,<br/>not the<br/><em>biggest</em> room.</h2>
+      <div class="who-tags">
+        <span class="who-tag">Brand designers</span>
+        <span class="who-tag">Photographers</span>
+        <span class="who-tag">Videographers</span>
+        <span class="who-tag">UX / UI designers</span>
+        <span class="who-tag">Content creators</span>
+        <span class="who-tag">Developers</span>
+        <span class="who-tag">Early-stage founders</span>
+        <span class="who-tag">Studio owners</span>
+        <span class="who-tag">Small business owners</span>
+      </div>
     </div>
-    <div style="display: flex; align-items: flex-end;">
-      <p class="section-body">Makers Klub is built for founders who want to find a creative co-founder, and creative professionals who want to build something — not just execute briefs.</p>
+    <div class="who-right">
+      <div class="who-box">
+        <p>Makers Klub is <strong>invite-only and approval-based</strong>. Members join via application — we review everyone personally. The community works because everyone in the room is genuinely worth meeting.</p>
+        <p><strong>Berlin-based or operating in Berlin.</strong> Independent-minded, quality-conscious, and allergic to corporate networking events.</p>
+        <p>If that sounds like you, you'll fit right in.</p>
+      </div>
     </div>
-  </div>
-
-  <div class="who-tags fade-up">
-    <div class="who-tag">Startup Founders</div>
-    <div class="who-tag">Business Owners</div>
-    <div class="who-tag">Talent Acquisition</div>
-    
-    <div class="who-tag">Designers (UI/UX, Graphic, Web, Brand Identity)</div>
-    <div class="who-tag">Marketing & Branding Professionals</div>
-    <div class="who-tag">Creative Directors</div>
-    
-    <div class="who-tag">Content Creators / Influencers</div>
-    <div class="who-tag">Content Strategists</div>
-    
-    <div class="who-tag">Photographers & Videographers</div>
-    <div class="who-tag">Advertisment</div>
-    
-    <div class="who-tag">Video Editors</div>
-    <div class="who-tag">Motion Graphics Designers</div>
-    <div class="who-tag">Animators (2D / 3D)</div>
-    
-    <div class="who-tag">Visual Artists</div>
-    
-    <div class="who-tag">Copywriters</div>
-    <div class="who-tag">Content Strategists</div>
-    
-    <div class="who-tag">Agencies (Creative / Branding / Production)</div>
-    <div class="who-tag">Production & Creative Studios</div>
-  </div>
-
-  <div class="who-disclaimer fade-up">
-    <p>This is for <strong>businesses building real products</strong> and <strong>creative freelancers ready to go beyond client work</strong>. If you're looking for meaningful collaboration — you're in the right place.</p>
   </div>
 </section>
 
-<!-- FINAL CTA -->
+<!-- EVENTS -->
+<section class="events-section" id="events">
+  <div class="events-inner">
+    <div class="events-header">
+      <div>
+        <span class="label">The events</span>
+        <h2 class="title" style="margin-bottom:0;">Three ways to<br/><em>show up.</em></h2>
+      </div>
+      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See what's on →</a>
+    </div>
+
+    <div class="events-grid">
+      <div class="event-card">
+        <div class="event-type">Monthly</div>
+        <h3>After-hours Socials</h3>
+        <p>Informal evening gatherings for the full community. Low-pressure, good for getting a feel for who's in the room. A drink, a conversation, and the kind of energy that only happens when the right people are together.</p>
+        <div class="event-footer">
+          <span class="event-access free">✓ Free members</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-type">Regular</div>
+        <h3>Co-working Days</h3>
+        <p>Daytime sessions where members work on their own projects in a shared space. Not a workshop, not a seminar. Just a room of focused, independent people — and the occasional great conversation that breaks out between them.</p>
+        <div class="event-footer">
+          <span class="event-access paid">✦ Paid members</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-type">Limited spots</div>
+        <h3>Matched Lunches</h3>
+        <p>Smaller, more intentional. Curated tables where a business owner meets a creative who's been vetted as the right fit. Part of the upcoming Makers Klub platform — available to paid members.</p>
+        <div class="event-footer">
+          <span class="event-access paid">✦ Paid members</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERSHIP -->
+<section class="membership-section" id="membership">
+  <div class="membership-header">
+    <span class="label">Membership</span>
+    <h2 class="title">Two ways<br/>to <em>join.</em></h2>
+    <p class="body-l">Start free, upgrade when you're ready. Both tiers are approval-based — we review every application personally.</p>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-card free">
+      <div class="tier-name">Basic</div>
+      <div class="tier-price"><strong>€0</strong> / month</div>
+      <ul class="tier-items">
+        <li class="tier-item"><span class="tier-check">✓</span>Free access to after-hours socials</li>
+        <li class="tier-item"><span class="tier-check">✓</span>Access to the Makers Klub community</li>
+      </ul>
+      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-block ochre">See upcoming events →</a>
+      <p class="tier-note">Approval required. Berlin-based.</p>
+    </div>
+
+    <div class="tier-card paid">
+      <div class="tier-name">Premium</div>
+      <div class="tier-price"><strong>€20</strong> / 3 months</div>
+      <ul class="tier-items">
+        <li class="tier-item"><span class="tier-check">✓</span>Everything in Basic</li>
+        <li class="tier-item"><span class="tier-check">✓</span>Free access to all events</li>
+        <li class="tier-item"><span class="tier-check">✓</span>Monthly curated lunches with like-minded people</li>
+        <li class="tier-item"><span class="tier-check">✓</span>Access to Makers Klub Whatsapp group</li>
+        <li class="tier-item"><span class="tier-check">✓</span>10% discount on co-working days</li>
+        <li class="tier-item"><span class="tier-check">✓</span>Early access to the Makers Klub platform</li>
+      </ul>
+      <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-block ochre">Join the waitlist →</a>
+      <p class="tier-note">Platform launching soon. Join the waitlist now.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM TEASE -->
+<div class="platform-strip">
+  <div class="platform-inner">
+    <div class="platform-text">
+      <span class="label">Coming soon</span>
+      <h3>The Makers Klub <em>platform.</em></h3>
+      <p>Paid members get access to a private platform to manage their connections, discover opportunities posted by the community, and stay close to what's happening. More details when you join.</p>
+    </div>
+    <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline">Join the waitlist</a>
+  </div>
+</div>
+
+<!-- CTA -->
 <section class="cta-section" id="join">
-  <div class="cta-inner fade-up">
-    <div class="cta-eyebrow">
-      <div class="cta-eyebrow-line"></div>
-      <span class="cta-eyebrow-text">Berlin launch · Founding members</span>
-      <div class="cta-eyebrow-line"></div>
-    </div>
-
-    <h2 class="cta-title">A real outcome <br/>is <em>one match away.</em></h2>
-
-    <p class="cta-body">
-      Join the waitlist. Fill out your brief when we reach out.<br/>We'll match you when we launch in Berlin.
-    </p>
-
-    <div class="cta-counter">
-      ✦ <strong>Berlin launch</strong> · Founding members only
-    </div>
-
-    <div>
-      <a href="#" class="cta-btn" onclick="openTally(event)">
-        Join the Waitlist — It's Free
-        <span>→</span>
-      </a>
-      <p class="cta-privacy">No spam. No credit card. Just your spot in the queue.</p>
-    </div>
+  <div class="cta-glow"></div>
+  <div class="cta-inner">
+    <span class="label">Get started</span>
+    <h2 class="title">Come to<br/>the next <em>event.</em></h2>
+    <p class="body-l">The best way to understand what Makers Klub is — is to come to one. Check the calendar and find something that fits.</p>
+    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre" style="padding: 15px 32px; font-size: 15px;">See upcoming events →</a>
+    <p class="cta-note">Approval-based. Berlin-based. Free to start.</p>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
   <a href="#" class="footer-logo">
-    <img src="logo.svg" alt="Makers Klub" style="height: 64px; width: auto;" />
+    <img src="logo.svg" alt="Makers Klub" />
+    <span class="footer-logo-text">Makers Klub</span>
   </a>
-  <p class="footer-mid">© 2026 Makers Klub. Berlin, Germany.</p>
-  <p class="footer-right">Where founders meet their creative co-founder.</p>
+  <div class="footer-links">
+    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank">Events</a>
+    <a href="https://tally.so/r/J9JAjJ" target="_blank">Platform waitlist</a>
+    <a href="https://linkedin.com/company/makers-klub" target="_blank">LinkedIn</a>
+  </div>
+  <p class="footer-copy">© 2025 Makers Klub. Berlin.</p>
 </footer>
 
-<script>
-  // Cursor
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  let mx = 0, my = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-    ring.style.left = mx + 'px';
-    ring.style.top = my + 'px';
-  });
-
-  // Nav scroll
-  window.addEventListener('scroll', () => {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
-  });
-
-  // Scroll animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 100);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  function openTally(e) {
-    if (e) e.preventDefault();
-    window.open('https://tally.so/r/J9JAjJ', '_blank');
-  }
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
