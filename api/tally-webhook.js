@@ -33,45 +33,44 @@ export default async function handler(req, res) {
     const data = await resend.emails.send({
       from: "Makers Klub <hello@makersklub.com>",
       to: email,
-      subject: "You're on the Makers Klub waitlist",
+      subject: "Welcome to Makers Klub",
       headers: {
         "List-Unsubscribe": "<mailto:hello@makersklub.com?subject=unsubscribe>",
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
-      text: `You're on the Makers Klub waitlist.
+      text: `Welcome to Makers Klub.
 
-Thanks for applying. We review every application personally, so it might take a few days before you hear back.
+You're on the waitlist — and we're glad you found us. Makers Klub is still early, and that's exactly why this is a good time to be here.
 
-In the meantime, come to one of our events — they're a good way to meet the community before committing to anything.
+We're building a community for freelancers, founders, and solopreneurs in creative industries in Berlin — through events, working sessions, and the kind of introductions you can't engineer on LinkedIn. Follow along as we grow.
+
+As a thank you for signing up, you get 15% off your first co-working day. Use code MAKERS15 at checkout.
 
 See upcoming events: https://luma.com/calendar/cal-GBRc6zCvxA5bqnz
+Follow us on Instagram: https://www.instagram.com/themakersklub/
 
 See you in the room.
-— Tushar, Makers Klub
-
-makersklub.com · Berlin`,
+— Tushar
+Founder, Makers Klub · Berlin
+makersklub.com`,
       html: `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>You're on the Makers Klub waitlist</title>
+  <title>Welcome to Makers Klub</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f1ea;font-family:Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:48px 20px;">
     <tr>
       <td align="center">
-        <table width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0" role="presentation">
+        <table width="100%" style="max-width:520px;" cellpadding="0" cellspacing="0" role="presentation">
 
           <!-- Logo -->
           <tr>
-            <td style="padding-bottom:24px;">
-              <img src="${LOGO_URL}"
-                   alt="Makers Klub"
-                   width="64"
-                   height="64"
-                   style="display:block;border:0;" />
+            <td style="padding-bottom:28px;">
+              <img src="${LOGO_URL}" alt="Makers Klub" width="48" height="48" style="display:block;border:0;" />
             </td>
           </tr>
 
@@ -79,39 +78,64 @@ makersklub.com · Berlin`,
           <tr>
             <td style="background:#ffffff;border-radius:12px;padding:40px;">
 
-              <p style="margin:0 0 24px;font-size:22px;font-weight:600;color:#0f1e3d;line-height:1.3;">
-                You're on the waitlist.
+              <p style="margin:0 0 20px;font-size:21px;font-weight:600;color:#0f1e3d;line-height:1.3;">
+                Welcome to Makers Klub.
               </p>
 
-              <p style="margin:0 0 16px;font-size:15px;color:#4a4a5a;line-height:1.7;">
-                Thanks for applying. We go through every application personally, so it might take a few days before you hear back.
+              <p style="margin:0 0 14px;font-size:14px;color:#5a5a6a;line-height:1.75;">
+                You're on the waitlist — and we're glad you found us. Makers Klub is still early, and that's exactly why this is a good time to be here.
               </p>
 
-              <p style="margin:0 0 16px;font-size:15px;color:#4a4a5a;line-height:1.7;">
-                In the meantime, the best way to get a feel for Makers Klub is to come to one of our events. Open to everyone — a good way to meet the community before committing to anything.
+              <p style="margin:0 0 28px;font-size:14px;color:#5a5a6a;line-height:1.75;">
+                We're building a community for freelancers, founders, and solopreneurs in creative industries in Berlin — through events, working sessions, and the kind of introductions you can't engineer on LinkedIn. Follow along as we grow.
               </p>
 
-              <p style="margin:0 0 32px;font-size:15px;color:#4a4a5a;line-height:1.7;">
-                See you in the room.
-              </p>
-
-              <!-- CTA -->
-              <table cellpadding="0" cellspacing="0" role="presentation">
+              <!-- Discount block -->
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:24px;">
                 <tr>
-                  <td style="background:#013dc4;border-radius:6px;">
+                  <td style="background:#f5f1ea;border-radius:10px;padding:20px 24px;border:1px solid #e8e2d8;">
+                    <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#013dc4;text-transform:uppercase;letter-spacing:1px;">Your welcome discount</p>
+                    <p style="margin:0 0 14px;font-size:14px;color:#5a5a6a;line-height:1.65;">As a thank you for signing up, you get <strong style="color:#0f1e3d;">15% off</strong> your first co-working day. Use this code at checkout:</p>
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="background:#ffffff;border-radius:6px;padding:10px 18px;border:1px solid #e8e2d8;">
+                          <p style="margin:0;font-size:16px;font-weight:700;color:#0f1e3d;letter-spacing:2px;">MAKERS15</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA 1 -->
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:10px;">
+                <tr>
+                  <td style="background:#013dc4;border-radius:6px;text-align:center;">
                     <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz"
-                       style="display:inline-block;padding:13px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
+                       style="display:block;padding:13px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
                       See upcoming events →
                     </a>
                   </td>
                 </tr>
               </table>
 
+              <!-- CTA 2 -->
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="border:1px solid #e8e2d8;border-radius:6px;text-align:center;">
+                    <a href="https://www.instagram.com/themakersklub/"
+                       style="display:block;padding:13px 24px;font-size:14px;font-weight:500;color:#0f1e3d;text-decoration:none;">
+                      Follow us on Instagram →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
               <!-- Signature -->
-              <p style="margin:40px 0 0;font-size:14px;color:#9b9b9b;line-height:1.6;">
-                — Tushar<br/>
-                Founder, Makers Klub
-              </p>
+              <div style="margin-top:36px;padding-top:20px;border-top:1px solid #f0ece4;">
+                <p style="margin:0;font-size:13px;color:#0f1e3d;font-weight:500;">Tushar Rungta</p>
+                <p style="margin:2px 0 0;font-size:13px;color:#9b9b9b;">Founder, Makers Klub</p>
+              </div>
 
             </td>
           </tr>
@@ -122,7 +146,7 @@ makersklub.com · Berlin`,
               <p style="margin:0;font-size:12px;color:#aaaaaa;line-height:1.6;">
                 Makers Klub · Berlin ·
                 <a href="https://www.makersklub.com" style="color:#aaaaaa;">makersklub.com</a><br/>
-                You're receiving this because you applied to join Makers Klub.
+                You're receiving this because you signed up to Makers Klub.
               </p>
             </td>
           </tr>
