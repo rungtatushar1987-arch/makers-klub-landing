@@ -67,16 +67,18 @@ makersklub.com`,
       <td align="center">
         <table width="100%" style="max-width:520px;" cellpadding="0" cellspacing="0" role="presentation">
 
-          <!-- Logo -->
-          <tr>
-            <td style="padding-bottom:28px;">
-              <img src="${LOGO_URL}" alt="Makers Klub" width="48" height="48" style="display:block;border:0;" />
-            </td>
-          </tr>
-
           <!-- Card -->
           <tr>
             <td style="background:#ffffff;border-radius:12px;padding:40px;">
+
+              <!-- Logo centered inside card -->
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:28px;">
+                <tr>
+                  <td align="center">
+                    <img src="${LOGO_URL}" alt="Makers Klub" width="96" height="96" style="display:block;border:0;" />
+                  </td>
+                </tr>
+              </table>
 
               <p style="margin:0 0 20px;font-size:21px;font-weight:600;color:#0f1e3d;line-height:1.3;">
                 Welcome to Makers Klub.
