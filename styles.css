@@ -774,6 +774,223 @@ footer {
 
 .footer-copy { font-size: 13px; color: var(--fg-muted); }
 
+/* ── MEMBERS ─────────────────────────────────── */
+.members-section { padding: 96px 48px; }
+
+.members-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.members-sub {
+  font-size: 15px;
+  color: var(--fg-2);
+  max-width: 280px;
+  text-align: right;
+  line-height: 1.65;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.member-card {
+  background: white;
+  border: 1px solid var(--cream-3);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.member-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.member-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.member-initial {
+  font-family: 'Fraunces', serif;
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--navy);
+  opacity: 0.4;
+}
+
+.member-info {
+  padding: 16px;
+}
+
+.member-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 2px;
+}
+
+.member-role {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-bottom: 10px;
+}
+
+.member-cta {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ochre);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,30,61,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--cream-2);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.modal-close:hover { background: var(--cream-3); }
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modal-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
+  flex-shrink: 0;
+}
+
+.modal-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 2px;
+}
+
+.modal-role {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.modal-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-img-ph {
+  aspect-ratio: 4/3;
+  background: var(--cream-2);
+  border-radius: 10px;
+}
+
+.modal-img-ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+.modal-bio {
+  font-size: 14px;
+  color: var(--fg-2);
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+
+.modal-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modal-link {
+  background: var(--cream-2);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-2);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.modal-link:hover {
+  background: var(--navy);
+  color: white;
+}
+
 /* ── RESPONSIVE ───────────────────────────────── */
 @media (max-width: 960px) {
   nav { padding: 0 24px; }
@@ -809,6 +1026,11 @@ footer {
   .events-header { flex-direction: column; align-items: flex-start; }
 
   .membership-section { padding: 64px 24px; }
+
+  .members-section { padding: 64px 24px; }
+  .members-grid { grid-template-columns: repeat(2, 1fr); }
+  .members-header { flex-direction: column; align-items: flex-start; }
+  .members-sub { text-align: left; max-width: 100%; }
 
   .platform-strip { padding: 40px 24px; }
   .platform-inner { grid-template-columns: 1fr; gap: 24px; }
