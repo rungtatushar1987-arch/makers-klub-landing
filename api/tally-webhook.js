@@ -84,23 +84,23 @@ makersklub.com`,
                 Welcome to Makers Klub.
               </p>
 
-              <p style="margin:0 0 14px;font-size:14px;color:#5a5a6a;line-height:1.75;">
+              <p style="margin:0 0 14px;font-size:14px;color:#4a5878;line-height:1.75;">
                 You're on the waitlist — and we're glad you found us. Makers Klub is still early, and that's exactly why this is a good time to be here.
               </p>
 
-              <p style="margin:0 0 28px;font-size:14px;color:#5a5a6a;line-height:1.75;">
+              <p style="margin:0 0 28px;font-size:14px;color:#4a5878;line-height:1.75;">
                 We're building a community for freelancers, founders, and solopreneurs in creative industries in Berlin — through events, working sessions, and the kind of introductions you can't engineer on LinkedIn. Follow along as we grow.
               </p>
 
               <!-- Discount block -->
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:24px;">
                 <tr>
-                  <td style="background:#f5f1ea;border-radius:10px;padding:20px 24px;border:1px solid #e8e2d8;">
-                    <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#013dc4;text-transform:uppercase;letter-spacing:1px;">Your welcome discount</p>
-                    <p style="margin:0 0 14px;font-size:14px;color:#5a5a6a;line-height:1.65;">As a thank you for signing up, you get <strong style="color:#0f1e3d;">15% off</strong> your first co-working day. Use this code at checkout:</p>
+                  <td style="background:#f5f1ea;border-radius:10px;padding:20px 24px;border:1px solid #e0d8c8;">
+                    <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#f4a833;text-transform:uppercase;letter-spacing:1px;">Your welcome discount</p>
+                    <p style="margin:0 0 14px;font-size:14px;color:#4a5878;line-height:1.65;">As a thank you for signing up, you get <strong style="color:#0f1e3d;">15% off</strong> your first co-working day. Use this code at checkout:</p>
                     <table cellpadding="0" cellspacing="0" role="presentation">
                       <tr>
-                        <td style="background:#ffffff;border-radius:6px;padding:10px 18px;border:1px solid #e8e2d8;">
+                        <td style="background:#ffffff;border-radius:6px;padding:10px 18px;border:1px solid #e0d8c8;">
                           <p style="margin:0;font-size:16px;font-weight:700;color:#0f1e3d;letter-spacing:2px;">MAKERS15</p>
                         </td>
                       </tr>
@@ -109,22 +109,22 @@ makersklub.com`,
                 </tr>
               </table>
 
-              <!-- CTA 1 -->
+              <!-- CTA 1 — ochre -->
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:10px;">
                 <tr>
-                  <td style="background:#013dc4;border-radius:6px;text-align:center;">
+                  <td style="background:#f4a833;border-radius:6px;text-align:center;">
                     <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz"
-                       style="display:block;padding:13px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
+                       style="display:block;padding:13px 24px;font-size:14px;font-weight:600;color:#0f1e3d;text-decoration:none;">
                       See upcoming events →
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- CTA 2 -->
+              <!-- CTA 2 — ghost -->
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
-                  <td style="border:1px solid #e8e2d8;border-radius:6px;text-align:center;">
+                  <td style="border:1px solid #e0d8c8;border-radius:6px;text-align:center;">
                     <a href="https://www.instagram.com/themakersklub/"
                        style="display:block;padding:13px 24px;font-size:14px;font-weight:500;color:#0f1e3d;text-decoration:none;">
                       Follow us on Instagram →
@@ -134,9 +134,9 @@ makersklub.com`,
               </table>
 
               <!-- Signature -->
-              <div style="margin-top:36px;padding-top:20px;border-top:1px solid #f0ece4;">
+              <div style="margin-top:36px;padding-top:20px;border-top:1px solid #e0d8c8;">
                 <p style="margin:0;font-size:13px;color:#0f1e3d;font-weight:500;">Tushar Rungta</p>
-                <p style="margin:2px 0 0;font-size:13px;color:#9b9b9b;">Founder, Makers Klub</p>
+                <p style="margin:2px 0 0;font-size:13px;color:#8a93a8;">Founder, Makers Klub</p>
               </div>
 
             </td>
@@ -145,9 +145,9 @@ makersklub.com`,
           <!-- Footer -->
           <tr>
             <td style="padding:24px 0 0;">
-              <p style="margin:0;font-size:12px;color:#aaaaaa;line-height:1.6;">
+              <p style="margin:0;font-size:12px;color:#8a93a8;line-height:1.6;">
                 Makers Klub · Berlin ·
-                <a href="https://www.makersklub.com" style="color:#aaaaaa;">makersklub.com</a><br/>
+                <a href="https://www.makersklub.com" style="color:#8a93a8;">makersklub.com</a><br/>
                 You're receiving this because you signed up to Makers Klub.
               </p>
             </td>
