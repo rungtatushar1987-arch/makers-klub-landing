@@ -1,3 +1,18 @@
+# Vercel
 .vercel
+
+# Environment
 .env*.local
+.env
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# OS
+.DS_Store
+
+# Images
 *.jpg
