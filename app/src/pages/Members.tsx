@@ -25,7 +25,6 @@ export default function Members() {
   // Filters
   const [filterEvent, setFilterEvent] = useState<string>('all')
   const [filterTag, setFilterTag] = useState<string>('all')
-  const [filterOpen, setFilterOpen] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -113,99 +112,71 @@ export default function Members() {
         paddingBottom: 20,
         paddingTop: 4,
       }}>
-        <div className="mkw-pagehead" style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+        <div className="mkw-pagehead" style={{ marginBottom: 16, paddingBottom: 16 }}>
           <div>
             <div className="eyebrow">Your people · {connections.length} connections</div>
             <h1>Network</h1>
             <p className="sub">Everyone you've met at Makers Klub events.</p>
           </div>
           <div className="actions">
-            <button
-              className={`mk-btn ${filterOpen ? 'mk-btn-navy' : 'mk-btn-ghost'}`}
-              onClick={() => setFilterOpen(o => !o)}
-            >
-              Filter {activeFilters > 0 && `(${activeFilters})`}
-            </button>
             <button className="mk-btn mk-btn-ochre">Export contacts →</button>
           </div>
         </div>
 
-        {/* Filter panel */}
-        {filterOpen && (
-          <div style={{
-            marginTop: 16,
-            background: 'var(--mk-white)',
-            border: '1px solid var(--border-1)',
-            borderRadius: 12,
-            padding: '18px 22px',
-            display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'flex-start'
-          }}>
-            {/* Event filter */}
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 10 }}>Event</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                <button
-                  onClick={() => setFilterEvent('all')}
-                  style={{
-                    padding: '6px 14px', borderRadius: 999, border: `1.5px solid ${filterEvent === 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                    background: filterEvent === 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
-                    color: filterEvent === 'all' ? '#fff' : 'var(--fg-2)',
-                    fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)'
-                  }}
-                >All</button>
-                {eventNames.map(name => (
-                  <button
-                    key={name}
-                    onClick={() => setFilterEvent(name)}
-                    style={{
-                      padding: '6px 14px', borderRadius: 999, border: `1.5px solid ${filterEvent === name ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                      background: filterEvent === name ? 'var(--mk-navy)' : 'var(--mk-white)',
-                      color: filterEvent === name ? '#fff' : 'var(--fg-2)',
-                      fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)'
-                    }}
-                  >{name}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Action tag filter */}
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 10 }}>Action item</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                <button
-                  onClick={() => setFilterTag('all')}
-                  style={{
-                    padding: '6px 14px', borderRadius: 999, border: `1.5px solid ${filterTag === 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                    background: filterTag === 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
-                    color: filterTag === 'all' ? '#fff' : 'var(--fg-2)',
-                    fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)'
-                  }}
-                >All</button>
-                {ACTION_TAGS.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => setFilterTag(tag)}
-                    style={{
-                      padding: '6px 14px', borderRadius: 999, border: `1.5px solid ${filterTag === tag ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                      background: filterTag === tag ? 'var(--mk-navy)' : 'var(--mk-white)',
-                      color: filterTag === tag ? '#fff' : 'var(--fg-2)',
-                      fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)'
-                    }}
-                  >{tag}</button>
-                ))}
-              </div>
-            </div>
-
-            {activeFilters > 0 && (
-              <button
-                onClick={() => { setFilterEvent('all'); setFilterTag('all') }}
-                style={{ alignSelf: 'flex-end', background: 'none', border: 'none', color: 'var(--fg-3)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)', textDecoration: 'underline' }}
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-        )}
+        {/* Filter row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-3)', letterSpacing: 0.3, whiteSpace: 'nowrap' }}>Filter by</span>
+          <select
+            value={filterEvent}
+            onChange={e => setFilterEvent(e.target.value)}
+            style={{
+              padding: '7px 32px 7px 14px', borderRadius: 999,
+              border: `1.5px solid ${filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
+              background: filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
+              color: filterEvent !== 'all' ? '#fff' : 'var(--fg-2)',
+              fontSize: 12, fontWeight: 500, cursor: 'pointer',
+              fontFamily: 'var(--font-body)', outline: 'none',
+              appearance: 'none',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${filterEvent !== 'all' ? '%23ffffff' : '%238a93a8'}' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 10px center',
+            }}
+          >
+            <option value="all">All events</option>
+            {eventNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <select
+            value={filterTag}
+            onChange={e => setFilterTag(e.target.value)}
+            style={{
+              padding: '7px 32px 7px 14px', borderRadius: 999,
+              border: `1.5px solid ${filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
+              background: filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
+              color: filterTag !== 'all' ? '#fff' : 'var(--fg-2)',
+              fontSize: 12, fontWeight: 500, cursor: 'pointer',
+              fontFamily: 'var(--font-body)', outline: 'none',
+              appearance: 'none',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${filterTag !== 'all' ? '%23ffffff' : '%238a93a8'}' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 10px center',
+            }}
+          >
+            <option value="all">All action items</option>
+            {ACTION_TAGS.map(tag => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
+          </select>
+          {activeFilters > 0 && (
+            <button
+              onClick={() => { setFilterEvent('all'); setFilterTag('all') }}
+              style={{ background: 'none', border: 'none', color: 'var(--fg-3)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)', textDecoration: 'underline' }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Results count */}
