@@ -7,6 +7,8 @@ type Connection = {
   connected_clerk_user_id: string
   event_name: string
   notes: string
+  tags: string[]
+  follow_up: boolean
   action_tags: string[]
   remind_followup: boolean
   created_at: string
@@ -44,6 +46,8 @@ export default function Members() {
 
       setConnections(connsData.map((c: Connection) => ({
         ...c,
+        tags: c.tags || [],
+        follow_up: c.follow_up || false,
         action_tags: c.action_tags || [],
         remind_followup: c.remind_followup || false,
         profile: profileMap.get(c.connected_clerk_user_id)
@@ -54,14 +58,14 @@ export default function Members() {
   }, [user])
 
   // Derived stats
-  const followupCount = connections.filter(c => c.action_tags?.length > 0).length
+  const followupCount = connections.filter(c => c.tags?.length > 0).length
   const eventNames = [...new Set(connections.map(c => c.event_name).filter(Boolean))]
 
   // Filtered list
   const filtered = useMemo(() => {
     return connections.filter(c => {
       const eventMatch = filterEvent === 'all' || c.event_name === filterEvent
-      const tagMatch = filterTag === 'all' || c.action_tags?.includes(filterTag)
+      const tagMatch = filterTag === 'all' || c.tags?.includes(filterTag)
       return eventMatch && tagMatch
     })
   }, [connections, filterEvent, filterTag])
@@ -71,24 +75,24 @@ export default function Members() {
   }
 
   function toggleTag(conn: Connection, tag: string) {
-    const tags = conn.action_tags.includes(tag)
-      ? conn.action_tags.filter(t => t !== tag)
-      : [...conn.action_tags, tag]
-    updateConn(conn.id, { action_tags: tags })
+    const tags = conn.tags.includes(tag)
+      ? conn.tags.filter(t => t !== tag)
+      : [...conn.tags, tag]
+    updateConn(conn.id, { tags })
   }
 
   async function clearTag(conn: Connection, tag: string) {
-    const tags = conn.action_tags.filter(t => t !== tag)
-    updateConn(conn.id, { action_tags: tags })
-    await supabase.from('connections').update({ action_tags: tags }).eq('id', conn.id)
+    const tags = conn.tags.filter(t => t !== tag)
+    updateConn(conn.id, { tags })
+    await supabase.from('connections').update({ tags }).eq('id', conn.id)
   }
 
   async function saveConnection(conn: Connection) {
     setSavingConn(conn.id)
     await supabase.from('connections').update({
       notes: conn.notes,
-      action_tags: conn.action_tags,
-      remind_followup: conn.remind_followup
+      tags: conn.tags,
+      follow_up: conn.follow_up
     }).eq('id', conn.id)
     setSavingConn(null)
     setEditingConn(null)
@@ -244,7 +248,7 @@ export default function Members() {
                   <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, color: 'var(--mk-navy)', marginBottom: 2 }}>
                     {conn.profile?.full_name || 'Member'}
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: conn.action_tags?.length > 0 || conn.notes ? 8 : 0 }}>
+                  <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: conn.tags?.length > 0 || conn.notes ? 8 : 0 }}>
                     {conn.profile?.role_category
                       ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1)
                       : 'Maker'}
@@ -253,19 +257,19 @@ export default function Members() {
                     {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </div>
                   {conn.notes && !isEditing && (
-                    <div style={{
-                      fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13,
-                      color: 'var(--fg-2)', padding: '8px 12px',
-                      borderLeft: '3px solid var(--mk-ochre)',
-                      background: 'var(--mk-cream-2)', borderRadius: '0 6px 6px 0',
-                      lineHeight: 1.5, marginBottom: conn.action_tags?.length > 0 ? 8 : 0
-                    }}>
+                  <div style={{
+                  fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13,
+                  color: 'var(--fg-2)', padding: '8px 12px',
+                  borderLeft: '3px solid var(--mk-ochre)',
+                  background: 'var(--mk-cream-2)', borderRadius: '0 6px 6px 0',
+                  lineHeight: 1.5, marginBottom: conn.tags?.length > 0 ? 8 : 0
+                  }}>
                       {conn.notes}
                     </div>
                   )}
-                  {conn.action_tags?.length > 0 && !isEditing && (
+                  {conn.tags?.length > 0 && !isEditing && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {conn.action_tags.map(tag => (
+                      {conn.tags.map(tag => (
                         <span key={tag} style={{
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                           background: 'rgba(244,168,51,0.15)', color: '#8a5d10',
@@ -318,7 +322,7 @@ export default function Members() {
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Action items</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {ACTION_TAGS.map(tag => {
-                        const selected = conn.action_tags.includes(tag)
+                        const selected = conn.tags.includes(tag)
                         return (
                           <button
                             key={tag}
@@ -340,8 +344,8 @@ export default function Members() {
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--fg-2)', cursor: 'pointer', fontWeight: 500 }}>
                       <input
                         type="checkbox"
-                        checked={conn.remind_followup}
-                        onChange={e => updateConn(conn.id, { remind_followup: e.target.checked })}
+                        checked={conn.follow_up}
+                        onChange={e => updateConn(conn.id, { follow_up: e.target.checked })}
                         style={{ accentColor: 'var(--mk-ochre)', width: 15, height: 15 }}
                       />
                       Remind me to follow up
