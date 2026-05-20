@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import Events from './pages/Events'
@@ -20,7 +21,7 @@ function Protected({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SignedIn><AppShell>{children}</AppShell></SignedIn>
-      <SignedOut><RedirectToSignIn /></SignedOut>
+      <SignedOut><Navigate to="/app/login" replace /></SignedOut>
     </>
   )
 }
