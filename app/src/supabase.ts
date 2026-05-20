@@ -44,12 +44,13 @@ export type Connection = {
 }
 
 export const ACTION_TAGS = [
-  'Send CV',
-  'Schedule discovery call',
+  'Intro call',
+  'Send email',
   'Share portfolio',
+  'Collab discussion',
+  'Send CV',
   'Make introduction',
   'Follow up',
-  'Send proposal',
   'Connect on LinkedIn',
 ]
 
