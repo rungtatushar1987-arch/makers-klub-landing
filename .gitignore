@@ -16,3 +16,4 @@ dist/
 
 # Images
 *.jpg
+.DS_Store

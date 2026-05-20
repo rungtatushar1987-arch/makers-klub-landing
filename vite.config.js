@@ -1,13 +1,17 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  plugins: [react()],
   root: './',
+  publicDir: 'app/public',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: './index.html'
+        main: './index.html',
+        app: './app/index.html'
       }
     }
   },
@@ -22,6 +26,7 @@ export default defineConfig({
     }
   },
   resolve: {
-    extensions: ['.js', '.mjs', '.json']
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.json']
   },
+  appType: 'mpa'
 })

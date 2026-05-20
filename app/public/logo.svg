@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="92" fill="#cdbcf5"></circle>
+  <text x="100" y="92" text-anchor="middle" font-family="Inter, sans-serif" font-weight="500" font-size="22" fill="#0f1e3d" letter-spacing="0.5">makers</text>
+  <text x="100" y="128" text-anchor="middle" font-family="Fraunces, Recoleta, Georgia, serif" font-weight="800" font-size="42" fill="#0f1e3d" letter-spacing="2">KLUB</text>
+</svg>

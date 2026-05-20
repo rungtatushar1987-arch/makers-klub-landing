@@ -1,0 +1,68 @@
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useUser, useClerk } from '@clerk/clerk-react'
+
+export default function Sidebar() {
+  const { user } = useUser()
+  const { signOut } = useClerk()
+  const navigate = useNavigate()
+
+  const initials = user?.fullName
+    ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : '?'
+
+  const role = 'Member · Berlin'
+
+  return (
+    <aside className="mkw-side">
+      <div className="mkw-brand">
+        <div className="mkw-brand-mark">MK</div>
+        <div className="mkw-brand-name">Makers Klub</div>
+      </div>
+
+      <nav className="mkw-nav">
+        <div className="mkw-nav-label">Klub</div>
+
+        <NavLink
+          to="/app/dashboard"
+          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="nav-ic">◇</span> Home
+        </NavLink>
+
+        <NavLink
+          to="/app/events"
+          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="nav-ic">▭</span> Events
+        </NavLink>
+
+        <NavLink
+          to="/app/network"
+          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="nav-ic">♡</span> Network
+        </NavLink>
+
+        <div className="mkw-nav-label" style={{ marginTop: 14 }}>Account</div>
+
+        <NavLink
+          to="/app/profile"
+          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+        >
+          <span className="nav-ic">◉</span> My brief
+        </NavLink>
+      </nav>
+
+      <div className="mkw-side-foot">
+        <div className="av" style={{ background: '#f4a833', color: '#0f1e3d' }}>{initials}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="who" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {user?.fullName || user?.firstName || 'Member'}
+          </div>
+          <div className="sub">{role}</div>
+        </div>
+        <button onClick={() => signOut(() => navigate('/app/login'))}>Sign out</button>
+      </div>
+    </aside>
+  )
+}

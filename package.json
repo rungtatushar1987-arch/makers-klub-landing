@@ -9,14 +9,27 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": ["networking", "creatives", "berlin", "community"],
+  "keywords": [
+    "networking",
+    "creatives",
+    "berlin",
+    "community"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.6",
     "@supabase/supabase-js": "^2.39.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
     "resend": "^3.2.0"
   },
   "devDependencies": {
-    "vite": "^5.0.12"
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13"
   }
 }
