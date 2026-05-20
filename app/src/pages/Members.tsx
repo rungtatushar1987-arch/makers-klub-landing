@@ -130,16 +130,12 @@ export default function Members() {
             value={filterEvent}
             onChange={e => setFilterEvent(e.target.value)}
             style={{
-              padding: '7px 32px 7px 14px', borderRadius: 999,
+              padding: '7px 14px', borderRadius: 999,
               border: `1.5px solid ${filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
               background: filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
               color: filterEvent !== 'all' ? '#fff' : 'var(--fg-2)',
               fontSize: 12, fontWeight: 500, cursor: 'pointer',
               fontFamily: 'var(--font-body)', outline: 'none',
-              appearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${filterEvent !== 'all' ? '%23ffffff' : '%238a93a8'}' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 10px center',
             }}
           >
             <option value="all">All events</option>
@@ -151,16 +147,12 @@ export default function Members() {
             value={filterTag}
             onChange={e => setFilterTag(e.target.value)}
             style={{
-              padding: '7px 32px 7px 14px', borderRadius: 999,
+              padding: '7px 14px', borderRadius: 999,
               border: `1.5px solid ${filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
               background: filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
               color: filterTag !== 'all' ? '#fff' : 'var(--fg-2)',
               fontSize: 12, fontWeight: 500, cursor: 'pointer',
               fontFamily: 'var(--font-body)', outline: 'none',
-              appearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${filterTag !== 'all' ? '%23ffffff' : '%238a93a8'}' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 10px center',
             }}
           >
             <option value="all">All action items</option>
