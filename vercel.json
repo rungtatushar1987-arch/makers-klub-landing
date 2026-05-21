@@ -4,6 +4,7 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/login(.*)", "dest": "/app/index.html" },
+    { "src": "/signup(.*)", "dest": "/app/index.html" },
     { "src": "/home(.*)", "dest": "/app/index.html" },
     { "src": "/events(.*)", "dest": "/app/index.html" },
     { "src": "/network(.*)", "dest": "/app/index.html" },
