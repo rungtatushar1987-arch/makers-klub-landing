@@ -12,6 +12,7 @@ node_modules/
 dist/
 
 # OS
+BUILD_LOG.md
 .DS_Store
 
 # Images
