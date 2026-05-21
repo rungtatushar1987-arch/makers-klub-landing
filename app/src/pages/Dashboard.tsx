@@ -1,26 +1,10 @@
-import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
-import { supabase, type Event, type Profile, ACTION_TAGS, getInitials, getAvatarColor } from '../supabase'
-
-type Connection = {
-  id: string
-  connected_clerk_user_id: string
-  event_name: string
-  notes: string
-  action_tags: string[]
-  remind_followup: boolean
-  created_at: string
-  profile?: Profile
-}
+import { useKlub } from '../KlubContext'
+import { type Event, ACTION_TAGS, getInitials, getAvatarColor } from '../supabase'
 
 export default function Dashboard() {
   const { user } = useUser()
-  const [connections, setConnections] = useState<Connection[]>([])
-  const [events, setEvents] = useState<Event[]>([])
-  const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
-  const [loading, setLoading] = useState(true)
-  const [editingConn, setEditingConn] = useState<string | null>(null)
-  const [savingConn, setSavingConn] = useState<string | null>(null)
+  const { connections, events, rsvpd, loading, toggleRsvp, clearTag } = useKlub()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
@@ -32,77 +16,6 @@ export default function Dashboard() {
   const registeredUpcoming = upcoming.filter(e => rsvpd.has(e.id))
   const recommendedUpcoming = upcoming.filter(e => !rsvpd.has(e.id))
   const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
-
-  useEffect(() => {
-    async function load() {
-      const [{ data: connsData }, { data: eventsData }, { data: rsvpData }] = await Promise.all([
-        supabase.from('connections').select('*').eq('clerk_user_id', user?.id).order('created_at', { ascending: false }),
-        supabase.from('events').select('*').order('date'),
-        supabase.from('event_rsvps').select('event_id').eq('clerk_user_id', user?.id)
-      ])
-
-      if (eventsData) setEvents(eventsData)
-      if (rsvpData) setRsvpd(new Set(rsvpData.map((r: { event_id: string }) => r.event_id)))
-
-      if (connsData) {
-        const ids = connsData.map((c: Connection) => c.connected_clerk_user_id)
-        if (ids.length > 0) {
-          const { data: profilesData } = await supabase.from('profiles').select('*').in('clerk_user_id', ids)
-          const profileMap = new Map((profilesData || []).map((p: Profile) => [p.clerk_user_id, p]))
-          setConnections(connsData.map((c: Connection) => ({
-            ...c,
-            action_tags: c.action_tags || [],
-            remind_followup: c.remind_followup || false,
-            profile: profileMap.get(c.connected_clerk_user_id)
-          })))
-        } else {
-          setConnections([])
-        }
-      }
-      setLoading(false)
-    }
-    if (user) load()
-  }, [user])
-
-  async function saveConnection(conn: Connection) {
-    setSavingConn(conn.id)
-    await supabase.from('connections').update({
-      notes: conn.notes,
-      action_tags: conn.action_tags,
-      remind_followup: conn.remind_followup
-    }).eq('id', conn.id)
-    setSavingConn(null)
-    setEditingConn(null)
-  }
-
-  function updateConn(id: string, patch: Partial<Connection>) {
-    setConnections(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c))
-  }
-
-  function toggleTag(conn: Connection, tag: string) {
-    const tags = conn.action_tags.includes(tag)
-      ? conn.action_tags.filter(t => t !== tag)
-      : [...conn.action_tags, tag]
-    updateConn(conn.id, { action_tags: tags })
-  }
-
-  async function clearTag(conn: Connection, tag: string) {
-    const tags = conn.action_tags.filter(t => t !== tag)
-    updateConn(conn.id, { action_tags: tags })
-    await supabase.from('connections').update({ action_tags: tags }).eq('id', conn.id)
-  }
-
-  async function toggleRsvp(event: Event) {
-    if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
-    const going = rsvpd.has(event.id)
-    if (going) {
-      await supabase.from('event_rsvps').delete().eq('clerk_user_id', user?.id).eq('event_id', event.id)
-      setRsvpd(prev => { const s = new Set(prev); s.delete(event.id); return s })
-    } else {
-      await supabase.from('event_rsvps').insert({ clerk_user_id: user?.id, event_id: event.id, status: 'going' })
-      setRsvpd(prev => new Set([...prev, event.id]))
-    }
-  }
 
   if (loading) return <div className="mkw-loading">Loading…</div>
 
@@ -152,14 +65,13 @@ export default function Dashboard() {
           <h1>Good {greeting}, <em>{firstName}.</em></h1>
         </div>
         <div className="actions">
-          <a href="/app/profile" className="mk-btn mk-btn-ghost">My brief</a>
+          <a href="/profile" className="mk-btn mk-btn-ghost">My brief</a>
         </div>
       </div>
 
       <div className="mkw-home-grid">
         <div className="mkw-home-left">
 
-          {/* 1. Stats bar */}
           <div className="mkw-stats">
             <div className="mkw-stat">
               <div className="lbl">Connections</div>
@@ -180,16 +92,15 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* 2. Recent connections */}
           <div className="mkw-card">
             <div className="mkw-h3">
               <span>Recent connections</span>
-              <a href="/app/network">See all →</a>
+              <a href="/network">See all →</a>
             </div>
             {connections.length === 0 ? (
               <div style={{ padding: '20px 0', textAlign: 'center' }}>
                 <p style={{ fontSize: 14, color: 'var(--fg-3)', marginBottom: 12 }}>No connections yet. Come to an event.</p>
-                <a href="/app/events" className="mk-btn mk-btn-navy mk-btn-sm">See events →</a>
+                <a href="/events" className="mk-btn mk-btn-navy mk-btn-sm">See events →</a>
               </div>
             ) : (
               <div className="mkw-rows">
@@ -214,7 +125,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* 3. Pending actions */}
           {pendingConnections.length > 0 && (
             <div className="mkw-card">
               <div className="mkw-h3">
@@ -255,43 +165,33 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* 4. Events attended */}
           <div className="mkw-card">
             <div className="mkw-h3">
               <span>Events</span>
-              <a href="/app/events">See all →</a>
+              <a href="/events">See all →</a>
             </div>
 
-            {/* Registered upcoming */}
             {registeredUpcoming.length > 0 && (
               <>
-                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--mk-ochre)', fontWeight: 700, marginBottom: 10 }}>
-                  Registered
-                </div>
+                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--mk-ochre)', fontWeight: 700, marginBottom: 10 }}>Registered</div>
                 <div className="mkw-rows" style={{ marginBottom: 20 }}>
                   {registeredUpcoming.map(event => <EventRow key={event.id} event={event} />)}
                 </div>
               </>
             )}
 
-            {/* Recommended upcoming */}
             {recommendedUpcoming.length > 0 && (
               <>
-                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', fontWeight: 700, marginBottom: 10 }}>
-                  Recommended
-                </div>
+                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', fontWeight: 700, marginBottom: 10 }}>Recommended</div>
                 <div className="mkw-rows" style={{ marginBottom: 20 }}>
                   {recommendedUpcoming.slice(0, 3).map(event => <EventRow key={event.id} event={event} />)}
                 </div>
               </>
             )}
 
-            {/* Attended past */}
             {attended.length > 0 && (
               <>
-                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', fontWeight: 700, marginBottom: 10 }}>
-                  Attended
-                </div>
+                <div style={{ fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--fg-3)', fontWeight: 700, marginBottom: 10 }}>Attended</div>
                 <div className="mkw-rows">
                   {attended.map(event => <EventRow key={event.id} event={event} dim />)}
                 </div>
@@ -306,7 +206,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Right column — all upcoming MK events */}
         <div className="mkw-home-right">
           <div className="mkw-card mkw-card-cream" style={{ position: 'sticky', top: 28 }}>
             <div className="mkw-h3" style={{ marginBottom: 16 }}>

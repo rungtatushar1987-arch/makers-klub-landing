@@ -7,7 +7,7 @@ export default function Login() {
         <div className="mkw-login-mark">MK</div>
         <span className="mkw-login-name">Makers Klub</span>
       </div>
-      <SignIn routing="path" path="/app/login" afterSignInUrl="/app/dashboard" />
+      <SignIn routing="path" path="/login" afterSignInUrl="/home" />
     </div>
   )
 }

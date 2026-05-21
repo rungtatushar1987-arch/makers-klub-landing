@@ -1,0 +1,23 @@
+/* preview/_card.css — base styling shared by all preview cards (light theme) */
+@import url('../colors_and_type.css');
+
+html, body {
+  margin: 0;
+  background: var(--mk-cream);
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+body {
+  width: 700px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.row { display: flex; align-items: center; gap: 16px; }
+.col { display: flex; flex-direction: column; gap: 16px; }
+.label { font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--mk-ochre); font-weight: 600; }
+.tiny { font-size: 11px; color: var(--fg-3); font-family: ui-monospace, 'SF Mono', monospace; }
+.swatch { width: 120px; height: 120px; border-radius: 10px; border: 1px solid var(--border-1); }

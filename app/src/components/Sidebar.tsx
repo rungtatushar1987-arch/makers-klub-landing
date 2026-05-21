@@ -23,21 +23,21 @@ export default function Sidebar() {
         <div className="mkw-nav-label">Klub</div>
 
         <NavLink
-          to="/app/dashboard"
+          to="/home"
           className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
         >
           <span className="nav-ic">◇</span> Home
         </NavLink>
 
         <NavLink
-          to="/app/events"
+          to="/events"
           className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
         >
           <span className="nav-ic">▭</span> Events
         </NavLink>
 
         <NavLink
-          to="/app/network"
+          to="/network"
           className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
         >
           <span className="nav-ic">♡</span> Network
@@ -46,7 +46,7 @@ export default function Sidebar() {
         <div className="mkw-nav-label" style={{ marginTop: 14 }}>Account</div>
 
         <NavLink
-          to="/app/profile"
+          to="/profile"
           className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
         >
           <span className="nav-ic">◉</span> My brief
@@ -61,7 +61,7 @@ export default function Sidebar() {
           </div>
           <div className="sub">{role}</div>
         </div>
-        <button onClick={() => signOut(() => navigate('/app/login'))}>Sign out</button>
+        <button onClick={() => signOut(() => navigate('/login'))}>Sign out</button>
       </div>
     </aside>
   )

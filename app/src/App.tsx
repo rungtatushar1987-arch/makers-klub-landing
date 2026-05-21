@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
+import { KlubProvider } from './KlubContext'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import Events from './pages/Events'
@@ -7,37 +8,36 @@ import Members from './pages/Members'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 
-function AppShell({ children }: { children: React.ReactNode }) {
+function AppShell() {
   return (
-    <div className="mkw">
-      <Sidebar />
-      <main className="mkw-main">{children}</main>
-    </div>
+    <KlubProvider>
+      <div className="mkw">
+        <Sidebar />
+        <main className="mkw-main"><Outlet /></main>
+      </div>
+    </KlubProvider>
   )
 }
 
-function Protected({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <SignedIn><AppShell>{children}</AppShell></SignedIn>
-      <SignedOut><Navigate to="/app/login" replace /></SignedOut>
-    </>
-  )
+function ProtectedLayout() {
+  const { isSignedIn, isLoaded } = useAuth()
+  if (!isLoaded) return null
+  if (!isSignedIn) return <Navigate to="/login" replace />
+  return <AppShell />
 }
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/app/login/*"    element={<Login />} />
-        <Route path="/app/dashboard"  element={<Protected><Dashboard /></Protected>} />
-        <Route path="/app/events"     element={<Protected><Events /></Protected>} />
-        <Route path="/app/network"    element={<Protected><Members /></Protected>} />
-        <Route path="/app/members"    element={<Protected><Members /></Protected>} />
-        <Route path="/app/profile"    element={<Protected><Profile /></Protected>} />
-        <Route path="/app/index.html" element={<Navigate to="/app/dashboard" replace />} />
-        <Route path="/app"            element={<Navigate to="/app/dashboard" replace />} />
-        <Route path="/"               element={<Navigate to="/app/dashboard" replace />} />
+        <Route path="/login/*" element={<Login />} />
+        <Route element={<ProtectedLayout />}>
+          <Route path="/home"    element={<Dashboard />} />
+          <Route path="/events"  element={<Events />} />
+          <Route path="/network" element={<Members />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/home" replace />} />
       </Routes>
     </BrowserRouter>
   )

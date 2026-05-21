@@ -3,9 +3,9 @@ import { useUser, UserButton } from '@clerk/clerk-react'
 import './Layout.css'
 
 const nav = [
-  { to: '/', label: 'Dashboard', icon: '◇' },
+  { to: '/home', label: 'Dashboard', icon: '◇' },
   { to: '/events', label: 'Events', icon: '◈' },
-  { to: '/members', label: 'Members', icon: '◉' },
+  { to: '/network', label: 'Members', icon: '◉' },
   { to: '/profile', label: 'Profile', icon: '◎' },
 ]
 
@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavLink
               key={to}
               to={to}
-              end={to === '/'}
+              end={to === '/home'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <span className="nav-icon">{icon}</span>
@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="sidebar-footer">
-          <UserButton afterSignOutUrl="/app/login" />
+          <UserButton afterSignOutUrl="/login" />
           <div className="sidebar-user">
             <p className="sidebar-name">{user?.firstName} {user?.lastName}</p>
             <p className="sidebar-email">{user?.primaryEmailAddress?.emailAddress}</p>

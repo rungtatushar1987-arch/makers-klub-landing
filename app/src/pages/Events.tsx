@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
+import { useKlub } from '../KlubContext'
 import { supabase, type Event, type Profile, ACTION_TAGS, getInitials, getAvatarColor } from '../supabase'
 
 type Attendee = {
@@ -8,62 +9,29 @@ type Attendee = {
   connected: boolean
 }
 
-type Connection = {
-  id: string
-  connected_clerk_user_id: string
-  event_name: string
-  notes: string
+type PendingConn = {
   action_tags: string[]
+  notes: string
   remind_followup: boolean
 }
 
 export default function Events() {
   const { user } = useUser()
+  const { events, rsvpd, toggleRsvp, connections, addConnection, loading } = useKlub()
+
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
-  const [events, setEvents] = useState<Event[]>([])
-  const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
-  const [myConnectionIds, setMyConnectionIds] = useState<Set<string>>(new Set())
   const [attendees, setAttendees] = useState<Record<string, Attendee[]>>({})
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [connectingUser, setConnectingUser] = useState<string | null>(null)
-
-  // Connection edit state
   const [editingAttendee, setEditingAttendee] = useState<string | null>(null)
-  const [pendingConn, setPendingConn] = useState<Partial<Connection>>({})
-  const [savingConn, setSavingConn] = useState(false)
+  const [pendingConn, setPendingConn] = useState<PendingConn>({ action_tags: [], notes: '', remind_followup: false })
+
+  const myConnectionIds = new Set(connections.map(c => c.connected_clerk_user_id))
 
   const now = new Date()
   const upcoming = events.filter(e => new Date(e.date) >= now)
   const past = events.filter(e => new Date(e.date) < now).reverse()
   const shown = tab === 'upcoming' ? upcoming : past
-
-  useEffect(() => {
-    async function load() {
-      const [{ data: eventsData }, { data: rsvpData }, { data: connsData }] = await Promise.all([
-        supabase.from('events').select('*').order('date'),
-        supabase.from('event_rsvps').select('event_id').eq('clerk_user_id', user?.id),
-        supabase.from('connections').select('connected_clerk_user_id').eq('clerk_user_id', user?.id)
-      ])
-      if (eventsData) setEvents(eventsData)
-      if (rsvpData) setRsvpd(new Set(rsvpData.map((r: { event_id: string }) => r.event_id)))
-      if (connsData) setMyConnectionIds(new Set(connsData.map((c: { connected_clerk_user_id: string }) => c.connected_clerk_user_id)))
-      setLoading(false)
-    }
-    if (user) load()
-  }, [user])
-
-  async function toggleRsvp(event: Event) {
-    if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
-    const going = rsvpd.has(event.id)
-    if (going) {
-      await supabase.from('event_rsvps').delete().eq('clerk_user_id', user?.id).eq('event_id', event.id)
-      setRsvpd(prev => { const s = new Set(prev); s.delete(event.id); return s })
-    } else {
-      await supabase.from('event_rsvps').insert({ clerk_user_id: user?.id, event_id: event.id, status: 'going' })
-      setRsvpd(prev => new Set([...prev, event.id]))
-    }
-  }
 
   async function loadAttendees(event: Event) {
     if (expandedEvent === event.id) { setExpandedEvent(null); return }
@@ -94,13 +62,13 @@ export default function Events() {
       clerk_user_id: user?.id,
       connected_clerk_user_id: attendee.clerk_user_id,
       event_name: eventTitle,
-      action_tags: pendingConn.action_tags || [],
-      notes: pendingConn.notes || '',
-      remind_followup: pendingConn.remind_followup || false
+      action_tags: pendingConn.action_tags,
+      notes: pendingConn.notes,
+      remind_followup: pendingConn.remind_followup
     }).select().single()
 
     if (data) {
-      setMyConnectionIds(prev => new Set([...prev, attendee.clerk_user_id]))
+      addConnection({ ...data, profile: attendee.profile })
       setAttendees(prev => {
         const updated = { ...prev }
         Object.keys(updated).forEach(eid => {
@@ -113,22 +81,16 @@ export default function Events() {
     }
     setConnectingUser(null)
     setEditingAttendee(null)
-    setPendingConn({})
-  }
-
-  function startConnect(attendee: Attendee) {
-    setEditingAttendee(attendee.clerk_user_id)
     setPendingConn({ action_tags: [], notes: '', remind_followup: false })
   }
 
   function togglePendingTag(tag: string) {
-    setPendingConn(prev => {
-      const tags = prev.action_tags || []
-      return {
-        ...prev,
-        action_tags: tags.includes(tag) ? tags.filter(t => t !== tag) : [...tags, tag]
-      }
-    })
+    setPendingConn(prev => ({
+      ...prev,
+      action_tags: prev.action_tags.includes(tag)
+        ? prev.action_tags.filter(t => t !== tag)
+        : [...prev.action_tags, tag]
+    }))
   }
 
   if (loading) return <div className="mkw-loading">Loading…</div>
@@ -142,18 +104,12 @@ export default function Events() {
           <p className="sub">Show up, meet people, grow your network.</p>
         </div>
         <div className="actions">
-          <a
-            href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz"
-            target="_blank"
-            rel="noreferrer"
-            className="mk-btn mk-btn-ochre"
-          >
+          <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" rel="noreferrer" className="mk-btn mk-btn-ochre">
             Full calendar →
           </a>
         </div>
       </div>
 
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid var(--border-1)', marginBottom: 24 }}>
         {(['upcoming', 'past'] as const).map(t => (
           <button
@@ -187,14 +143,8 @@ export default function Events() {
           const eventAttendees = attendees[event.id] || []
 
           return (
-            <div key={event.id} style={{
-              background: 'var(--mk-white)',
-              border: '1px solid var(--border-1)',
-              borderRadius: 14, overflow: 'hidden'
-            }}>
-              {/* Event row */}
+            <div key={event.id} style={{ background: 'var(--mk-white)', border: '1px solid var(--border-1)', borderRadius: 14, overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '18px 22px' }}>
-                {/* Date block */}
                 <div style={{
                   width: 52, height: 56, borderRadius: 10, flexShrink: 0,
                   background: isPast ? 'var(--mk-cream-2)' : 'var(--mk-navy)',
@@ -208,7 +158,6 @@ export default function Events() {
                   </div>
                 </div>
 
-                {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
                     <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16, color: isPast ? 'var(--fg-2)' : 'var(--mk-navy)' }}>
@@ -225,7 +174,6 @@ export default function Events() {
                   )}
                 </div>
 
-                {/* Actions */}
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   {isPast && (
                     <button className="mkw-row-action" onClick={() => loadAttendees(event)}>
@@ -233,24 +181,18 @@ export default function Events() {
                     </button>
                   )}
                   {!isPast && (
-                    <button
-                      className={`mkw-row-action ${going ? '' : 'primary'}`}
-                      onClick={() => toggleRsvp(event)}
-                      style={going ? { color: '#1e7a3f' } : {}}
-                    >
+                    <button className={`mkw-row-action ${going ? '' : 'primary'}`} onClick={() => toggleRsvp(event)} style={going ? { color: '#1e7a3f' } : {}}>
                       {going ? '✓ Going' : 'RSVP →'}
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Attendee list */}
               {expanded && (
                 <div style={{ borderTop: '1px solid var(--border-1)', padding: '20px 22px' }}>
                   <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 16 }}>
                     People at this event · {eventAttendees.length}
                   </p>
-
                   {eventAttendees.length === 0 ? (
                     <p style={{ fontSize: 13, color: 'var(--fg-3)' }}>No other attendees found.</p>
                   ) : (
@@ -278,32 +220,24 @@ export default function Events() {
                               {attendee.connected ? (
                                 <span className="mkw-tag green" style={{ padding: '7px 14px', fontSize: 12 }}>Connected ✓</span>
                               ) : isEditing ? (
-                                <button className="mkw-row-action" onClick={() => { setEditingAttendee(null); setPendingConn({}) }}>
-                                  Cancel
-                                </button>
+                                <button className="mkw-row-action" onClick={() => setEditingAttendee(null)}>Cancel</button>
                               ) : (
-                                <button className="mkw-row-action primary" onClick={() => startConnect(attendee)}>
-                                  Say Hi →
-                                </button>
+                                <button className="mkw-row-action primary" onClick={() => setEditingAttendee(attendee.clerk_user_id)}>Say Hi →</button>
                               )}
                             </div>
 
-                            {/* Inline connect panel */}
                             {isEditing && (
                               <div style={{
-                                margin: '4px 0 12px 56px',
-                                background: 'var(--mk-cream)',
-                                border: '1px solid var(--border-1)',
-                                borderRadius: 12, padding: 18,
+                                margin: '4px 0 12px 56px', background: 'var(--mk-cream)',
+                                border: '1px solid var(--border-1)', borderRadius: 12, padding: 18,
                                 display: 'flex', flexDirection: 'column', gap: 14
                               }}>
                                 <div>
                                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Note</div>
                                   <textarea
-                                    className="mkw-form-textarea"
-                                    rows={2}
+                                    className="mkw-form-textarea" rows={2}
                                     placeholder="How did you meet? What did you talk about?"
-                                    value={pendingConn.notes || ''}
+                                    value={pendingConn.notes}
                                     onChange={e => setPendingConn(prev => ({ ...prev, notes: e.target.value }))}
                                     style={{ fontSize: 13 }}
                                   />
@@ -312,41 +246,30 @@ export default function Events() {
                                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Action items</div>
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                                     {ACTION_TAGS.map(tag => {
-                                      const selected = (pendingConn.action_tags || []).includes(tag)
+                                      const selected = pendingConn.action_tags.includes(tag)
                                       return (
-                                        <button
-                                          key={tag}
-                                          onClick={() => togglePendingTag(tag)}
-                                          style={{
-                                            padding: '7px 14px', borderRadius: 999,
-                                            border: `1.5px solid ${selected ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                                            background: selected ? 'var(--mk-navy)' : 'var(--mk-white)',
-                                            color: selected ? '#fff' : 'var(--fg-2)',
-                                            fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                                            fontFamily: 'var(--font-body)', transition: 'all 0.12s'
-                                          }}
-                                        >
-                                          {tag}
-                                        </button>
+                                        <button key={tag} onClick={() => togglePendingTag(tag)} style={{
+                                          padding: '7px 14px', borderRadius: 999,
+                                          border: `1.5px solid ${selected ? 'var(--mk-navy)' : 'var(--border-1)'}`,
+                                          background: selected ? 'var(--mk-navy)' : 'var(--mk-white)',
+                                          color: selected ? '#fff' : 'var(--fg-2)',
+                                          fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                                          fontFamily: 'var(--font-body)', transition: 'all 0.12s'
+                                        }}>{tag}</button>
                                       )
                                     })}
                                   </div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--fg-2)', cursor: 'pointer', fontWeight: 500 }}>
-                                    <input
-                                      type="checkbox"
-                                      checked={pendingConn.remind_followup || false}
+                                    <input type="checkbox" checked={pendingConn.remind_followup}
                                       onChange={e => setPendingConn(prev => ({ ...prev, remind_followup: e.target.checked }))}
-                                      style={{ accentColor: 'var(--mk-ochre)', width: 15, height: 15 }}
-                                    />
+                                      style={{ accentColor: 'var(--mk-ochre)', width: 15, height: 15 }} />
                                     Remind me to follow up
                                   </label>
-                                  <button
-                                    className="mk-btn mk-btn-ochre mk-btn-sm"
+                                  <button className="mk-btn mk-btn-ochre mk-btn-sm"
                                     disabled={connectingUser === attendee.clerk_user_id}
-                                    onClick={() => connectAttendee(attendee, event.title)}
-                                  >
+                                    onClick={() => connectAttendee(attendee, event.title)}>
                                     {connectingUser === attendee.clerk_user_id ? 'Connecting…' : 'Connect →'}
                                   </button>
                                 </div>
