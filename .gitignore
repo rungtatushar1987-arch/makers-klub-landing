@@ -18,3 +18,4 @@ BUILD_LOG.md
 # Images
 *.jpg
 .DS_Store
+design/
