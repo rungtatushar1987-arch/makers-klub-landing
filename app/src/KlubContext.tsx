@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useUser } from '@clerk/clerk-react'
-import { supabase, type Event, type Profile, type Connection } from './supabase'
+import { supabase, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
 
 type KlubContextType = {
   connections: Connection[]
@@ -26,6 +26,31 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
   const load = useCallback(async () => {
     if (!user) return
+
+    // Ensure a profile row exists for this user
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('clerk_user_id')
+      .eq('clerk_user_id', user.id)
+      .maybeSingle()
+
+    if (!existingProfile) {
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.emailAddresses[0]?.emailAddress || ''
+      const slug = fullName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user.id.slice(-6)
+      await supabase.from('profiles').insert({
+        clerk_user_id: user.id,
+        full_name: fullName,
+        bio: '',
+        role_category: '',
+        avatar_color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+        slug,
+        linkedin_url: '',
+        instagram_url: '',
+        website_url: '',
+        notify_email: true,
+      })
+    }
+
     const [{ data: connsData }, { data: eventsData }, { data: rsvpData }] = await Promise.all([
       supabase.from('connections').select('*').eq('clerk_user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('events').select('*').order('date'),
