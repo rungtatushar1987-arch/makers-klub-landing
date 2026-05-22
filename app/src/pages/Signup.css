@@ -1,0 +1,61 @@
+
+/* ===== Custom Signup form ===== */
+.mkw-signup-card {
+  background: var(--mk-white);
+  border-radius: var(--r-xl);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+}
+
+.mkw-signup-head { margin-bottom: 28px; }
+
+.mkw-signup-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 2.2px;
+  text-transform: uppercase; color: var(--mk-ochre); margin-bottom: 8px;
+}
+
+.mkw-signup-title {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 28px; letter-spacing: -0.6px; color: var(--mk-navy);
+  margin-bottom: 8px; line-height: 1.1;
+}
+
+.mkw-signup-sub {
+  font-size: 13px; color: var(--fg-2);
+}
+.mkw-signup-sub a { color: var(--mk-navy); font-weight: 600; text-decoration: none; }
+.mkw-signup-sub a:hover { text-decoration: underline; }
+.mkw-signup-sub strong { color: var(--mk-navy); font-weight: 600; }
+
+.mkw-signup-form { display: flex; flex-direction: column; gap: 16px; }
+
+.mkw-signup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Reuse .mkw-form-group / .mkw-form-label / .mkw-form-input — already defined above */
+
+.mkw-code-input {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 800;
+  letter-spacing: 8px; text-align: center;
+  padding: 14px 20px;
+}
+
+.mkw-signup-error {
+  font-size: 13px; color: #c0392b;
+  background: rgba(192,57,43,0.08);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
+.mkw-signup-submit { width: 100%; justify-content: center; }
+
+.mkw-signup-resend {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--fg-3); font-family: var(--font-body);
+  text-align: center; padding: 4px 0;
+  transition: color 0.12s;
+}
+.mkw-signup-resend:hover { color: var(--mk-navy); }
