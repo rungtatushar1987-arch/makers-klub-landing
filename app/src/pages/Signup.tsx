@@ -39,12 +39,10 @@ export default function Signup() {
           setActive({ session: result.createdSessionId }).then(() => navigate('/home'))
           return
         }
-        // Otherwise populate fields from what Clerk returns
+        // Otherwise populate email from what Clerk returns
         if (result.emailAddress) setEmail(result.emailAddress)
-        // Clerk sometimes stuffs the email into firstName when no name was set — ignore it
-        const looksLikeEmail = (s: string) => s.includes('@')
-        if (result.firstName && !looksLikeEmail(result.firstName)) setFirstName(result.firstName)
-        if (result.lastName  && !looksLikeEmail(result.lastName))  setLastName(result.lastName)
+        // Don't try to populate names from ticket — Clerk doesn't have them
+        // unless explicitly set when the invitation was created
       })
       .catch(() => {}) // ignore — fields will be empty, user can type
   }, [isLoaded, ticket])
