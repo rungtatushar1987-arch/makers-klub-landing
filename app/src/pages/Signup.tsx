@@ -53,6 +53,14 @@ export default function Signup() {
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
 
+  const passwordRules = [
+    { label: 'At least 8 characters', valid: (p: string) => p.length >= 8 },
+    { label: 'One uppercase letter',  valid: (p: string) => /[A-Z]/.test(p) },
+    { label: 'One number',            valid: (p: string) => /[0-9]/.test(p) },
+  ]
+
+  const passwordValid = passwordRules.every(r => r.valid(password))
+
   // ── Step 1: create the sign-up ──────────────────────────────────────────
   async function handleDetails(e: React.FormEvent) {
     e.preventDefault()
@@ -126,7 +134,7 @@ export default function Signup() {
               <p className="mkw-signup-sub">Already have one? <a href="/login">Sign in</a></p>
             </div>
 
-            <form onSubmit={handleDetails} className="mkw-signup-form">
+            <form onSubmit={handleDetails} className="mkw-signup-form" autoComplete="off">
               <div className="mkw-signup-row">
                 <div className="mkw-form-group">
                   <label className="mkw-form-label">First name</label>
@@ -136,6 +144,7 @@ export default function Signup() {
                     placeholder="Ada"
                     value={firstName}
                     onChange={e => setFirstName(e.target.value)}
+                    autoComplete="given-name"
                     required
                     autoFocus
                   />
@@ -148,6 +157,7 @@ export default function Signup() {
                     placeholder="Lovelace"
                     value={lastName}
                     onChange={e => setLastName(e.target.value)}
+                    autoComplete="family-name"
                   />
                 </div>
               </div>
@@ -175,8 +185,18 @@ export default function Signup() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  minLength={8}
+                  autoComplete="new-password"
                 />
+                {password.length > 0 && (
+                  <div className="mkw-password-rules">
+                    {passwordRules.map(rule => (
+                      <div key={rule.label} className={`mkw-password-rule ${rule.valid(password) ? 'valid' : ''}`}>
+                        <span className="mkw-rule-icon">{rule.valid(password) ? '✓' : '○'}</span>
+                        {rule.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {error && <p className="mkw-signup-error">{error}</p>}
@@ -184,7 +204,7 @@ export default function Signup() {
               <button
                 type="submit"
                 className="mk-btn mk-btn-ochre mk-btn-lg mkw-signup-submit"
-                disabled={loading}
+                disabled={loading || !passwordValid}
               >
                 {loading ? 'Creating account…' : 'Continue →'}
               </button>

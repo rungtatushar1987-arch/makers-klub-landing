@@ -61,3 +61,13 @@
   transition: color 0.12s;
 }
 .mkw-signup-resend:hover { color: var(--mk-navy); }
+
+/* Password rules */
+.mkw-password-rules { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.mkw-password-rule {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--fg-3);
+  transition: color 0.15s;
+}
+.mkw-password-rule.valid { color: #2d9e6b; }
+.mkw-rule-icon { font-size: 11px; width: 14px; text-align: center; font-weight: 700; }
