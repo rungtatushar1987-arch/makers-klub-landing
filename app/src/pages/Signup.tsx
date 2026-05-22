@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSignUp } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import './Signup.css'
@@ -19,6 +19,13 @@ export default function Signup() {
   const [lastName, setLastName]   = useState('')
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
+
+  // When loaded with a ticket, Clerk pre-populates signUp.emailAddress — use it
+  useEffect(() => {
+    if (isLoaded && ticket && signUp?.emailAddress) {
+      setEmail(signUp.emailAddress)
+    }
+  }, [isLoaded, ticket, signUp?.emailAddress])
 
   // Step 2 field
   const [code, setCode] = useState('')
@@ -130,6 +137,8 @@ export default function Signup() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
+                  disabled={!!ticket}
+                  style={ticket ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
                 />
               </div>
 
