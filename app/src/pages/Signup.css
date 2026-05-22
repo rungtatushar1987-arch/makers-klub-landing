@@ -31,7 +31,9 @@
 
 .mkw-signup-form { display: flex; flex-direction: column; gap: 16px; }
 
-.mkw-signup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mkw-signup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+.mkw-signup-row .mkw-form-group { min-width: 0; }
+.mkw-signup-row .mkw-form-input { width: 100%; }
 
 /* Reuse .mkw-form-group / .mkw-form-label / .mkw-form-input — already defined above */
 

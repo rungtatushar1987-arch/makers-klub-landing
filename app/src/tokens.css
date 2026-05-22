@@ -491,6 +491,7 @@ html, body, #root { height: 100%; }
 .mkw-form-input,
 .mkw-form-textarea,
 .mkw-form-select {
+  width: 100%;
   padding: 11px 16px;
   border: 1.5px solid var(--border-1);
   border-radius: var(--r-sm);
