@@ -4,7 +4,7 @@ export default function Login() {
   return (
     <div className="mkw-login">
       <div className="mkw-login-brand">
-        <div className="mkw-login-mark">MK</div>
+        <img src="logo.svg" alt="Makers Klub" />
         <span className="mkw-login-name">Makers Klub</span>
       </div>
       <SignIn routing="path" path="/login" afterSignInUrl="/home" />
