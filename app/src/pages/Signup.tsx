@@ -9,6 +9,9 @@ export default function Signup() {
   const { isLoaded, signUp, setActive } = useSignUp()
   const navigate = useNavigate()
 
+  // Pick up the Clerk invite ticket from the URL if present
+  const ticket = new URLSearchParams(window.location.search).get('__clerk_ticket') ?? undefined
+
   const [step, setStep] = useState<Step>('details')
 
   // Step 1 fields
@@ -36,6 +39,7 @@ export default function Signup() {
         lastName,
         emailAddress: email,
         password,
+        ...(ticket ? { ticket } : {}),
       })
 
       // Send email verification code
