@@ -20,12 +20,23 @@ export default function Signup() {
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
 
-  // When loaded with a ticket, Clerk pre-populates signUp.emailAddress — use it
+  // When loaded with a ticket, validate it immediately so Clerk populates the fields
   useEffect(() => {
-    if (isLoaded && ticket && signUp?.emailAddress) {
-      setEmail(signUp.emailAddress)
-    }
-  }, [isLoaded, ticket, signUp?.emailAddress])
+    if (!isLoaded || !ticket) return
+    signUp.create({ strategy: 'ticket', ticket } as any)
+      .then(result => {
+        // Ticket may complete signup directly (no password required) — handle that
+        if (result.status === 'complete') {
+          setActive({ session: result.createdSessionId }).then(() => navigate('/home'))
+          return
+        }
+        // Otherwise populate fields from what Clerk returns
+        if (result.emailAddress) setEmail(result.emailAddress)
+        if (result.firstName)    setFirstName(result.firstName)
+        if (result.lastName)     setLastName(result.lastName)
+      })
+      .catch(() => {}) // ignore — fields will be empty, user can type
+  }, [isLoaded, ticket])
 
   // Step 2 field
   const [code, setCode] = useState('')
@@ -41,13 +52,18 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      await signUp.create({
-        firstName,
-        lastName,
-        emailAddress: email,
-        password,
-        ...(ticket ? { ticket } : {}),
-      })
+      // Only create if no ticket — ticket flow already called create on mount
+      if (!ticket) {
+        await signUp.create({
+          firstName,
+          lastName,
+          emailAddress: email,
+          password,
+        })
+      } else {
+        // Still need to set the password for ticket-based signups
+        await signUp.update({ password })
+      }
 
       // Send email verification code
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
