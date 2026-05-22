@@ -12,12 +12,21 @@ export default function Signup() {
   // Pick up the Clerk invite ticket from the URL if present
   const ticket = new URLSearchParams(window.location.search).get('__clerk_ticket') ?? undefined
 
+  // Decode the email from the ticket JWT immediately (no network call needed)
+  const ticketEmail = ticket ? (() => {
+    try {
+      const payload = ticket.split('.')[1]
+      const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+      return (decoded.email_address ?? decoded.email ?? '') as string
+    } catch { return '' }
+  })() : ''
+
   const [step, setStep] = useState<Step>('details')
 
   // Step 1 fields
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName]   = useState('')
-  const [email, setEmail]         = useState('')
+  const [email, setEmail]         = useState(ticketEmail)
   const [password, setPassword]   = useState('')
 
   // When loaded with a ticket, validate it immediately so Clerk populates the fields
@@ -32,8 +41,10 @@ export default function Signup() {
         }
         // Otherwise populate fields from what Clerk returns
         if (result.emailAddress) setEmail(result.emailAddress)
-        if (result.firstName)    setFirstName(result.firstName)
-        if (result.lastName)     setLastName(result.lastName)
+        // Clerk sometimes stuffs the email into firstName when no name was set — ignore it
+        const looksLikeEmail = (s: string) => s.includes('@')
+        if (result.firstName && !looksLikeEmail(result.firstName)) setFirstName(result.firstName)
+        if (result.lastName  && !looksLikeEmail(result.lastName))  setLastName(result.lastName)
       })
       .catch(() => {}) // ignore — fields will be empty, user can type
   }, [isLoaded, ticket])
@@ -139,24 +150,23 @@ export default function Signup() {
                     placeholder="Lovelace"
                     value={lastName}
                     onChange={e => setLastName(e.target.value)}
-                    required
                   />
                 </div>
               </div>
 
-              <div className="mkw-form-group">
-                <label className="mkw-form-label">Email</label>
-                <input
-                  className="mkw-form-input"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  disabled={!!ticket}
-                  style={ticket ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
-                />
-              </div>
+              {!ticket && (
+                <div className="mkw-form-group">
+                  <label className="mkw-form-label">Email</label>
+                  <input
+                    className="mkw-form-input"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
 
               <div className="mkw-form-group">
                 <label className="mkw-form-label">Password</label>
