@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 import { type Event, ACTION_TAGS, getInitials, getAvatarColor } from '../supabase'
+import Onboarding from './Onboarding'
 
 export default function Dashboard() {
   const { user } = useUser()
@@ -18,6 +19,9 @@ export default function Dashboard() {
   const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
 
   if (loading) return <div className="mkw-loading">Loading…</div>
+
+  const isOnboarding = connections.length === 0 && attended.length === 0
+  if (isOnboarding) return <Onboarding />
 
   const EventRow = ({ event, dim = false }: { event: Event, dim?: boolean }) => {
     const going = rsvpd.has(event.id)

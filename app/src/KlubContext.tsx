@@ -7,6 +7,7 @@ type KlubContextType = {
   events: Event[]
   rsvpd: Set<string>
   loading: boolean
+  isOnboarding: boolean
   toggleRsvp: (event: Event) => Promise<void>
   updateConnection: (id: string, patch: Partial<Connection>) => void
   saveConnection: (conn: Connection) => Promise<void>
@@ -119,6 +120,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   return (
     <KlubContext.Provider value={{
       connections, events, rsvpd, loading,
+      isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
       refresh: load
     }}>

@@ -23,6 +23,16 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true
       }
+    },
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/home/, to: '/app/index.html' },
+        { from: /^\/events/, to: '/app/index.html' },
+        { from: /^\/network/, to: '/app/index.html' },
+        { from: /^\/profile/, to: '/app/index.html' },
+        { from: /^\/login/, to: '/app/index.html' },
+        { from: /^\/signup/, to: '/app/index.html' },
+      ]
     }
   },
   resolve: {

@@ -1,10 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useUser, useClerk } from '@clerk/clerk-react'
+import { useKlub } from '../KlubContext'
 
 export default function Sidebar() {
   const { user } = useUser()
   const { signOut } = useClerk()
   const navigate = useNavigate()
+  const { isOnboarding } = useKlub()
 
   const initials = user?.fullName
     ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
@@ -29,28 +31,32 @@ export default function Sidebar() {
           <span className="nav-ic">◇</span> Home
         </NavLink>
 
-        <NavLink
-          to="/events"
-          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="nav-ic">▭</span> Events
-        </NavLink>
+        {!isOnboarding && (
+          <>
+            <NavLink
+              to="/events"
+              className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+            >
+              <span className="nav-ic">▭</span> Events
+            </NavLink>
 
-        <NavLink
-          to="/network"
-          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="nav-ic">♡</span> Network
-        </NavLink>
+            <NavLink
+              to="/network"
+              className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+            >
+              <span className="nav-ic">♡</span> Network
+            </NavLink>
 
-        <div className="mkw-nav-label" style={{ marginTop: 14 }}>Account</div>
+            <div className="mkw-nav-label" style={{ marginTop: 14 }}>Account</div>
 
-        <NavLink
-          to="/profile"
-          className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
-        >
-          <span className="nav-ic">◉</span> My brief
-        </NavLink>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+            >
+              <span className="nav-ic">◉</span> My brief
+            </NavLink>
+          </>
+        )}
       </nav>
 
       <div className="mkw-side-foot">
