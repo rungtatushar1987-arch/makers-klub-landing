@@ -29,7 +29,7 @@ export default function Signup() {
   const [email, setEmail]         = useState(ticketEmail)
   const [password, setPassword]   = useState('')
 
-// Step 2 field
+  // Step 2 field
   const [code, setCode] = useState('')
 
   const [error, setError]     = useState('')
@@ -51,27 +51,34 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      // Only create if no ticket — ticket flow already called create on mount
       if (!ticket) {
+        // Normal signup flow
         await signUp.create({
           firstName,
           lastName,
           emailAddress: email,
           password,
         })
+        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+        setStep('verify')
       } else {
-        await signUp.create({
+        // Ticket flow — single create call, email auto-verified by Clerk
+        const result = await signUp.create({
           strategy: 'ticket' as any,
           ticket,
           firstName,
           lastName,
           password,
         })
+        if (result.status === 'complete') {
+          await setActive({ session: result.createdSessionId })
+          navigate('/home')
+        } else {
+          // Clerk still requires email verification in some cases
+          await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
+          setStep('verify')
+        }
       }
-
-      // Send email verification code
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
-      setStep('verify')
     } catch (err: any) {
       setError(err.errors?.[0]?.longMessage ?? err.message ?? 'Something went wrong.')
     } finally {
