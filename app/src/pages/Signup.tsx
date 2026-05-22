@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSignUp } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import './Signup.css'
@@ -29,25 +29,7 @@ export default function Signup() {
   const [email, setEmail]         = useState(ticketEmail)
   const [password, setPassword]   = useState('')
 
-  // When loaded with a ticket, validate it immediately so Clerk populates the fields
-  useEffect(() => {
-    if (!isLoaded || !ticket) return
-    signUp.create({ strategy: 'ticket', ticket } as any)
-      .then(result => {
-        // Ticket may complete signup directly (no password required) — handle that
-        if (result.status === 'complete') {
-          setActive({ session: result.createdSessionId }).then(() => navigate('/home'))
-          return
-        }
-        // Otherwise populate email from what Clerk returns
-        if (result.emailAddress) setEmail(result.emailAddress)
-        // Don't try to populate names from ticket — Clerk doesn't have them
-        // unless explicitly set when the invitation was created
-      })
-      .catch(() => {}) // ignore — fields will be empty, user can type
-  }, [isLoaded, ticket])
-
-  // Step 2 field
+// Step 2 field
   const [code, setCode] = useState('')
 
   const [error, setError]     = useState('')
@@ -78,8 +60,13 @@ export default function Signup() {
           password,
         })
       } else {
-        // Still need to set the password for ticket-based signups
-        await signUp.update({ password })
+        await signUp.create({
+          strategy: 'ticket' as any,
+          ticket,
+          firstName,
+          lastName,
+          password,
+        })
       }
 
       // Send email verification code
