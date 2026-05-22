@@ -159,6 +159,7 @@ html, body, #root { height: 100%; }
 }
 
 .mkw-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
+.mkw-brand-logo { width: 32px; height: 32px; flex-shrink: 0; }
 .mkw-brand-mark {
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--mk-lavender);
@@ -476,6 +477,7 @@ html, body, #root { height: 100%; }
   flex-direction: column; gap: 32px;
 }
 .mkw-login-brand { display: flex; align-items: center; gap: 14px; }
+.mkw-login-logo { width: 48px; height: 48px; flex-shrink: 0; }
 .mkw-login-mark {
   width: 52px; height: 52px; border-radius: 50%;
   background: var(--mk-lavender);

@@ -15,7 +15,7 @@ export default function Sidebar() {
   return (
     <aside className="mkw-side">
       <div className="mkw-brand">
-        <div className="mkw-brand-mark">MK</div>
+        <img src="/logo.svg" alt="Makers Klub" className="mkw-brand-logo" />
         <div className="mkw-brand-name">Makers Klub</div>
       </div>
 
