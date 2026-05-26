@@ -1,3 +1,8 @@
+// Mobile redirect to PWA
+if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+  window.location.replace('https://app.makersklub.com');
+}
+
 // Nav scroll
 window.addEventListener('scroll', () => {
   document.querySelector('nav').classList.toggle('scrolled', window.scrollY > 60);
