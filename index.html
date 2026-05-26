@@ -6,7 +6,6 @@
   <title>Makers Klub — Berlin's Creative Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,700;1,9..144,800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
-  
 </head>
 <body>
 
@@ -18,7 +17,6 @@
   </a>
   <div class="nav-right">
     <a href="#events" class="nav-link">Events</a>
-    <a href="#membership" class="nav-link">Membership</a>
     <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="nav-cta">See upcoming events →</a>
   </div>
 </nav>
@@ -44,7 +42,7 @@
       </p>
       <div class="hero-actions">
         <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming events →</a>
-        <a href="#membership" class="btn-outline">View membership</a>
+        <a href="#events" class="btn-outline">How it works</a>
       </div>
     </div>
   </div>
@@ -63,7 +61,6 @@
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05126.jpg" alt="Makers Klub session" /></div>
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05133.jpg" alt="Makers Klub session" /></div>
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05066.jpg" alt="Makers Klub session" /></div>
-      <!-- duplicates for seamless loop -->
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="Makers Klub session" /></div>
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Makers Klub session" /></div>
       <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Makers Klub session" /></div>
@@ -146,7 +143,7 @@
   </div>
 </section>
 
-<!-- EVENTS -->
+<!-- EVENTS HEADER -->
 <section class="events-section" id="events">
   <div class="events-inner">
     <div class="events-header">
@@ -156,69 +153,50 @@
       </div>
       <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See what's on →</a>
     </div>
+  </div>
+</section>
 
-    <div class="events-grid">
-      <div class="event-card">
-        <div class="event-type">Monthly</div>
-        <h3>After-hours Socials</h3>
-        <p>Informal evening gatherings for the full community. Low-pressure, good for getting a feel for who's in the room. A drink, a conversation, and the kind of energy that only happens when the right people are together.</p>
-        <div class="event-footer">
-          <span class="event-access free">✓ Free members</span>
-        </div>
-      </div>
-      <div class="event-card">
-        <div class="event-type">Monthly</div>
-        <h3>Creative of the Month</h3>
-        <p>Every month, one community member gets a real spotlight — a 15–20 min slot to pitch or present at a networking event, a guest spot on the Makers Klub podcast, and their portfolio featured on the website.</p>
-        <div class="event-footer">
-          <span class="event-access paid">✦ Paid members</span>
-        </div>
-      </div>
-      <div class="event-card">
-        <div class="event-type">Limited spots</div>
-        <h3>Matched Brunches</h3>
-        <p>Small group brunches where you get matched with like-minded creatives. No agenda, no pitching — just the right people around the same table.</p>
-        <div class="event-footer">
-          <span class="event-access paid">✦ Paid members</span>
-        </div>
-      </div>
+<!-- EVENT: AFTER-HOURS SOCIALS -->
+<section class="event-type-section">
+  <div class="event-type-inner">
+    <div class="event-type-text">
+      <span class="label">Monthly</span>
+      <h2 class="title">After-Hours<br/><em>Socials</em></h2>
+      <p class="body-l">Creatives and business owners in the same room, on purpose. No agenda, no formalities — just drinks at a good venue and conversations that tend to go somewhere. The mix of people is the format.</p>
+      <a href="https://luma.com/h7qwhc0h" target="_blank" class="btn-ochre">See upcoming dates →</a>
+    </div>
+    <div class="event-type-photo">
+      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="After-Hours Socials" />
     </div>
   </div>
 </section>
 
-<!-- MEMBERSHIP -->
-<section class="membership-section" id="membership">
-  <div class="membership-header">
-    <span class="label">Membership</span>
-    <h2 class="title">Two ways<br/>to <em>join.</em></h2>
-    <p class="body-l">Start free, upgrade when you're ready. Both tiers are approval-based — we review every application personally.</p>
-  </div>
-
-  <div class="tier-grid">
-    <div class="tier-card free">
-      <div class="tier-name">Basic</div>
-      <div class="tier-price"><strong>€0</strong> / month</div>
-      <ul class="tier-items">
-        <li class="tier-item"><span class="tier-check">✓</span>Free access to after-hours socials</li>
-        <li class="tier-item"><span class="tier-check">✓</span>Access to the Makers Klub community</li>
-      </ul>
-      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-block ochre">See upcoming events →</a>
-      <p class="tier-note">Approval required. Berlin-based.</p>
+<!-- EVENT: TALKS & WORKSHOPS -->
+<section class="event-type-section event-type-section--reversed">
+  <div class="event-type-inner">
+    <div class="event-type-photo">
+      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Talks and Workshops" />
     </div>
+    <div class="event-type-text">
+      <span class="label">Regular</span>
+      <h2 class="title">Talks &<br/><em>Workshops</em></h2>
+      <p class="body-l">Practical sessions led by community members and invited guests. Portfolio reviews, skills deep-dives, and honest conversations about what it actually takes to run a creative business in Berlin.</p>
+      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming dates →</a>
+    </div>
+  </div>
+</section>
 
-    <div class="tier-card paid">
-      <div class="tier-name">Premium</div>
-      <div class="tier-price"><strong>€20</strong> / 3 months</div>
-      <ul class="tier-items">
-        <li class="tier-item"><span class="tier-check">✓</span>Everything in Basic</li>
-        <li class="tier-item"><span class="tier-check">✓</span>Free access to all events</li>
-        <li class="tier-item"><span class="tier-check">✓</span>Monthly Matched Brunches with like-minded people</li>
-        <li class="tier-item"><span class="tier-check">✓</span>Access to Makers Klub Whatsapp group</li>
-        <li class="tier-item"><span class="tier-check">✓</span>10% discount on co-working days</li>
-        <li class="tier-item"><span class="tier-check">✓</span>Early access to the Makers Klub platform</li>
-      </ul>
-      <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-block ochre">Join the waitlist →</a>
-      <p class="tier-note">Platform launching soon. Join the waitlist now.</p>
+<!-- EVENT: PITCH DAYS -->
+<section class="event-type-section">
+  <div class="event-type-inner">
+    <div class="event-type-text">
+      <span class="label">Monthly</span>
+      <h2 class="title">Pitch<br/><em>Days</em></h2>
+      <p class="body-l">Founders and creative professionals pitch their ideas, projects, or work to a room of peers. Real feedback, real questions, no fluff. If you're building something and want to pressure-test it — this is the room.</p>
+      <a href="https://luma.com/8fb00b7z" target="_blank" class="btn-ochre">See upcoming dates →</a>
+    </div>
+    <div class="event-type-photo">
+      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Pitch Days" />
     </div>
   </div>
 </section>
@@ -229,7 +207,7 @@
     <div class="platform-text">
       <span class="label">Coming soon</span>
       <h3>The Makers Klub <em>platform.</em></h3>
-      <p>Paid members get access to a private platform to manage their connections, discover opportunities posted by the community, and stay close to what's happening. More details when you join.</p>
+      <p>A private platform to manage your connections, stay on top of follow-ups, and discover opportunities posted by the community. Built for independent creatives — not sales teams.</p>
       <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline" style="margin-top: 24px; display: inline-block;">Join the waitlist</a>
     </div>
     <div class="platform-screenshot">
