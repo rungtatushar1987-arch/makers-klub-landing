@@ -1,0 +1,18 @@
+{
+  "name": "Makers Klub",
+  "short_name": "Makers Klub",
+  "description": "The Makers Klub members platform",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#0f1e3d",
+  "theme_color": "#0f1e3d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
