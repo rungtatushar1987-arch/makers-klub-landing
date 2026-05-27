@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useUser, UserButton } from '@clerk/clerk-react'
 import './Layout.css'
@@ -11,6 +12,14 @@ const nav = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
+
+  useEffect(() => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches
+    if (isMobile || isPWA) {
+      window.location.href = 'https://app.makersklub.com'
+    }
+  }, [])
 
   return (
     <div className="layout">
