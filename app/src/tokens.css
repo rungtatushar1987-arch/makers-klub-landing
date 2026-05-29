@@ -228,9 +228,16 @@ html, body, #root { height: 100%; }
 /* ===== Page head ===== */
 .mkw-pagehead {
   display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 28px; padding-bottom: 22px;
+  margin-bottom: 28px; padding: 28px 36px 22px;
   border-bottom: 1px solid var(--border-1);
   gap: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--mk-cream);
+  margin-top: -28px;
+  margin-left: -36px;
+  margin-right: -36px;
 }
 .mkw-pagehead .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
