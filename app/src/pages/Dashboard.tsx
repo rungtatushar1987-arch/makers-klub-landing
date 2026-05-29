@@ -211,7 +211,7 @@ export default function Dashboard() {
         </div>
 
         <div className="mkw-home-right">
-          <div className="mkw-card mkw-card-cream" style={{ position: 'sticky', top: 28 }}>
+          <div className="mkw-card mkw-card-cream">
             <div className="mkw-h3" style={{ marginBottom: 16 }}>
               <span>All upcoming events</span>
             </div>

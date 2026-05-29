@@ -220,7 +220,10 @@ html, body, #root { height: 100%; }
 .mkw-side-foot button:hover { color: var(--mk-navy); }
 
 /* ===== Main content ===== */
-.mkw-main { padding: 28px 36px 64px; min-width: 0; overflow-y: auto; height: 100vh; }
+.mkw-main { padding: 28px 36px 64px; min-width: 0; overflow-y: auto; height: 100vh; overflow-x: hidden; }
+
+/* Allow right column to stick within the scrolling main container */
+.mkw-home-right { position: sticky; top: 28px; align-self: start; }
 
 /* ===== Page head ===== */
 .mkw-pagehead {
