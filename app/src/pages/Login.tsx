@@ -1,11 +1,17 @@
 import { useState } from 'react'
-import { useSignIn } from '@clerk/clerk-react'
+import { useSignIn, useAuth } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import './Signup.css'
 
 export default function Login() {
   const { isLoaded, signIn, setActive } = useSignIn()
+  const { isSignedIn } = useAuth()
   const navigate = useNavigate()
+
+  if (isLoaded && isSignedIn) {
+    navigate('/home', { replace: true })
+    return null
+  }
 
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
