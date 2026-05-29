@@ -62,19 +62,20 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
+    <>
       <div className="mkw-pagehead">
         <div>
           <div className="eyebrow">{new Date().toLocaleDateString('en', { month: 'long', year: 'numeric' })}</div>
           <h1>Good {greeting}, <em>{firstName}.</em></h1>
         </div>
         <div className="actions">
-          <a href="/profile" className="mk-btn mk-btn-ghost">My brief</a>
+          <a href="/profile" className="mk-btn mk-btn-ghost">My Profile</a>
         </div>
       </div>
 
-      <div className="mkw-home-grid">
-        <div className="mkw-home-left">
+      <div className="mkw-main-body">
+        <div className="mkw-home-grid">
+          <div className="mkw-home-left">
 
           <div className="mkw-stats">
             <div className="mkw-stat">
@@ -208,9 +209,9 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-        </div>
+          </div>
 
-        <div className="mkw-home-right">
+          <div className="mkw-home-right">
           <div className="mkw-card mkw-card-cream">
             <div className="mkw-h3" style={{ marginBottom: 16 }}>
               <span>All upcoming events</span>
@@ -266,8 +267,9 @@ export default function Dashboard() {
               </a>
             </div>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

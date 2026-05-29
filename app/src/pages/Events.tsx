@@ -96,7 +96,7 @@ export default function Events() {
   if (loading) return <div className="mkw-loading">Loading…</div>
 
   return (
-    <div>
+    <>
       <div className="mkw-pagehead">
         <div>
           <div className="eyebrow">Berlin · Makers Klub</div>
@@ -109,6 +109,8 @@ export default function Events() {
           </a>
         </div>
       </div>
+
+      <div className="mkw-main-body">
 
       <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid var(--border-1)', marginBottom: 24 }}>
         {(['upcoming', 'past'] as const).map(t => (
@@ -286,6 +288,7 @@ export default function Events() {
           )
         })}
       </div>
-    </div>
+      </div>
+    </>
   )
 }

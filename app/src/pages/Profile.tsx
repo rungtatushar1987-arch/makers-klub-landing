@@ -38,20 +38,20 @@ export default function Profile() {
   if (loading) return <div className="mkw-loading">Loading…</div>
 
   return (
-    <div>
+    <>
       <div className="mkw-pagehead">
         <div>
           <div className="eyebrow">Account</div>
-          <h1>My <em>brief.</em></h1>
-          <p className="sub">Your profile is how other members get to know you before the session. Keep it honest and specific.</p>
+          <h1>My <em>Profile</em></h1>
         </div>
       </div>
 
-      {saved && (
-        <div style={{ background: 'rgba(74,222,128,0.15)', color: '#1e7a3f', padding: '12px 20px', borderRadius: 8, marginBottom: 24, fontSize: 14, fontWeight: 600 }}>
-          Brief saved.
-        </div>
-      )}
+      <div className="mkw-main-body">
+        {saved && (
+          <div style={{ background: 'rgba(74,222,128,0.15)', color: '#1e7a3f', padding: '12px 20px', borderRadius: 8, marginBottom: 24, fontSize: 14, fontWeight: 600 }}>
+            Profile saved.
+          </div>
+        )}
 
       <div className="mkw-form">
         <div className="mkw-form-group">
@@ -92,9 +92,10 @@ export default function Profile() {
         </div>
 
         <button className="mk-btn mk-btn-ochre" onClick={save} disabled={saving} style={{ width: 'fit-content' }}>
-          {saving ? 'Saving…' : 'Save brief →'}
+          {saving ? 'Saving…' : 'Save profile →'}
         </button>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

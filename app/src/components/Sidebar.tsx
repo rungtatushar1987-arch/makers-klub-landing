@@ -53,7 +53,7 @@ export default function Sidebar() {
               to="/profile"
               className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
             >
-              <span className="nav-ic">◉</span> My brief
+              <span className="nav-ic">◉</span> My Profile
             </NavLink>
           </>
         )}

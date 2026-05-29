@@ -140,8 +140,6 @@ html, body, #root { height: 100%; }
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100vh;
-  max-width: 1440px;
-  margin: 0 auto;
 }
 
 /* ===== Sidebar ===== */
@@ -220,24 +218,21 @@ html, body, #root { height: 100%; }
 .mkw-side-foot button:hover { color: var(--mk-navy); }
 
 /* ===== Main content ===== */
-.mkw-main { padding: 28px 36px 64px; min-width: 0; overflow-y: auto; height: 100vh; overflow-x: hidden; }
+.mkw-main { display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
+.mkw-main-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px 24px 64px 16px; }
 
-/* Allow right column to stick within the scrolling main container */
-.mkw-home-right { position: sticky; top: 28px; align-self: start; }
+/* Allow right column to stick within the scrolling body */
+.mkw-home-right { position: sticky; top: 0; align-self: start; }
 
 /* ===== Page head ===== */
 .mkw-pagehead {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 28px; padding: 28px 36px 22px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px 14px 16px;
   border-bottom: 1px solid var(--border-1);
   gap: 24px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-shrink: 0;
   background: var(--mk-cream);
-  margin-top: -28px;
-  margin-left: -36px;
-  margin-right: -36px;
+  box-shadow: 0 2px 12px rgba(15,30,61,0.06);
 }
 .mkw-pagehead .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
@@ -246,7 +241,7 @@ html, body, #root { height: 100%; }
 }
 .mkw-pagehead h1 {
   font-family: var(--font-display); font-weight: 800;
-  font-size: 42px; line-height: 1.02; letter-spacing: -1.2px; color: var(--mk-navy);
+  font-size: 32px; line-height: 1.05; letter-spacing: -0.8px; color: var(--mk-navy);
 }
 .mkw-pagehead h1 em { color: var(--mk-lavender); font-style: italic; }
 .mkw-pagehead .sub { font-size: 14px; color: var(--fg-2); margin-top: 8px; max-width: 480px; line-height: 1.55; }
@@ -265,7 +260,7 @@ html, body, #root { height: 100%; }
 .mkw-card-cream { background: var(--mk-cream-2); border-color: transparent; }
 
 /* ===== Stats ===== */
-.mkw-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.mkw-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
 .mkw-stat { background: var(--mk-white); border: 1px solid var(--border-1); border-radius: 14px; padding: 18px 20px; }
 .mkw-stat .lbl { font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--fg-3); font-weight: 700; margin-bottom: 10px; }
 .mkw-stat .num { font-family: var(--font-display); font-weight: 800; font-size: 34px; color: var(--mk-navy); line-height: 1; letter-spacing: -1px; }

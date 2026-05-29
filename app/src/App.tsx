@@ -14,7 +14,9 @@ function AppShell() {
     <KlubProvider>
       <div className="mkw">
         <Sidebar />
-        <main className="mkw-main"><Outlet /></main>
+        <main className="mkw-main">
+          <Outlet />
+        </main>
       </div>
     </KlubProvider>
   )

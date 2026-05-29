@@ -76,27 +76,20 @@ export default function Members() {
   if (loading) return <div className="mkw-loading">Loading…</div>
 
   return (
-    <div>
-      <div style={{
-        position: 'sticky', top: 0, zIndex: 20,
-        background: 'var(--mk-cream)',
-        borderBottom: '1px solid var(--border-1)',
-        marginBottom: 28,
-        paddingBottom: 20,
-        paddingTop: 4,
-      }}>
-        <div className="mkw-pagehead" style={{ marginBottom: 16, paddingBottom: 16 }}>
-          <div>
-            <div className="eyebrow">Your people · {conns.length} connections</div>
-            <h1>Network</h1>
-            <p className="sub">Everyone you've met at Makers Klub events.</p>
-          </div>
-          <div className="actions">
-            <button className="mk-btn mk-btn-ochre">Export contacts →</button>
-          </div>
+    <>
+      <div className="mkw-pagehead">
+        <div>
+          <div className="eyebrow">Your people · {conns.length} connections</div>
+          <h1>Network</h1>
         </div>
+        <div className="actions">
+          <button className="mk-btn mk-btn-ochre">Export contacts →</button>
+        </div>
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <div className="mkw-main-body">
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-3)', letterSpacing: 0.3, whiteSpace: 'nowrap' }}>Filter by</span>
           <select value={filterEvent} onChange={e => setFilterEvent(e.target.value)} style={{
             padding: '7px 14px', borderRadius: 999,
@@ -125,9 +118,8 @@ export default function Members() {
             </button>
           )}
         </div>
-      </div>
 
-      {activeFilters > 0 && (
+        {activeFilters > 0 && (
         <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 16 }}>
           Showing {filtered.length} of {conns.length} connections
         </div>
@@ -283,6 +275,7 @@ export default function Members() {
           )
         })}
       </div>
-    </div>
+      </div>
+    </>
   )
 }
