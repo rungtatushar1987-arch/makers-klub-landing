@@ -14,8 +14,9 @@
   --mk-navy-2:    #1a2a4f;
   --mk-ochre:     #f4a833;
   --mk-ochre-2:   #e89a1f;
-  --mk-lavender:  #cdbcf5;
-  --mk-lavender-2:#b8a2eb;
+  --mk-ochre-text:#916518;
+  --mk-lavender:  #5B5BD6;
+  --mk-lavender-2:#4a4ac4;
   --mk-white:     #ffffff;
 
   --fg-1: #0f1e3d;
@@ -75,7 +76,7 @@ body {
 .mk-body-l  { font-size: 18px; line-height: 1.65; color: var(--fg-2); }
 .mk-body    { font-size: 15px; line-height: 1.65; color: var(--fg-2); }
 .mk-body-s  { font-size: 13px; line-height: 1.55; color: var(--fg-2); }
-.mk-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--mk-ochre); }
+.mk-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--mk-ochre-text); }
 
 /* ===== Italic accent ===== */
 .mk-italic-accent {
@@ -129,7 +130,7 @@ body {
 /* ===== Tags / pills ===== */
 .mkw-tag { font-size: 10px; padding: 2px 9px; border-radius: var(--r-pill); letter-spacing: 0.4px; font-weight: 700; }
 .mkw-tag.lavender { background: var(--mk-lavender); color: var(--mk-navy); }
-.mkw-tag.ochre    { background: rgba(244,168,51,0.18); color: #8a5d10; }
+.mkw-tag.ochre    { background: rgba(244,168,51,0.18); color: var(--mk-ochre-text); }
 .mkw-tag.green    { background: rgba(74,222,128,0.18); color: #1e7a3f; }
 .mkw-tag.muted    { background: var(--mk-cream-2); color: var(--fg-2); }
 
@@ -253,7 +254,7 @@ html, body, #root { height: 100%; }
   color: var(--fg-3); font-weight: 700; margin-bottom: 14px;
   display: flex; justify-content: space-between; align-items: baseline;
 }
-.mkw-h3 a { font-size: 12px; color: var(--mk-ochre); text-decoration: none; font-weight: 600; letter-spacing: normal; text-transform: none; }
+.mkw-h3 a { font-size: 12px; color: var(--mk-ochre-text); text-decoration: none; font-weight: 600; letter-spacing: normal; text-transform: none; }
 
 /* ===== Cards ===== */
 .mkw-card { background: var(--mk-white); border: 1px solid var(--border-1); border-radius: 14px; padding: 22px; }
@@ -356,7 +357,7 @@ html, body, #root { height: 100%; }
   padding: 10px 14px;
   border-left: 3px solid var(--mk-ochre);
   border-radius: 0 8px 8px 0;
-  background: var(--mk-cream-2);
+  background: var(--mk-white);
 }
 
 /* ===== Match reveal ===== */
@@ -494,26 +495,67 @@ html, body, #root { height: 100%; }
 /* ===== Profile form ===== */
 .mkw-form { display: flex; flex-direction: column; gap: 20px; max-width: 540px; }
 .mkw-form-group { display: flex; flex-direction: column; gap: 6px; }
-.mkw-form-label { font-size: 13px; font-weight: 600; color: var(--mk-navy); }
+.mkw-form-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--fg-3);
+}
 .mkw-form-input,
 .mkw-form-textarea,
 .mkw-form-select {
   width: 100%;
   padding: 11px 16px;
   border: 1.5px solid var(--border-1);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   font-size: 14px;
   font-family: var(--font-body);
   background: var(--mk-white);
   color: var(--fg-1);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  appearance: none;
 }
+.mkw-form-input::placeholder,
+.mkw-form-textarea::placeholder { color: var(--fg-3); }
+.mkw-form-input:hover,
+.mkw-form-textarea:hover,
+.mkw-form-select:hover { border-color: var(--border-2); }
 .mkw-form-input:focus,
 .mkw-form-textarea:focus,
-.mkw-form-select:focus { border-color: var(--mk-navy); }
-.mkw-form-input:disabled { background: var(--mk-cream-2); color: var(--fg-3); cursor: not-allowed; opacity: 1; }
-.mkw-form-textarea { resize: vertical; min-height: 90px; }
+.mkw-form-select:focus {
+  border-color: var(--mk-navy);
+  background: var(--mk-white);
+  box-shadow: 0 0 0 3px rgba(15,30,61,0.07);
+}
+.mkw-form-input:disabled { background: var(--mk-cream); color: var(--fg-3); cursor: not-allowed; opacity: 1; }
+.mkw-form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+/* Filter pills (Network tab) */
+.mkw-filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.mkw-filter-label { font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--fg-3); white-space: nowrap; }
+.mkw-filter-select {
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--border-1);
+  background: var(--mk-cream-2);
+  color: var(--fg-2);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: var(--font-body);
+  outline: none; appearance: none;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+.mkw-filter-select:hover { border-color: var(--border-2); }
+.mkw-filter-select.active {
+  background: var(--mk-navy);
+  border-color: var(--mk-navy);
+  color: #fff;
+}
+.mkw-filter-clear {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--fg-3); font-family: var(--font-body);
+  text-decoration: underline; padding: 0;
+  transition: color 0.12s;
+}
+.mkw-filter-clear:hover { color: var(--mk-navy); }
 
 /* ===== Loading / empty ===== */
 .mkw-loading { display: flex; align-items: center; justify-content: center; padding: 64px; font-size: 14px; color: var(--fg-3); }

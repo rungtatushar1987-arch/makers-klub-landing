@@ -89,33 +89,26 @@ export default function Members() {
 
       <div className="mkw-main-body">
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-3)', letterSpacing: 0.3, whiteSpace: 'nowrap' }}>Filter by</span>
-          <select value={filterEvent} onChange={e => setFilterEvent(e.target.value)} style={{
-            padding: '7px 14px', borderRadius: 999,
-            border: `1.5px solid ${filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-            background: filterEvent !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
-            color: filterEvent !== 'all' ? '#fff' : 'var(--fg-2)',
-            fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)', outline: 'none',
-          }}>
+        <div className="mkw-filter-bar">
+          <span className="mkw-filter-label">Filter by</span>
+          <select
+            value={filterEvent}
+            onChange={e => setFilterEvent(e.target.value)}
+            className={`mkw-filter-select${filterEvent !== 'all' ? ' active' : ''}`}
+          >
             <option value="all">All events</option>
             {eventNames.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
-          <select value={filterTag} onChange={e => setFilterTag(e.target.value)} style={{
-            padding: '7px 14px', borderRadius: 999,
-            border: `1.5px solid ${filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-            background: filterTag !== 'all' ? 'var(--mk-navy)' : 'var(--mk-white)',
-            color: filterTag !== 'all' ? '#fff' : 'var(--fg-2)',
-            fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-body)', outline: 'none',
-          }}>
+          <select
+            value={filterTag}
+            onChange={e => setFilterTag(e.target.value)}
+            className={`mkw-filter-select${filterTag !== 'all' ? ' active' : ''}`}
+          >
             <option value="all">All action items</option>
             {ACTION_TAGS.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
           {activeFilters > 0 && (
-            <button onClick={() => { setFilterEvent('all'); setFilterTag('all') }}
-              style={{ background: 'none', border: 'none', color: 'var(--fg-3)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-body)', textDecoration: 'underline' }}>
-              Clear
-            </button>
+            <button className="mkw-filter-clear" onClick={() => { setFilterEvent('all'); setFilterTag('all') }}>Clear</button>
           )}
         </div>
 
