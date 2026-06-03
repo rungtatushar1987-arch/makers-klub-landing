@@ -26,6 +26,14 @@ function ProtectedLayout() {
   const { isSignedIn, isLoaded } = useAuth()
   if (!isLoaded) return null
   if (!isSignedIn) return <Navigate to="/login" replace />
+
+  // Redirect mobile users to the PWA
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+  if (isMobile) {
+    window.location.replace('https://app.makersklub.com')
+    return null
+  }
+
   return <AppShell />
 }
 

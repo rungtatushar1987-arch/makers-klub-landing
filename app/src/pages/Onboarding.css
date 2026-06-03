@@ -1,5 +1,5 @@
 .onb-wrap {
-  padding: 0 0 80px;
+  padding: 0 24px 80px;
 }
 
 /* Hero */
@@ -48,6 +48,13 @@
   gap: 24px;
   padding: 32px 0;
   align-items: start;
+}
+
+.onb-side {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
 /* Cards */
@@ -230,6 +237,8 @@
 }
 
 @media (max-width: 900px) {
-  .onb-grid { grid-template-columns: 1fr; padding: 24px 20px; }
+  .onb-wrap { padding: 0 16px 80px; }
+  .onb-grid { grid-template-columns: 1fr; padding: 24px 0; }
   .onb-hero { padding: 32px 20px 28px; }
+  .onb-side { position: static; max-height: none; overflow-y: visible; }
 }
