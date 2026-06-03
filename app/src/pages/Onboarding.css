@@ -242,3 +242,120 @@
   .onb-hero { padding: 32px 20px 28px; }
   .onb-side { position: static; max-height: none; overflow-y: visible; }
 }
+
+/* Going pill on event cards */
+.onb-going-pill {
+  display: inline-flex;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(91,91,214,0.1);
+  color: var(--mk-lavender);
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+/* Member strip */
+.onb-member-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.onb-member-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--mk-cream);
+  border: 1px solid var(--border-1);
+  border-radius: 999px;
+  padding: 5px 12px 5px 5px;
+}
+
+.onb-member-av {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.onb-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.onb-member-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mk-navy);
+  white-space: nowrap;
+}
+
+.onb-member-role {
+  font-size: 10px;
+  color: var(--fg-3);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Activity feed */
+.onb-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.onb-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--mk-cream);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+}
+
+.onb-activity-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.onb-activity-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--fg-2);
+  line-height: 1.4;
+}
+
+.onb-activity-text strong {
+  color: var(--mk-navy);
+  font-weight: 700;
+}
+
+.onb-activity-event {
+  color: var(--mk-lavender);
+  font-weight: 600;
+}
+
+.onb-activity-age {
+  font-size: 11px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+  white-space: nowrap;
+}

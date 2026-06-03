@@ -1,21 +1,61 @@
+import { useMemo } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import type { Event } from '../supabase'
+import type { Event, Profile } from '../supabase'
 import './Onboarding.css'
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const h = Math.floor(diff / 3600000)
+  const d = Math.floor(diff / 86400000)
+  if (h < 1) return 'just now'
+  if (h < 24) return `${h}h ago`
+  if (d === 1) return 'yesterday'
+  return `${d}d ago`
+}
+
+function getInitials(name?: string | null): string {
+  if (!name) return '?'
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+}
 
 export default function Onboarding() {
   const { user } = useUser()
-  const { events, rsvpd, toggleRsvp } = useKlub()
+  const { events, rsvpd, toggleRsvp, allRsvps, allProfiles } = useKlub()
 
   const firstName = user?.firstName || 'there'
   const now = new Date()
   const upcoming = events.filter(e => new Date(e.date) >= now).slice(0, 4)
-
   const profilePct = user?.firstName && user?.lastName ? 25 : 10
+
+  // Community members — up to 8, exclude self
+  const communityMembers = useMemo(() => {
+    return allProfiles.filter(p => p.clerk_user_id !== user?.id).slice(0, 8)
+  }, [allProfiles, user?.id])
+
+  // Activity feed — recent RSVPs for upcoming events, exclude self
+  const activityFeed = useMemo(() => {
+    const now = Date.now()
+    const upcomingIds = new Set(events.filter(e => new Date(e.date).getTime() > now).map(e => e.id))
+    const eventMap: Record<string, string> = {}
+    events.forEach(e => { eventMap[e.id] = e.title })
+    return allRsvps
+      .filter(r => r.profile && r.clerk_user_id !== user?.id && upcomingIds.has(r.event_id))
+      .slice(0, 5)
+      .map(r => ({ profile: r.profile!, eventTitle: eventMap[r.event_id] || 'an event', createdAt: r.created_at }))
+  }, [allRsvps, events, user?.id])
+
+  // RSVP count per event
+  const rsvpCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allRsvps.forEach(r => { counts[r.event_id] = (counts[r.event_id] || 0) + 1 })
+    return counts
+  }, [allRsvps])
 
   const EventCard = ({ event }: { event: Event }) => {
     const going = rsvpd.has(event.id)
     const d = new Date(event.date)
+    const count = rsvpCounts[event.id] || 0
     return (
       <div className="onb-event-card">
         <div className="onb-event-date">
@@ -26,6 +66,7 @@ export default function Onboarding() {
           <div className="onb-event-title">{event.title}</div>
           <div className="onb-event-meta">
             {event.location} · {d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })}
+            {count > 0 && <span className="onb-going-pill">{count} going</span>}
           </div>
         </div>
         <button
@@ -73,6 +114,29 @@ export default function Onboarding() {
             <a href="/profile" className="mk-btn mk-btn-navy mk-btn-sm">Complete your profile →</a>
           </div>
 
+          {/* Who's in the Klub */}
+          {communityMembers.length > 0 && (
+            <div className="onb-card">
+              <div className="onb-card-label">Who's in the Klub</div>
+              <div className="onb-card-title" style={{ marginBottom: 12 }}>
+                {communityMembers.length}+ members in Berlin
+              </div>
+              <div className="onb-member-strip">
+                {communityMembers.map(m => (
+                  <div key={m.clerk_user_id} className="onb-member-chip">
+                    <div className="onb-member-av" style={{ background: m.avatar_color || '#0f1e3d' }}>
+                      {getInitials(m.full_name)}
+                    </div>
+                    <div className="onb-member-info">
+                      <span className="onb-member-name">{m.full_name?.split(' ')[0] || '?'}</span>
+                      {m.role_category && <span className="onb-member-role">{m.role_category}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Events */}
           <div className="onb-card">
             <div className="onb-card-label">Step 1</div>
@@ -97,6 +161,28 @@ export default function Onboarding() {
               Full calendar →
             </a>
           </div>
+
+          {/* Activity feed */}
+          {activityFeed.length > 0 && (
+            <div className="onb-card">
+              <div className="onb-card-label">Community activity</div>
+              <div className="onb-activity-list">
+                {activityFeed.map((item, i) => (
+                  <div key={i} className="onb-activity-item">
+                    <div className="onb-activity-av" style={{ background: item.profile.avatar_color || '#0f1e3d' }}>
+                      {getInitials(item.profile.full_name)}
+                    </div>
+                    <div className="onb-activity-text">
+                      <strong>{item.profile.full_name?.split(' ')[0] || 'Someone'}</strong>
+                      {' '}is going to{' '}
+                      <span className="onb-activity-event">{item.eventTitle}</span>
+                    </div>
+                    <span className="onb-activity-age">{timeAgo(item.createdAt)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Locked: Network */}
           <div className="onb-card onb-card-locked">
@@ -158,7 +244,7 @@ export default function Onboarding() {
             <div className="onb-card-label">The community</div>
             <div className="onb-community-stats">
               <div className="onb-comm-stat">
-                <div className="onb-comm-num">47+</div>
+                <div className="onb-comm-num">{allProfiles.length > 0 ? `${allProfiles.length}+` : '47+'}</div>
                 <div className="onb-comm-lbl">Members</div>
               </div>
               <div className="onb-comm-stat">

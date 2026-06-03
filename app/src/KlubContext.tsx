@@ -6,6 +6,8 @@ type KlubContextType = {
   connections: Connection[]
   events: Event[]
   rsvpd: Set<string>
+  allRsvps: { clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]
+  allProfiles: Profile[]
   loading: boolean
   isOnboarding: boolean
   toggleRsvp: (event: Event) => Promise<void>
@@ -23,6 +25,8 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [connections, setConnections] = useState<Connection[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
+  const [allRsvps, setAllRsvps] = useState<{ clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]>([])
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
@@ -52,14 +56,21 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       })
     }
 
-    const [{ data: connsData }, { data: eventsData }, { data: rsvpData }] = await Promise.all([
+    const [{ data: connsData }, { data: eventsData }, { data: rsvpData }, { data: allRsvpData }, { data: profilesAllData }] = await Promise.all([
       supabase.from('connections').select('*').eq('clerk_user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('events').select('*').order('date'),
-      supabase.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id)
+      supabase.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
+      supabase.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20)
     ])
 
     if (eventsData) setEvents(eventsData)
     if (rsvpData) setRsvpd(new Set(rsvpData.map((r: { event_id: string }) => r.event_id)))
+    if (profilesAllData) setAllProfiles(profilesAllData as Profile[])
+    if (allRsvpData && profilesAllData) {
+      const profileMap = new Map((profilesAllData as Profile[]).map(p => [p.clerk_user_id, p]))
+      setAllRsvps(allRsvpData.map((r: any) => ({ ...r, profile: profileMap.get(r.clerk_user_id) })))
+    }
 
     if (connsData) {
       const ids = connsData.map((c: Connection) => c.connected_clerk_user_id)
@@ -119,7 +130,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <KlubContext.Provider value={{
-      connections, events, rsvpd, loading,
+      connections, events, rsvpd, allRsvps, allProfiles, loading,
       isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
       refresh: load
