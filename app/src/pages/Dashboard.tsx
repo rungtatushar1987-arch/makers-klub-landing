@@ -21,7 +21,11 @@ export default function Dashboard() {
   if (loading) return <div className="mkw-loading">Loading…</div>
 
   const isOnboarding = connections.length === 0 && attended.length === 0
-  if (isOnboarding) return <Onboarding />
+  if (isOnboarding) return (
+    <div className="mkw-main-body mkw-main-body--onboarding">
+      <Onboarding />
+    </div>
+  )
 
   const EventRow = ({ event, dim = false }: { event: Event, dim?: boolean }) => {
     const going = rsvpd.has(event.id)
