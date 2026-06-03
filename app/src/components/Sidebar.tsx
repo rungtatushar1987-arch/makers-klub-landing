@@ -1,11 +1,9 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useUser, useClerk } from '@clerk/clerk-react'
+import { NavLink } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 
 export default function Sidebar() {
   const { user } = useUser()
-  const { signOut } = useClerk()
-  const navigate = useNavigate()
   const { isOnboarding } = useKlub()
 
   const initials = user?.fullName
@@ -31,7 +29,17 @@ export default function Sidebar() {
           <span className="nav-ic">◇</span> Home
         </NavLink>
 
-        {!isOnboarding && (
+        {isOnboarding ? (
+          <>
+            <div className="mkw-nav-label" style={{ marginTop: 14 }}>Account</div>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}
+            >
+              <span className="nav-ic">◉</span> My Profile
+            </NavLink>
+          </>
+        ) : (
           <>
             <NavLink
               to="/events"
@@ -67,7 +75,6 @@ export default function Sidebar() {
           </div>
           <div className="sub">{role}</div>
         </div>
-        <button onClick={() => signOut(() => navigate('/login'))}>Sign out</button>
       </div>
     </aside>
   )

@@ -220,7 +220,7 @@ html, body, #root { height: 100%; }
 
 /* ===== Main content ===== */
 .mkw-main { display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
-.mkw-main:has(.mkw-main-body--onboarding) { overflow-y: auto; }
+.mkw-main:has(.mkw-main-body--onboarding) { height: auto; min-height: 100vh; overflow: visible; }
 .mkw-main-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px 32px 64px 40px; }
 .mkw-main-body--onboarding { overflow: visible; }
 
