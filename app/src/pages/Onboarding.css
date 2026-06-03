@@ -1,12 +1,14 @@
 .onb-wrap {
-  padding: 0 24px 80px;
+  padding: 24px 0 80px;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
 }
 
 /* Hero */
 .onb-hero {
   padding: 48px 48px 40px;
   background: var(--mk-navy);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   position: relative;
   overflow: hidden;
 }
@@ -53,8 +55,10 @@
 .onb-side {
   position: sticky;
   top: 0;
-  max-height: 100vh;
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
+  padding-right: 4px;
+  padding-top: 24px;
 }
 
 /* Cards */

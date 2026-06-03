@@ -220,10 +220,10 @@ html, body, #root { height: 100%; }
 
 /* ===== Main content ===== */
 .mkw-main { display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
-.mkw-main-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px 24px 64px 16px; }
+.mkw-main-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px 32px 64px 40px; }
 
-/* Allow right column to stick within the scrolling body */
-.mkw-home-right { position: sticky; top: 0; align-self: start; }
+/* Right column scrolls independently */
+.mkw-home-right { position: sticky; top: 0; align-self: start; max-height: calc(100vh - 60px); overflow-y: auto; }
 
 /* ===== Page head ===== */
 .mkw-pagehead {
