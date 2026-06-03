@@ -1,15 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { supabase, type Profile } from '../supabase'
+import { useKlub } from '../KlubContext'
+import './Profile.css'
 
 const ROLE_OPTIONS = ['founder', 'designer', 'photographer', 'videographer', 'creator', 'developer', 'other']
+const ROLE_LABELS: Record<string, string> = {
+  founder: 'Founder / Business Owner',
+  designer: 'Brand / UI Designer',
+  photographer: 'Photographer',
+  videographer: 'Videographer',
+  creator: 'Content Creator',
+  developer: 'Developer',
+  other: 'Other',
+}
+
+function calcProgress(p: Partial<Profile>): { pct: number; fieldsLeft: number; isComplete: boolean } {
+  const has = [
+    !!p.full_name?.trim(),
+    !!p.bio?.trim(),
+    !!p.role_category,
+    !!(p.linkedin_url?.trim() || p.instagram_url?.trim() || p.website_url?.trim()),
+  ]
+  const filled = has.filter(Boolean).length
+  return { pct: Math.round((filled / 4) * 100), fieldsLeft: 4 - filled, isComplete: filled === 4 }
+}
 
 export default function Profile() {
   const { user } = useUser()
+  const { events } = useKlub()
   const [profile, setProfile] = useState<Partial<Profile>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [socialError, setSocialError] = useState(false)
+
+  const upcomingCount = useMemo(() => {
+    const now = new Date()
+    return events.filter(e => new Date(e.date) >= now).length
+  }, [events])
 
   useEffect(() => {
     async function load() {
@@ -20,19 +49,25 @@ export default function Profile() {
     if (user) load()
   }, [user])
 
+  function update(field: keyof Profile, value: string) {
+    setProfile(prev => ({ ...prev, [field]: value }))
+    if (['linkedin_url', 'instagram_url', 'website_url'].includes(field)) setSocialError(false)
+  }
+
+  const { pct, fieldsLeft, isComplete } = calcProgress(profile)
+  const hasSocial = !!(profile.linkedin_url?.trim() || profile.instagram_url?.trim() || profile.website_url?.trim())
+  const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && !!profile.role_category && hasSocial
+
   async function save() {
+    if (!canSave) { if (!hasSocial) setSocialError(true); return }
     setSaving(true)
     const slug = profile.slug || (profile.full_name
-      ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user?.id.slice(-6)
       : undefined)
     await supabase.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
-  }
-
-  function update(field: keyof Profile, value: string) {
-    setProfile(prev => ({ ...prev, [field]: value }))
   }
 
   if (loading) return <div className="mkw-loading">Loading…</div>
@@ -48,53 +83,115 @@ export default function Profile() {
 
       <div className="mkw-main-body">
         {saved && (
-          <div style={{ background: 'rgba(74,222,128,0.15)', color: '#1e7a3f', padding: '12px 20px', borderRadius: 8, marginBottom: 24, fontSize: 14, fontWeight: 600 }}>
-            Profile saved.
-          </div>
+          <div className="prof-saved-toast">✓ Profile saved</div>
         )}
 
-      <div className="mkw-form">
-        <div className="mkw-form-group">
-          <label className="mkw-form-label">Full name</label>
-          <input className="mkw-form-input" value={profile.full_name || ''} onChange={e => update('full_name', e.target.value)} placeholder="Your name" />
-        </div>
+        <div className="prof-layout">
 
-        <div className="mkw-form-group">
-          <label className="mkw-form-label">One-line bio</label>
-          <textarea className="mkw-form-textarea" value={profile.bio || ''} onChange={e => update('bio', e.target.value)} placeholder="What you do + what you're working on right now" />
-        </div>
+          {/* ── LEFT: form ── */}
+          <div className="prof-left">
 
-        <div className="mkw-form-group">
-          <label className="mkw-form-label">Role</label>
-          <select className="mkw-form-select" value={profile.role_category || ''} onChange={e => update('role_category', e.target.value)}>
-            <option value="">Select your role</option>
-            {ROLE_OPTIONS.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
-          </select>
-        </div>
+            {/* Progress */}
+            <div className="prof-progress-card">
+              <div className="prof-progress-label">Your profile</div>
+              <div className="prof-progress-row">
+                <span className="prof-progress-sub">{pct}% complete{fieldsLeft > 0 ? ` · ${fieldsLeft} field${fieldsLeft !== 1 ? 's' : ''} left` : ' · all done!'}</span>
+                <span className="prof-progress-pct">{pct}%</span>
+              </div>
+              <div className="prof-progress-bar-bg">
+                <div className="prof-progress-bar-fill" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
 
-        <div style={{ borderTop: '1px solid var(--border-1)', paddingTop: 20, marginTop: 4 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 16 }}>Socials</p>
+            {/* Personal */}
+            <div className="prof-section">
+              <div className="prof-section-label">Personal</div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Full name *</label>
+                <input className="mkw-form-input" value={profile.full_name || ''} onChange={e => update('full_name', e.target.value)} placeholder="Your name" />
+              </div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">One-line bio *</label>
+                <textarea className="mkw-form-textarea" value={profile.bio || ''} onChange={e => update('bio', e.target.value)} placeholder="What you do + what you're working on right now" />
+              </div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">I am a… *</label>
+                <select className="mkw-form-select" value={profile.role_category || ''} onChange={e => update('role_category', e.target.value)}>
+                  <option value="">Select your role</option>
+                  {ROLE_OPTIONS.map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+                </select>
+                <p className="prof-field-hint">We'll use this to recommend events and matches for you</p>
+              </div>
+            </div>
 
-          <div className="mkw-form-group" style={{ marginBottom: 16 }}>
-            <label className="mkw-form-label">Instagram</label>
-            <input className="mkw-form-input" value={profile.instagram_url || ''} onChange={e => update('instagram_url', e.target.value)} placeholder="https://instagram.com/yourhandle" />
+            {/* Social */}
+            <div className="prof-section">
+              <div className="prof-section-label">Social links</div>
+              <div className={socialError ? 'prof-social-error' : 'prof-social-req'}>
+                {socialError ? '⚠ Add at least one link to save your profile' : 'At least one link required'}
+              </div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">LinkedIn</label>
+                <input className="mkw-form-input" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
+              </div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Instagram</label>
+                <input className="mkw-form-input" value={profile.instagram_url || ''} onChange={e => update('instagram_url', e.target.value)} placeholder="https://instagram.com/yourhandle" />
+              </div>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Website</label>
+                <input className="mkw-form-input" value={profile.website_url || ''} onChange={e => update('website_url', e.target.value)} placeholder="https://yourwebsite.com" />
+              </div>
+            </div>
+
+            <button
+              className={`mk-btn ${canSave ? 'mk-btn-navy' : 'mk-btn-ghost'} prof-save-btn`}
+              onClick={save}
+              disabled={saving || !canSave}
+            >
+              {saving ? 'Saving…' : isComplete ? 'Save profile' : 'Save & unlock →'}
+            </button>
+
           </div>
 
-          <div className="mkw-form-group" style={{ marginBottom: 16 }}>
-            <label className="mkw-form-label">LinkedIn</label>
-            <input className="mkw-form-input" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
-          </div>
+          {/* ── RIGHT: sidebar ── */}
+          <div className="prof-right">
 
-          <div className="mkw-form-group">
-            <label className="mkw-form-label">Website</label>
-            <input className="mkw-form-input" value={profile.website_url || ''} onChange={e => update('website_url', e.target.value)} placeholder="https://yourwebsite.com" />
+            {/* QR locked */}
+            <div className="prof-qr-card">
+              <div className="prof-qr-blur-wrap">
+                <div className="prof-qr-blur-grid">
+                  {[1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1].map((on, i) => (
+                    <div key={i} className={on ? 'prof-qr-dot' : 'prof-qr-dot-empty'} />
+                  ))}
+                </div>
+                <div className="prof-qr-lock">🔒</div>
+              </div>
+              <div className="prof-qr-title">{isComplete ? 'Your QR code is live' : 'Your QR code is locked'}</div>
+              <div className="prof-qr-sub">
+                At Makers Klub events, members scan each other's QR codes on the app to connect instantly. Complete your profile to unlock yours.
+              </div>
+              {!isComplete && (
+                <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to unlock</div>
+              )}
+            </div>
+
+            {/* Events waiting */}
+            <div className="prof-events-card">
+              <div className="prof-events-num">{upcomingCount}</div>
+              <div className="prof-events-title">upcoming event{upcomingCount !== 1 ? 's' : ''} waiting to be discovered</div>
+              <div className="prof-events-sub">Complete your profile so we can match you to the right events and people in the Klub.</div>
+              <a href="/events" className="prof-events-link">Browse events →</a>
+            </div>
+
+            {/* Tip */}
+            <div className="prof-tip-card">
+              <div className="prof-tip-label">Why it matters</div>
+              <div className="prof-tip-text">Members with a complete profile get 3× more connection requests after events. Your bio is the first thing someone sees when they scan your QR.</div>
+            </div>
+
           </div>
         </div>
-
-        <button className="mk-btn mk-btn-ochre" onClick={save} disabled={saving} style={{ width: 'fit-content' }}>
-          {saving ? 'Saving…' : 'Save profile →'}
-        </button>
-      </div>
       </div>
     </>
   )
