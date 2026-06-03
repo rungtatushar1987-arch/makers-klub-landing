@@ -65,8 +65,8 @@
   background: var(--mk-white);
   border: 1px solid var(--border-1);
   border-radius: var(--r-lg);
-  padding: 28px;
-  margin-bottom: 16px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
 }
 
 .onb-card:last-child { margin-bottom: 0; }
