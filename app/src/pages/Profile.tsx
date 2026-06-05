@@ -77,7 +77,7 @@ export default function Profile() {
       <div className="mkw-pagehead">
         <div>
           <div className="eyebrow">Account</div>
-          <h1>My <em>Profile</em></h1>
+          <h1>My Profile</h1>
         </div>
       </div>
 
@@ -145,7 +145,7 @@ export default function Profile() {
             </div>
 
             <button
-              className={`mk-btn ${canSave ? 'mk-btn-navy' : 'mk-btn-ghost'} prof-save-btn`}
+              className={`mk-btn ${canSave ? 'mk-btn-primary' : 'mk-btn-ghost'} prof-save-btn`}
               onClick={save}
               disabled={saving || !canSave}
             >

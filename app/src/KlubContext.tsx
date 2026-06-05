@@ -30,7 +30,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
-    if (!user) return
+    if (!user) { setLoading(false); return }
 
     // Ensure a profile row exists for this user
     const { data: existingProfile } = await supabase

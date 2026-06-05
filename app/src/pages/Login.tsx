@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSignIn, useAuth } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import './Signup.css'
@@ -8,15 +8,14 @@ export default function Login() {
   const { isSignedIn } = useAuth()
   const navigate = useNavigate()
 
-  if (isLoaded && isSignedIn) {
-    navigate('/home', { replace: true })
-    return null
-  }
-
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) navigate('/home', { replace: true })
+  }, [isLoaded, isSignedIn])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

@@ -1,6 +1,15 @@
 import { useState, useMemo } from 'react'
 import { useKlub } from '../KlubContext'
-import { supabase, type Profile, ACTION_TAGS, getInitials, getAvatarColor } from '../supabase'
+import { supabase, type Profile, ACTION_TAGS, getInitials } from '../supabase'
+
+const AV_COLORS = [
+  { bg: '#fcb813', fg: '#0a1340' },
+  { bg: '#7a4ed8', fg: '#ffffff' },
+  { bg: '#3b6dd9', fg: '#ffffff' },
+  { bg: '#0a1340', fg: '#ffffff' },
+  { bg: '#a587f0', fg: '#0a1340' },
+]
+const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
 type Connection = {
   id: string
@@ -19,29 +28,25 @@ export default function Members() {
   const { connections: rawConnections, loading } = useKlub()
   const connections = rawConnections as unknown as Connection[]
 
-  const [localConns, setLocalConns] = useState<Connection[] | null>(null)
-  const [editingConn, setEditingConn] = useState<string | null>(null)
-  const [savingConn, setSavingConn] = useState<string | null>(null)
-  const [filterEvent, setFilterEvent] = useState<string>('all')
-  const [filterTag, setFilterTag] = useState<string>('all')
+  const [localConns, setLocalConns]       = useState<Connection[] | null>(null)
+  const [editingConn, setEditingConn]     = useState<string | null>(null)
+  const [savingConn, setSavingConn]       = useState<string | null>(null)
+  const [filterEvent, setFilterEvent]     = useState<string>('all')
+  const [filterTag, setFilterTag]         = useState<string>('all')
 
-  // Use local state if edits have been made, otherwise use context data
   const conns: Connection[] = (localConns ?? connections).map(c => ({
     ...c,
     tags: (c as any).tags || [],
     follow_up: (c as any).follow_up || false,
   }))
 
-  const followupCount = conns.filter(c => c.tags?.length > 0).length
   const eventNames = [...new Set(conns.map(c => c.event_name).filter(Boolean))]
 
-  const filtered = useMemo(() => {
-    return conns.filter(c => {
-      const eventMatch = filterEvent === 'all' || c.event_name === filterEvent
-      const tagMatch = filterTag === 'all' || c.tags?.includes(filterTag)
-      return eventMatch && tagMatch
-    })
-  }, [conns, filterEvent, filterTag])
+  const filtered = useMemo(() => conns.filter(c => {
+    const eventMatch = filterEvent === 'all' || c.event_name === filterEvent
+    const tagMatch   = filterTag === 'all'   || c.tags?.includes(filterTag)
+    return eventMatch && tagMatch
+  }), [conns, filterEvent, filterTag])
 
   function updateConn(id: string, patch: Partial<Connection>) {
     setLocalConns(prev => (prev ?? conns).map(c => c.id === id ? { ...c, ...patch } : c))
@@ -63,9 +68,7 @@ export default function Members() {
   async function saveConnection(conn: Connection) {
     setSavingConn(conn.id)
     await supabase.from('connections').update({
-      notes: conn.notes,
-      tags: conn.tags,
-      follow_up: conn.follow_up
+      notes: conn.notes, tags: conn.tags, follow_up: conn.follow_up
     }).eq('id', conn.id)
     setSavingConn(null)
     setEditingConn(null)
@@ -79,18 +82,16 @@ export default function Members() {
     <>
       <div className="mkw-pagehead">
         <div>
-          <div className="eyebrow">Your people · {conns.length} connections</div>
+          <div className="eyebrow">Your people · {conns.length} connection{conns.length !== 1 ? 's' : ''}</div>
           <h1>Network</h1>
-        </div>
-        <div className="actions">
-          <button className="mk-btn mk-btn-ochre">Export contacts →</button>
         </div>
       </div>
 
       <div className="mkw-main-body">
 
+        {/* ── Filters ── */}
         <div className="mkw-filter-bar">
-          <span className="mkw-filter-label">Filter by</span>
+          <span className="mkw-filter-label">Filter</span>
           <select
             value={filterEvent}
             onChange={e => setFilterEvent(e.target.value)}
@@ -108,167 +109,221 @@ export default function Members() {
             {ACTION_TAGS.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
           {activeFilters > 0 && (
-            <button className="mkw-filter-clear" onClick={() => { setFilterEvent('all'); setFilterTag('all') }}>Clear</button>
+            <button
+              className="mkw-filter-clear"
+              onClick={() => { setFilterEvent('all'); setFilterTag('all') }}
+            >
+              Clear
+            </button>
           )}
         </div>
 
         {activeFilters > 0 && (
-        <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: 16 }}>
-          Showing {filtered.length} of {conns.length} connections
-        </div>
-      )}
+          <div style={{ fontSize: 12, color: 'var(--ink-3)', marginBottom: 16, fontFamily: 'var(--font-body)' }}>
+            Showing {filtered.length} of {conns.length} connections
+          </div>
+        )}
 
-      {filtered.length === 0 && (
-        <div className="mkw-empty">
-          {conns.length === 0 ? 'No connections yet. Come to an event.' : 'No connections match these filters.'}
-        </div>
-      )}
+        {filtered.length === 0 && (
+          <div className="mkw-empty">
+            {conns.length === 0 ? 'No connections yet. Come to an event.' : 'No connections match these filters.'}
+          </div>
+        )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filtered.map((conn, i) => {
-          const isEditing = editingConn === conn.id
-          return (
-            <div key={conn.id} style={{
-              background: 'var(--mk-white)',
-              border: `1px solid ${isEditing ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-              borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.15s'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '18px 20px' }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                  background: getAvatarColor(i), color: i === 2 ? '#fff' : '#0f1e3d',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15
-                }}>
-                  {getInitials(conn.profile?.full_name)}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, color: 'var(--mk-navy)', marginBottom: 2 }}>
-                    {conn.profile?.full_name || 'Member'}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {filtered.map((conn, i) => {
+            const isEditing = editingConn === conn.id
+            const c = av(i)
+            return (
+              <div key={conn.id} style={{
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
+                WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
+                border: `1px solid ${isEditing ? 'var(--mk-violet)' : 'var(--glass-border)'}`,
+                boxShadow: isEditing
+                  ? '0 0 0 3px rgba(122,78,216,0.12), var(--glass-shadow)'
+                  : 'var(--glass-shadow), var(--glass-hi)',
+                borderRadius: 'var(--r-sm)',
+                overflow: 'hidden',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
+              }}>
+                {/* ── Main row ── */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px 18px' }}>
+                  {/* Avatar */}
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                    background: c.bg, color: c.fg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
+                  }}>
+                    {getInitials(conn.profile?.full_name)}
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--fg-3)', marginBottom: conn.tags?.length > 0 || conn.notes ? 8 : 0 }}>
-                    {conn.profile?.role_category
-                      ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1)
-                      : 'Maker'}
-                    {conn.event_name ? ` · ${conn.event_name}` : ''}
-                    {' · '}
-                    {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </div>
-                  {conn.notes && !isEditing && (
+
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13,
-                      color: 'var(--fg-2)', padding: '8px 12px',
-                      borderLeft: '3px solid var(--mk-ochre)',
-                      background: 'var(--mk-cream-2)', borderRadius: '0 6px 6px 0',
-                      lineHeight: 1.5, marginBottom: conn.tags?.length > 0 ? 8 : 0
+                      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
+                      color: 'var(--ink-1)', marginBottom: 3,
+                      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
                     }}>
-                      {conn.notes}
+                      {conn.profile?.full_name || 'Member'}
+                      {conn.follow_up && (
+                        <span style={{
+                          padding: '2px 9px', borderRadius: 999,
+                          background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)',
+                          fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
+                        }}>↻ Follow up</span>
+                      )}
                     </div>
-                  )}
-                  {conn.tags?.length > 0 && !isEditing && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {conn.tags.map(tag => (
-                        <span key={tag} style={{
-                          display: 'inline-flex', alignItems: 'center', gap: 4,
-                          background: 'rgba(244,168,51,0.15)', color: '#8a5d10',
-                          fontSize: 11, fontWeight: 700, padding: '3px 10px',
-                          borderRadius: 999, letterSpacing: 0.3
-                        }}>
-                          {tag}
-                          <button onClick={() => clearTag(conn, tag)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a5d10', fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}>×</button>
-                        </span>
-                      ))}
+                    <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', marginBottom: conn.notes || conn.tags?.length > 0 ? 8 : 0 }}>
+                      {conn.profile?.role_category
+                        ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1)
+                        : 'Maker'}
+                      {conn.event_name ? ` · ${conn.event_name}` : ''}
+                      {' · '}
+                      {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'flex-start' }}>
-                  {conn.profile?.linkedin_url && (
-                    <a href={conn.profile.linkedin_url} target="_blank" rel="noreferrer" style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999,
-                      border: '1.5px solid var(--border-1)', background: 'var(--mk-white)',
-                      fontSize: 11, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', whiteSpace: 'nowrap'
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                      LinkedIn
-                    </a>
-                  )}
-                  {conn.profile?.instagram_url && (
-                    <a href={conn.profile.instagram_url.startsWith('http') ? conn.profile.instagram_url : `https://${conn.profile.instagram_url}`} target="_blank" rel="noreferrer" style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999,
-                      border: '1.5px solid var(--border-1)', background: 'var(--mk-white)',
-                      fontSize: 11, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', whiteSpace: 'nowrap'
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                      Instagram
-                    </a>
-                  )}
-                  {conn.profile?.website_url && (
-                    <a href={conn.profile.website_url.startsWith('http') ? conn.profile.website_url : `https://${conn.profile.website_url}`} target="_blank" rel="noreferrer" style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999,
-                      border: '1.5px solid var(--border-1)', background: 'var(--mk-white)',
-                      fontSize: 11, fontWeight: 600, color: 'var(--fg-2)', textDecoration: 'none', whiteSpace: 'nowrap'
-                    }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                      Website
-                    </a>
-                  )}
-                  <button className="mkw-row-action" onClick={() => setEditingConn(isEditing ? null : conn.id)}>
-                    {isEditing ? 'Cancel' : 'Edit'}
-                  </button>
-                </div>
-              </div>
 
-              {isEditing && (
-                <div style={{
-                  borderTop: '1px solid var(--border-1)', padding: '18px 20px',
-                  background: 'var(--mk-cream)', display: 'flex', flexDirection: 'column', gap: 16
-                }}>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Note</div>
-                    <textarea className="mkw-form-textarea" rows={2}
-                      placeholder="How did you meet? What did you talk about?"
-                      value={conn.notes || ''}
-                      onChange={e => updateConn(conn.id, { notes: e.target.value })}
-                      style={{ fontSize: 13 }} />
+                    {/* Note quote */}
+                    {conn.notes && !isEditing && (
+                      <div style={{
+                        fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13,
+                        color: 'var(--ink-2)', padding: '9px 13px',
+                        borderLeft: '3px solid var(--accent)',
+                        background: 'rgba(252,184,19,0.08)',
+                        borderRadius: '0 var(--r-xs) var(--r-xs) 0',
+                        lineHeight: 1.5, marginBottom: conn.tags?.length > 0 ? 8 : 0,
+                      }}>
+                        {conn.notes}
+                      </div>
+                    )}
+
+                    {/* Tags */}
+                    {conn.tags?.length > 0 && !isEditing && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {conn.tags.map(tag => (
+                          <span key={tag} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)',
+                            fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+                            padding: '3px 10px', borderRadius: 999,
+                          }}>
+                            {tag}
+                            <button
+                              onClick={() => clearTag(conn, tag)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mk-yellow-deep)', fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}
+                            >×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--fg-3)', marginBottom: 8 }}>Action items</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {[...ACTION_TAGS, ...conn.tags.filter(t => !ACTION_TAGS.includes(t))].map(tag => {
-                        const selected = conn.tags.includes(tag)
-                        return (
-                          <button key={tag} onClick={() => toggleTag(conn, tag)} style={{
-                            padding: '7px 14px', borderRadius: 999,
-                            border: `1.5px solid ${selected ? 'var(--mk-navy)' : 'var(--border-1)'}`,
-                            background: selected ? 'var(--mk-navy)' : 'var(--mk-white)',
-                            color: selected ? '#fff' : 'var(--fg-2)',
-                            fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                            fontFamily: 'var(--font-body)', transition: 'all 0.12s'
-                          }}>{tag}</button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--fg-2)', cursor: 'pointer', fontWeight: 500 }}>
-                      <input type="checkbox" checked={conn.follow_up}
-                        onChange={e => updateConn(conn.id, { follow_up: e.target.checked })}
-                        style={{ accentColor: 'var(--mk-ochre)', width: 15, height: 15 }} />
-                      Remind me to follow up
-                    </label>
-                    <button className="mk-btn mk-btn-ochre mk-btn-sm"
-                      onClick={() => saveConnection(conn)} disabled={savingConn === conn.id}>
-                      {savingConn === conn.id ? 'Saving…' : 'Save →'}
+
+                  {/* Right actions */}
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {conn.profile?.linkedin_url && (
+                      <SocialLink href={conn.profile.linkedin_url} label="LinkedIn" />
+                    )}
+                    {conn.profile?.instagram_url && (
+                      <SocialLink
+                        href={conn.profile.instagram_url.startsWith('http') ? conn.profile.instagram_url : `https://${conn.profile.instagram_url}`}
+                        label="Instagram"
+                      />
+                    )}
+                    {conn.profile?.website_url && (
+                      <SocialLink
+                        href={conn.profile.website_url.startsWith('http') ? conn.profile.website_url : `https://${conn.profile.website_url}`}
+                        label="Website"
+                      />
+                    )}
+                    <button
+                      className="mkw-row-action"
+                      onClick={() => setEditingConn(isEditing ? null : conn.id)}
+                    >
+                      {isEditing ? 'Cancel' : 'Edit'}
                     </button>
                   </div>
                 </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
+
+                {/* ── Edit panel ── */}
+                {isEditing && (
+                  <div style={{
+                    borderTop: '1px solid var(--hairline)',
+                    padding: '16px 18px',
+                    background: 'rgba(255,255,255,0.35)',
+                    display: 'flex', flexDirection: 'column', gap: 16,
+                  }}>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Note</div>
+                      <textarea
+                        className="mkw-form-textarea" rows={2}
+                        placeholder="How did you meet? What did you talk about?"
+                        value={conn.notes || ''}
+                        onChange={e => updateConn(conn.id, { notes: e.target.value })}
+                        style={{ fontSize: 13 }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Action items</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {[...ACTION_TAGS, ...conn.tags.filter((t: string) => !ACTION_TAGS.includes(t))].map(tag => {
+                          const selected = conn.tags.includes(tag)
+                          return (
+                            <button key={tag} onClick={() => toggleTag(conn, tag)} style={{
+                              padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
+                              fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+                              border: `1px solid ${selected ? 'var(--mk-navy)' : 'var(--hairline-strong)'}`,
+                              background: selected ? 'var(--mk-navy)' : 'transparent',
+                              color: selected ? '#fff' : 'var(--ink-2)',
+                              transition: 'all 0.12s',
+                            }}>{tag}</button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--ink-2)', cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 500 }}>
+                        <input
+                          type="checkbox"
+                          checked={conn.follow_up}
+                          onChange={e => updateConn(conn.id, { follow_up: e.target.checked })}
+                          style={{ accentColor: 'var(--mk-yellow)', width: 15, height: 15 }}
+                        />
+                        Remind me to follow up
+                      </label>
+                      <button
+                        className="mk-btn mk-btn-primary mk-btn-sm"
+                        onClick={() => saveConnection(conn)}
+                        disabled={savingConn === conn.id}
+                      >
+                        {savingConn === conn.id ? 'Saving…' : 'Save →'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </>
+  )
+}
+
+function SocialLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer" style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '5px 11px', borderRadius: 999,
+      background: 'var(--glass-bg)',
+      backdropFilter: 'blur(var(--glass-blur))',
+      border: '1px solid var(--glass-border)',
+      fontSize: 11, fontWeight: 600, color: 'var(--ink-2)',
+      textDecoration: 'none', whiteSpace: 'nowrap',
+      fontFamily: 'var(--font-display)',
+      transition: 'color 0.12s',
+    }}>
+      {label}
+    </a>
   )
 }
