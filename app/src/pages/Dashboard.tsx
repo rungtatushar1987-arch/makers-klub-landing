@@ -406,7 +406,7 @@ function HeroMatchCard({
           ))}
         </div>
         <a
-          href="/network"
+          href={hasGroup ? '/network' : '/events'}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 7,
             background: 'var(--mk-yellow)', color: 'var(--mk-navy)',
