@@ -20,10 +20,12 @@ function calcProgress(p: Partial<Profile>): { pct: number; fieldsLeft: number; i
     !!p.full_name?.trim(),
     !!p.bio?.trim(),
     !!p.role_category,
-    !!(p.linkedin_url?.trim() || p.instagram_url?.trim() || p.website_url?.trim()),
+    !!p.linkedin_url?.trim(),
+    !!p.instagram_url?.trim(),
+    !!p.website_url?.trim(),
   ]
   const filled = has.filter(Boolean).length
-  return { pct: Math.round((filled / 4) * 100), fieldsLeft: 4 - filled, isComplete: filled === 4 }
+  return { pct: Math.round((filled / 6) * 100), fieldsLeft: 6 - filled, isComplete: filled === 6 }
 }
 
 export default function Profile() {
@@ -55,7 +57,7 @@ export default function Profile() {
   }
 
   const { pct, fieldsLeft, isComplete } = calcProgress(profile)
-  const hasSocial = !!(profile.linkedin_url?.trim() || profile.instagram_url?.trim() || profile.website_url?.trim())
+  const hasSocial = !!(profile.linkedin_url?.trim() && profile.instagram_url?.trim() && profile.website_url?.trim())
   const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && !!profile.role_category && hasSocial
 
   async function save() {
@@ -127,9 +129,11 @@ export default function Profile() {
             {/* Social */}
             <div className="prof-section">
               <div className="prof-section-label">Social links</div>
-              <div className={socialError ? 'prof-social-error' : 'prof-social-req'}>
-                {socialError ? '⚠ Add at least one link to save your profile' : 'At least one link required'}
-              </div>
+              {!hasSocial && (
+                <div className={socialError ? 'prof-social-error' : 'prof-social-req'}>
+                  {socialError ? '⚠ All three links are required to save your profile' : 'All three links required'}
+                </div>
+              )}
               <div className="mkw-form-group">
                 <label className="mkw-form-label">LinkedIn</label>
                 <input className="mkw-form-input" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
