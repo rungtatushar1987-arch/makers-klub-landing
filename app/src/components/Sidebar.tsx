@@ -64,7 +64,7 @@ export default function Sidebar() {
         <div className="av">{initials}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="who">{user?.fullName || user?.firstName || 'Member'}</div>
-          <div className="sub">Founding member</div>
+          <div className="sub">{user?.emailAddresses[0]?.emailAddress}</div>
         </div>
       </div>
     </aside>

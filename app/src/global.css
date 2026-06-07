@@ -176,7 +176,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 /* Right col sticky */
 .mkw-home-right {
   position: sticky;
-  top: calc(var(--pagehead-h, 81px) + 28px);
+  top: calc(var(--pagehead-h, 0px));
   align-self: start;
   max-height: calc(100vh - var(--pagehead-h, 81px) - 56px);
   overflow-y: auto;
