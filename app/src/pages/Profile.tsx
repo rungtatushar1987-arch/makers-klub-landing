@@ -25,6 +25,7 @@ function calcProgress(p: Partial<Profile>): { pct: number; fieldsLeft: number; i
     !!p.website_url?.trim(),
   ]
   const filled = has.filter(Boolean).length
+  // Complete only when ALL 6 fields are filled
   return { pct: Math.round((filled / 6) * 100), fieldsLeft: 6 - filled, isComplete: filled === 6 }
 }
 
@@ -32,6 +33,7 @@ export default function Profile() {
   const { user } = useUser()
   const { events } = useKlub()
   const [profile, setProfile] = useState<Partial<Profile>>({})
+  const [savedProfile, setSavedProfile] = useState<Partial<Profile>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -45,7 +47,7 @@ export default function Profile() {
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from('profiles').select('*').eq('clerk_user_id', user?.id).single()
-      if (data) setProfile(data)
+      if (data) { setProfile(data); setSavedProfile(data) }
       setLoading(false)
     }
     if (user) load()
@@ -56,17 +58,38 @@ export default function Profile() {
     if (['linkedin_url', 'instagram_url', 'website_url'].includes(field)) setSocialError(false)
   }
 
-  const { pct, fieldsLeft, isComplete } = calcProgress(profile)
-  const hasSocial = !!(profile.linkedin_url?.trim() && profile.instagram_url?.trim() && profile.website_url?.trim())
+  // Progress is based on saved profile state (not live form state)
+  const { pct, fieldsLeft, isComplete } = calcProgress(savedProfile)
+
+  // QR unlocks with name + bio + role + at least one social (lower bar than "complete")
+  const savedHasSocial =
+    !!savedProfile.linkedin_url?.trim() ||
+    !!savedProfile.instagram_url?.trim() ||
+    !!savedProfile.website_url?.trim()
+  const isProfileUnlocked =
+    !!savedProfile.full_name?.trim() &&
+    !!savedProfile.bio?.trim() &&
+    !!savedProfile.role_category &&
+    savedHasSocial
+
+  // Live form state: at least one social entered
+  const hasSocial =
+    !!profile.linkedin_url?.trim() ||
+    !!profile.instagram_url?.trim() ||
+    !!profile.website_url?.trim()
+
+  // Save & unlock button gate (locked layout only): all QR-unlock fields filled in form
   const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && !!profile.role_category && hasSocial
 
   async function save() {
-    if (!canSave) { if (!hasSocial) setSocialError(true); return }
+    if (!isProfileUnlocked && !canSave) { if (!hasSocial) setSocialError(true); return }
     setSaving(true)
     const slug = profile.slug || (profile.full_name
       ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user?.id.slice(-6)
       : undefined)
     await supabase.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
+    const updated = { ...profile, slug }
+    setSavedProfile(updated)
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
@@ -93,17 +116,19 @@ export default function Profile() {
           {/* ── LEFT: form ── */}
           <div className="prof-left">
 
-            {/* Progress */}
-            <div className="prof-progress-card">
-              <div className="prof-progress-label">Your profile</div>
-              <div className="prof-progress-row">
-                <span className="prof-progress-sub">{pct}% complete{fieldsLeft > 0 ? ` · ${fieldsLeft} field${fieldsLeft !== 1 ? 's' : ''} left` : ' · all done!'}</span>
-                <span className="prof-progress-pct">{pct}%</span>
+            {/* Progress — only shown when not fully complete */}
+            {!isComplete && (
+              <div className="prof-progress-card">
+                <div className="prof-progress-label">Your profile</div>
+                <div className="prof-progress-row">
+                  <span className="prof-progress-sub">{pct}% complete{fieldsLeft > 0 ? ` · ${fieldsLeft} field${fieldsLeft !== 1 ? 's' : ''} left` : ' · all done!'}</span>
+                  <span className="prof-progress-pct">{pct}%</span>
+                </div>
+                <div className="prof-progress-bar-bg">
+                  <div className="prof-progress-bar-fill" style={{ width: `${pct}%` }} />
+                </div>
               </div>
-              <div className="prof-progress-bar-bg">
-                <div className="prof-progress-bar-fill" style={{ width: `${pct}%` }} />
-              </div>
-            </div>
+            )}
 
             {/* Personal */}
             <div className="prof-section">
@@ -129,9 +154,9 @@ export default function Profile() {
             {/* Social */}
             <div className="prof-section">
               <div className="prof-section-label">Social links</div>
-              {!hasSocial && (
+              {!isProfileUnlocked && (
                 <div className={socialError ? 'prof-social-error' : 'prof-social-req'}>
-                  {socialError ? '⚠ All three links are required to save your profile' : 'All three links required'}
+                  {socialError ? '⚠ Add at least one link to unlock your QR code' : 'At least one link required to unlock your QR code'}
                 </div>
               )}
               <div className="mkw-form-group">
@@ -149,11 +174,11 @@ export default function Profile() {
             </div>
 
             <button
-              className={`mk-btn ${canSave ? 'mk-btn-primary' : 'mk-btn-ghost'} prof-save-btn`}
+              className={`mk-btn ${isProfileUnlocked || canSave ? 'mk-btn-primary' : 'mk-btn-ghost'} prof-save-btn`}
               onClick={save}
-              disabled={saving || !canSave}
+              disabled={saving || (!isProfileUnlocked && !canSave)}
             >
-              {saving ? 'Saving…' : isComplete ? 'Save profile' : 'Save & unlock →'}
+              {saving ? 'Saving…' : isProfileUnlocked ? 'Save profile' : 'Save & unlock →'}
             </button>
 
           </div>
@@ -161,7 +186,7 @@ export default function Profile() {
           {/* ── RIGHT: sidebar ── */}
           <div className="prof-right">
 
-            {/* QR locked */}
+            {/* QR card */}
             <div className="prof-qr-card">
               <div className="prof-qr-blur-wrap">
                 <div className="prof-qr-blur-grid">
@@ -169,14 +194,14 @@ export default function Profile() {
                     <div key={i} className={on ? 'prof-qr-dot' : 'prof-qr-dot-empty'} />
                   ))}
                 </div>
-                <div className="prof-qr-lock">🔒</div>
+                <div className="prof-qr-lock">{isProfileUnlocked ? '✓' : '🔒'}</div>
               </div>
-              <div className="prof-qr-title">{isComplete ? 'Your QR code is live' : 'Your QR code is locked'}</div>
+              <div className="prof-qr-title">{isProfileUnlocked ? 'Your QR code is live' : 'Your QR code is locked'}</div>
               <div className="prof-qr-sub">
                 At Makers Klub events, members scan each other's QR codes on the app to connect instantly. Complete your profile to unlock yours.
               </div>
               {!isComplete && (
-                <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to unlock</div>
+                <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to complete your profile</div>
               )}
             </div>
 
