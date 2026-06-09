@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Makers Klub — App Redesign · Aurora Glass</title>
+<link rel="stylesheet" href="app-glass/glass.css"/>
+<link rel="stylesheet" href="app-glass/desktop.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet"/>
+<style>
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background:
+      radial-gradient(120% 80% at 50% -10%, #f3f1fb 0%, #eceef6 45%, #e7e9f2 100%);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .g-dark-stage body { background: #04061a; }
+
+  .g-stage { padding: 64px 48px 140px; }
+  .g-stage-head { max-width: 1240px; margin: 0 auto 14px; }
+  .g-stage-eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 2.2px; text-transform: uppercase; color: #7a4ed8; margin-bottom: 16px;
+  }
+  .g-stage-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: #fcb813; }
+  .g-stage-head h1 {
+    font-family: 'Poppins', sans-serif; font-weight: 800;
+    font-size: clamp(40px, 5vw, 68px); line-height: 0.98; letter-spacing: -2px;
+    color: #0c1330; margin: 0;
+  }
+  .g-stage-head h1 em { font-style: normal; color: #7a4ed8; }
+  .g-stage-head p {
+    font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.6; color: #424a6b;
+    max-width: 620px; margin: 18px 0 0;
+  }
+
+  .g-group-label {
+    max-width: 1240px; margin: 56px auto 22px;
+    display: flex; align-items: center; gap: 14px;
+    font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 2px; text-transform: uppercase; color: #818aa6;
+  }
+  .g-group-label::after { content: ''; flex: 1; height: 1px; background: rgba(12,19,48,0.10); }
+  .g-group-label .n { color: #fcb813; }
+
+  .g-phones {
+    display: flex; gap: 36px; flex-wrap: wrap; justify-content: center;
+    max-width: 1700px; margin: 0 auto;
+  }
+  .g-frame-cell { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .g-cap { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; color: #424a6b; }
+
+  .g-desktop-wrap { display: flex; justify-content: center; max-width: 1340px; margin: 0 auto; }
+
+  /* Dark stage adjustments */
+  .g-stage.dark { }
+  .g-stage.dark .g-stage-head h1 { color: #fff; }
+  .g-stage.dark .g-stage-head h1 em { color: #a587f0; }
+  .g-stage.dark .g-stage-head p { color: rgba(255,255,255,0.7); }
+  .g-stage.dark .g-cap { color: rgba(255,255,255,0.7); }
+  .g-stage.dark .g-group-label { color: rgba(255,255,255,0.5); }
+  .g-stage.dark .g-group-label::after { background: rgba(255,255,255,0.12); }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="app-glass/tweaks-panel.jsx"></script>
+<script type="text/babel" src="app-glass/screens.jsx"></script>
+<script type="text/babel" src="app-glass/desktop.jsx"></script>
+<script type="text/babel">
+const { useTweaks, TweaksPanel, TweakSection, TweakSlider, TweakToggle, TweakRadio, TweakColor } = window;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#fcb813",
+  "glassBlur": 28,
+  "translucency": 42,
+  "glow": 95,
+  "radius": 22,
+  "headlineFont": "Poppins",
+  "dark": false
+}/*EDITMODE-END*/;
+
+function inkFor(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  return (0.299*r + 0.587*g + 0.114*b) > 150 ? '#0a1340' : '#ffffff';
+}
+const lerp = (a,b,t) => a + (b-a)*t;
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const o = t.translucency / 100;
+  const dark = t.dark;
+  const glassA  = dark ? lerp(0.04, 0.20, o) : lerp(0.30, 0.80, o);
+  const glassA2 = Math.min(glassA + (dark ? 0.06 : 0.16), 0.95);
+
+  const fontMap = {
+    Poppins: "'Poppins', system-ui, sans-serif",
+    Fraunces: "'Fraunces', Georgia, serif",
+  };
+
+  const rootStyle = {
+    '--accent': t.accent,
+    '--accent-ink': inkFor(t.accent),
+    '--glass-blur': t.glassBlur + 'px',
+    '--glass-bg': `rgba(255,255,255,${glassA.toFixed(3)})`,
+    '--glass-bg-2': `rgba(255,255,255,${glassA2.toFixed(3)})`,
+    '--blob': (t.glow / 100).toFixed(2),
+    '--r': t.radius + 'px',
+    '--r-sm': Math.round(t.radius * 0.64) + 'px',
+    '--r-xs': Math.round(t.radius * 0.45) + 'px',
+    '--font-display': fontMap[t.headlineFont] || fontMap.Poppins,
+  };
+
+  React.useEffect(() => {
+    document.body.style.background = dark
+      ? '#04061a'
+      : 'radial-gradient(120% 80% at 50% -10%, #f3f1fb 0%, #eceef6 45%, #e7e9f2 100%)';
+  }, [dark]);
+
+  return (
+    <div className={'g-root' + (dark ? ' g-dark' : '')} style={rootStyle}>
+      <div className={'g-stage' + (dark ? ' dark' : '')} data-screen-label="App Redesign — Aurora Glass">
+        <header className="g-stage-head">
+          <div className="g-stage-eyebrow"><span className="dot"></span> Makers Klub · App Redesign</div>
+          <h1>Aurora <em>Glass.</em></h1>
+          <p>A refined relayer of the member app — white surfaces, soft cosmic light, and frosted glass that keeps the community energy without the clutter. Mobile-first, with a desktop dashboard.</p>
+        </header>
+
+        <div className="g-group-label"><span className="n">Mobile</span> · seven core screens</div>
+        <div className="g-phones">
+          <Phone label="Splash"><ScreenSplash /></Phone>
+          <Phone label="Home · Match feed"><ScreenHome /></Phone>
+          <Phone label="Brief · Onboarding"><ScreenBrief /></Phone>
+          <Phone label="Match reveal"><ScreenMatch /></Phone>
+          <Phone label="Session detail"><ScreenSession /></Phone>
+          <Phone label="Memory"><ScreenMemory /></Phone>
+          <Phone label="Profile · Settings"><ScreenProfile /></Phone>
+        </div>
+
+        <div className="g-group-label"><span className="n">Desktop</span> · member dashboard</div>
+        <div className="g-desktop-wrap">
+          <Desktop />
+        </div>
+      </div>
+
+      <TweaksPanel>
+        <TweakSection label="Glass" />
+        <TweakSlider label="Blur" value={t.glassBlur} min={4} max={44} step={2} unit="px"
+          onChange={(v) => setTweak('glassBlur', v)} />
+        <TweakSlider label="Translucency" value={t.translucency} min={0} max={100} step={2} unit="%"
+          onChange={(v) => setTweak('translucency', v)} />
+        <TweakSlider label="Corner radius" value={t.radius} min={8} max={34} step={1} unit="px"
+          onChange={(v) => setTweak('radius', v)} />
+
+        <TweakSection label="Light" />
+        <TweakSlider label="Backdrop glow" value={t.glow} min={0} max={140} step={5} unit="%"
+          onChange={(v) => setTweak('glow', v)} />
+        <TweakColor label="Accent" value={t.accent}
+          options={['#fcb813', '#ff8f3c', '#7a4ed8', '#3b6dd9']}
+          onChange={(v) => setTweak('accent', v)} />
+        <TweakToggle label="Dark mode" value={t.dark}
+          onChange={(v) => setTweak('dark', v)} />
+
+        <TweakSection label="Type" />
+        <TweakRadio label="Headline font" value={t.headlineFont}
+          options={['Poppins', 'Fraunces']}
+          onChange={(v) => setTweak('headlineFont', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@ function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
 
 export default function Dashboard() {
   const { user } = useUser()
-  const { connections, events, rsvpd, loading, toggleRsvp, clearTag } = useKlub()
+  const { connections, events, rsvpd, loading, clearTag } = useKlub()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
@@ -79,15 +79,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {!isPast && (
-          <button
-            className={`mkw-row-action${going ? '' : ' primary'}`}
-            style={{ fontSize: compact ? 11 : 12, padding: compact ? '5px 10px' : undefined }}
-            onClick={() => toggleRsvp(event)}
-          >
-            {going ? '✓ Going' : 'RSVP →'}
-          </button>
-        )}
+
       </div>
     )
   }

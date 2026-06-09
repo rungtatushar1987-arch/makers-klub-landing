@@ -1,0 +1,156 @@
+/* ============================================================================
+   Makers Klub — "Aurora Glass" design tokens
+   Authoritative source of truth for the member-app redesign.
+   Light theme on :root, dark theme on [data-theme="dark"].
+   Hex values are FINAL — do not approximate. Copy verbatim.
+   ============================================================================ */
+
+:root {
+  /* ---- Brand hues (same in light & dark) ---------------------------------- */
+  --mk-yellow:        #fcb813;  /* PRIMARY ACCENT — actions, active states, CTAs */
+  --mk-yellow-deep:   #e0a000;  /* yellow text on light surfaces (contrast-safe) */
+  --mk-yellow-soft:   #ffce47;  /* yellow hover */
+  --mk-violet:        #7a4ed8;  /* secondary accent — links, stat numerals, gradient */
+  --mk-violet-soft:   #a587f0;  /* violet on dark, soft-violet avatar */
+  --mk-blue:          #3b6dd9;  /* gradient cards, avatars, glow */
+  --mk-navy:          #0a1340;  /* ink / headings, ink-on-yellow, active chip fill */
+
+  /* ---- Accent indirection (tweakable) ------------------------------------- */
+  --accent:           var(--mk-yellow);
+  --accent-ink:       #0a1340;  /* text/icon ON the accent (navy on yellow) */
+
+  /* ---- Ink ramp — text on LIGHT ------------------------------------------- */
+  --ink-1:            #0c1330;  /* primary text / headings */
+  --ink-2:            #424a6b;  /* body / secondary */
+  --ink-3:            #818aa6;  /* tertiary / labels / captions */
+
+  /* ---- Surfaces & lines (light) ------------------------------------------- */
+  --surface:          #ffffff;
+  --hairline:         rgba(12,19,48,0.08);
+  --hairline-strong:  rgba(12,19,48,0.14);
+
+  /* ---- Glass material (light) --------------------------------------------- */
+  --glass-blur:       22px;                        /* default; range 4–44px */
+  --glass-bg:         rgba(255,255,255,0.55);      /* standard card */
+  --glass-bg-strong:  rgba(255,255,255,0.72);      /* bottom nav, secondary buttons */
+  --glass-border:     rgba(255,255,255,0.85);      /* bright top-edge highlight */
+  --glass-highlight:  inset 0 1px 0 rgba(255,255,255,0.75);
+  --glass-shadow:     0 10px 34px rgba(38,40,90,0.12);
+
+  /* ---- Ambient backdrop opacity (the cosmic blobs) ------------------------ */
+  --blob-opacity:     0.9;                         /* range 0–1.4 */
+
+  /* ---- Status ------------------------------------------------------------- */
+  --ok:               #34d27b;
+  --danger:           #e0524f;
+
+  /* ---- Radii -------------------------------------------------------------- */
+  --r-lg:             22px;   /* hero/session/profile gradient cards, rail cards */
+  --r-sm:             14px;   /* list rows, member cards, tiles, options */
+  --r-xs:             10px;   /* inner pills, small icon boxes */
+  --r-pill:           999px;  /* buttons, chips, tab bar, toggles, avatars */
+
+  /* ---- Spacing (4-based) -------------------------------------------------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 22px; --sp-6: 28px; --sp-7: 44px; --sp-8: 72px;
+
+  /* ---- Elevation shadows -------------------------------------------------- */
+  --shadow-cta:       0 10px 24px rgba(252,184,19,0.40);  /* yellow CTA glow */
+  --shadow-gradient:  0 18px 44px rgba(80,60,200,0.34);   /* violet/blue card */
+
+  /* ---- Type --------------------------------------------------------------- */
+  --font-display:     'Poppins', system-ui, -apple-system, sans-serif; /* headings, UI, buttons */
+  --font-body:        'Inter', system-ui, -apple-system, sans-serif;   /* paragraphs */
+  --font-script:      'Caveat', cursive;                               /* logo wordmark only */
+
+  /* Type scale (px) */
+  --fs-topbar-title:  27px;  /* Poppins 700 */
+  --fs-screen-h2:     28px;  /* Poppins 700 */
+  --fs-card-title:    15px;  /* Poppins 700 (up to 20 for larger cards) */
+  --fs-body:          14px;  /* Inter 400 */
+  --fs-body-sm:       12px;  /* Inter 400 */
+  --fs-eyebrow:       10px;  /* Poppins 700 UPPERCASE, letter-spacing 1.8px */
+  --fs-stat:          26px;  /* Poppins 800 */
+}
+
+/* ============================================================================
+   DARK THEME — surface goes navy, glass becomes white-at-low-alpha, ink inverts.
+   Brand hues, radii, spacing, type are unchanged.
+   ============================================================================ */
+[data-theme="dark"] {
+  --ink-1:            #ffffff;
+  --ink-2:            rgba(255,255,255,0.74);
+  --ink-3:            rgba(255,255,255,0.46);
+
+  --surface:          #060a22;
+  --hairline:         rgba(255,255,255,0.10);
+  --hairline-strong:  rgba(255,255,255,0.18);
+
+  --glass-bg:         rgba(255,255,255,0.08);
+  --glass-bg-strong:  rgba(255,255,255,0.13);
+  --glass-border:     rgba(255,255,255,0.16);
+  --glass-highlight:  inset 0 1px 0 rgba(255,255,255,0.14);
+  --glass-shadow:     0 12px 40px rgba(0,0,0,0.45);
+
+  /* On dark, yellow text can sit at full strength */
+  --mk-yellow-deep:   #fcb813;
+  --mk-violet:        #a587f0;
+}
+
+/* ============================================================================
+   REUSABLE RECIPES — apply these classes/values, don't reinvent them.
+   ============================================================================ */
+
+/* The glass material (standard card). */
+.aurora-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+  border-radius: var(--r-sm);
+}
+
+/* Stronger glass — floating bottom nav, secondary buttons. */
+.aurora-glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(160%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-highlight);
+}
+
+/* Ambient backdrop — place as a z-index:0 layer behind glass. MUST exist for
+   glass to refract; never put glass directly on flat white. */
+.aurora-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--blob-opacity);
+  background:
+    radial-gradient(42% 30% at 18% 8%,   rgba(252,184,19,0.55) 0%, transparent 70%),
+    radial-gradient(48% 34% at 96% 30%,  rgba(122,78,216,0.45) 0%, transparent 72%),
+    radial-gradient(60% 38% at 50% 104%, rgba(59,109,217,0.42) 0%, transparent 70%),
+    radial-gradient(40% 26% at 80% 88%,  rgba(165,135,240,0.35) 0%, transparent 72%);
+}
+
+/* Colored gradient card — hero match / session / profile header. */
+.aurora-gradient {
+  background: linear-gradient(140deg, rgba(122,78,216,0.95) 0%, rgba(59,109,217,0.92) 100%);
+  box-shadow: var(--shadow-gradient);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: var(--r-lg);
+  color: #ffffff;
+}
+
+/* Primary (yellow) button. */
+.aurora-btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: var(--shadow-cta);
+}
