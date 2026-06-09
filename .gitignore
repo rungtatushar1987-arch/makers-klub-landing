@@ -18,4 +18,4 @@ BUILD_LOG.md
 # Images
 *.jpg
 .DS_Store
-design_handoff_aurora_glass_app/
+design_handoff_aurora_glass_app/package-lock.json
