@@ -1,74 +1,214 @@
-.events-page .page-header { margin-bottom: 40px; }
-.events-page h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; }
-.page-sub { font-size: 15px; color: var(--fg-2); }
+/* ── Events page — Aurora Glass ── */
 
-.events-section { margin-bottom: 40px; }
-.events-section .label { display: block; margin-bottom: 16px; }
+/* Grid layout */
+.ev-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
 
-.events-list { display: flex; flex-direction: column; gap: 12px; }
+.ev-col-left,
+.ev-col-right {
+  min-width: 0;
+}
 
-.event-card {
+.ev-col-right {
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+/* Tab bar */
+.ev-tabs {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 24px;
-  transition: box-shadow 0.2s;
+  gap: 4px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 16px;
 }
 
-.event-card:hover { box-shadow: var(--shadow); }
-.event-card.past { opacity: 0.5; }
-
-.event-card-left { display: flex; gap: 16px; align-items: flex-start; flex: 1; }
-
-.event-color-bar { width: 4px; border-radius: 999px; min-height: 60px; flex-shrink: 0; margin-top: 4px; }
-
-.ec-type { margin-bottom: 6px; text-transform: capitalize; }
-
-.ec-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
-
-.ec-meta { font-size: 13px; color: var(--fg-muted); margin-bottom: 4px; }
-
-.ec-location { font-size: 13px; color: var(--fg-2); margin-bottom: 6px; }
-
-.ec-desc { font-size: 13px; color: var(--fg-2); line-height: 1.6; max-width: 480px; }
-
-.event-card-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
-
-.rsvp-btn {
-  background: var(--navy);
-  color: white;
+.ev-tab {
+  background: none;
   border: none;
-  padding: 9px 20px;
-  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 600;
-  transition: background 0.2s;
-  white-space: nowrap;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--ink-3);
+  padding: 10px 18px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
 }
 
-.rsvp-btn:hover { background: var(--navy-2); }
-
-.rsvp-btn.going {
-  background: #3d9e6a;
-  color: white;
+.ev-tab.active {
+  color: var(--ink-1);
+  border-bottom-color: var(--mk-navy);
 }
 
-.rsvp-btn.going:hover { background: #2d8a58; }
-
-.luma-link { font-size: 12px; color: var(--fg-muted); white-space: nowrap; }
-.luma-link:hover { color: var(--navy); }
-
-.empty-state {
-  font-size: 14px;
-  color: var(--fg-muted);
-  padding: 32px;
-  background: var(--white);
-  border: 1px solid var(--cream-3);
-  border-radius: 14px;
-  text-align: center;
+/* Event card list */
+.ev-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.skeleton-list { display: flex; flex-direction: column; gap: 12px; }
-.skeleton { background: var(--cream-2); border-radius: 14px; animation: shimmer 1.5s infinite; }
-@keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.5} }
+/* Individual upcoming/recommended event card */
+.ev-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-hi);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+
+.ev-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(10,19,64,0.12), var(--glass-hi);
+}
+
+.ev-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+/* Date block */
+.ev-date-block {
+  width: 50px;
+  height: 54px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--mk-navy);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-date-block .ev-day {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+}
+
+.ev-date-block .ev-mon {
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  font-weight: 700;
+  color: var(--mk-yellow);
+  margin-top: 2px;
+}
+
+/* Card info */
+.ev-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ev-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.ev-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-1);
+}
+
+.ev-type-badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(122,78,216,0.12);
+  color: var(--mk-violet);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.ev-card-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}
+
+.ev-card-chevron {
+  color: var(--ink-3);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* Attendees accordion content */
+.ev-attendees-body {
+  border-top: 1px solid var(--hairline);
+  padding: 14px 4px;
+}
+
+/* Connect form inside accordion */
+.ev-connect-form {
+  margin-top: 8px;
+  margin-left: 40px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ev-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ev-tag-btn {
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--ink-2);
+  transition: all 0.12s;
+}
+
+.ev-tag-btn.selected {
+  border-color: var(--mk-navy);
+  background: var(--mk-navy);
+  color: #fff;
+}
+
+.ev-connect-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ev-remind-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
