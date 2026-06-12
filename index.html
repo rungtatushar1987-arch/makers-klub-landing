@@ -3,247 +3,733 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Makers Klub — Berlin's Creative Community</title>
+  <title>Makers Klub — The IRL Networking CRM</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,700;1,9..144,800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
 </head>
-<body>
+<body data-aud="professionals">
 
 <!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">
-    <img src="logo.svg" alt="Makers Klub" />
-    <span class="nav-logo-text">Makers Klub</span>
+<nav id="nav">
+  <a class="nav-logo" href="#top">
+    <img src="logo.svg" alt="Makers Klub">
+    <b>Makers Klub</b>
   </a>
+  <div class="nav-links">
+    <button class="nav-link active" data-aud="professionals">For professionals</button>
+    <button class="nav-link" data-aud="communities">For communities &amp; businesses</button>
+    <button class="nav-link" data-aud="mk-community">Community</button>
+  </div>
   <div class="nav-right">
-    <a href="#events" class="nav-link">Events</a>
-    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="nav-cta">See upcoming events →</a>
+    <a href="#join" class="btn-ochre">Join the waitlist →</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-top">
+<span id="top"></span>
+
+<!-- ══════════════════════════════════════════════
+     HERO · COMMUNITIES
+══════════════════════════════════════════════ -->
+<section class="hero aud" data-aud="communities">
+  <div class="wrap hero-inner">
     <div class="hero-left">
-      <div class="eyebrow">
-        <span class="eyebrow-dot"></span>
-        Berlin · Members-only community
+      <div class="eyebrow"><span class="eyebrow-dot"></span>For communities &amp; businesses</div>
+      <h1>Turn one-off events into a <em>network that lasts.</em></h1>
+      <p class="hero-sub">Makers Klub is the IRL networking CRM for communities and orgs. Import your events, see who's actually connecting, and keep members coming back — long after the name tags come off.</p>
+
+      <form class="waitlist" id="form-comm" novalidate>
+        <div class="wl-row">
+          <input class="wl-input" type="email" name="email" placeholder="you@community.org" autocomplete="email" required>
+          <button type="submit" class="btn-ochre lg">Get early access →</button>
+        </div>
+        <div class="wl-note">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          For Luma, Eventbrite &amp; in-person community organizers.
+        </div>
+      </form>
+      <div class="wl-success" id="success-comm">
+        <span class="tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span>You're on the list. We'll reach out about onboarding your community.</span>
       </div>
-      <h1>
-        Where <em>creatives</em><br/>
-        and business owners<br/>
-        come <em>together.</em>
-      </h1>
+
+      <div class="proof">
+        <div class="proof-stack">
+          <span class="av" style="background:#3b48c4">B</span>
+          <span class="av" style="background:#7a4ed8">M</span>
+          <span class="av" style="background:#0891b2">D</span>
+          <span class="av" style="background:#92400e">+</span>
+        </div>
+        <span class="proof-txt"><b>120+ communities</b> on the waitlist</span>
+      </div>
     </div>
 
-    <div class="hero-right">
-      <p class="hero-body">
-        Makers Klub brings freelancers, founders, and solopreneurs in creative industries together — through curated events, shared working sessions, and the kind of introductions you can't engineer on LinkedIn.
-      </p>
-      <div class="hero-actions">
-        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming events →</a>
-        <a href="#events" class="btn-outline">How it works</a>
+    <div class="hero-visual">
+      <img src="shots/pl-desktop.png" alt="Makers Klub web dashboard" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     HERO · PROFESSIONALS
+══════════════════════════════════════════════ -->
+<section class="hero aud" data-aud="professionals">
+  <div class="wrap hero-inner">
+    <div class="hero-left">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>For freelancers &amp; professionals</div>
+      <h1>Build a network that <em>works for you.</em></h1>
+      <p class="hero-sub">Makers Klub is your personal networking CRM. Remember everyone you meet at events, never drop a follow-up, and turn a stack of business cards into relationships that actually pay off.</p>
+
+      <form class="waitlist" id="form-pro" novalidate>
+        <div class="wl-row">
+          <input class="wl-input" type="email" name="email" placeholder="you@studio.com" autocomplete="email" required>
+          <button type="submit" class="btn-ochre lg">Join the waitlist →</button>
+        </div>
+        <div class="wl-note">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Free to start. No spam — only a nudge when we launch in your city.
+        </div>
+      </form>
+      <div class="wl-success" id="success-pro">
+        <span class="tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span>You're in. We'll email you the moment your city opens.</span>
+      </div>
+
+      <div class="proof">
+        <div class="proof-stack">
+          <span class="av" style="background:#f0a92e">T</span>
+          <span class="av" style="background:#7a4ed8">S</span>
+          <span class="av" style="background:#0891b2">J</span>
+          <span class="av" style="background:#92400e">+</span>
+        </div>
+        <span class="proof-txt"><b>340 founding members</b> already in line</span>
+      </div>
+    </div>
+
+    <div class="hero-visual shot-phone">
+      <img src="shots/pl-home.png" alt="Makers Klub app" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust aud" data-aud="communities">
+  <div class="trust-inner">
+    <div class="cell"><div class="n">120+</div><div class="l">Communities waitlisted</div></div>
+    <div class="cell"><div class="n">38K</div><div class="l">Members tracked</div></div>
+    <div class="cell"><div class="n">87%</div><div class="l">Avg retention lift</div></div>
+    <div class="cell"><div class="n">1</div><div class="l">Source of truth</div></div>
+  </div>
+</div>
+<div class="trust aud" data-aud="professionals">
+  <div class="trust-inner">
+    <div class="cell"><div class="n">340</div><div class="l">Founding members</div></div>
+    <div class="cell"><div class="n">12</div><div class="l">Cities on the list</div></div>
+    <div class="cell"><div class="n">0</div><div class="l">Dropped follow-ups</div></div>
+    <div class="cell"><div class="n">€0</div><div class="l">To get started</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════ -->
+<section class="sec aud" data-aud="communities">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="label">How it works · communities</span>
+      <h2 class="title">Your network, <em>finally on the record.</em></h2>
+      <p>Stop exporting guest lists into spreadsheets you never open again. Makers Klub turns every event into living network data.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div class="tag">Import</div>
+        <h3>Bring your events &amp; members</h3>
+        <p>Sync Luma, Eventbrite or a CSV. Your whole network — every guest, every event — in one place from day one.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div class="tag">Connect</div>
+        <h3>See who's meeting whom</h3>
+        <p>Every check-in maps your community's real connection graph automatically — no clipboards, no manual tagging.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div class="tag">Retain</div>
+        <h3>Keep them coming back</h3>
+        <p>Spot members going quiet, celebrate your super-connectors, and double down on the events that actually build bonds.</p>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="carousel-track-wrap">
-    <div class="carousel-track" id="carouselTrack">
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05041.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05080.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05088.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05104.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05121.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05123.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05126.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05133.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05066.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05041.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05080.jpg" alt="Makers Klub session" /></div>
-      <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05088.jpg" alt="Makers Klub session" /></div>
+<section class="sec aud" data-aud="professionals">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="label">How it works · professionals</span>
+      <h2 class="title">Three steps. <em>Zero dropped balls.</em></h2>
+      <p>A great conversation is worth nothing if you forget it by Monday. Makers Klub makes sure you never do.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div class="tag">Capture</div>
+        <h3>Log who you meet</h3>
+        <p>Add a new contact in seconds at the event — or scan their badge. The moment, the place, the face, saved.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div class="tag">Remember</div>
+        <h3>Keep the context</h3>
+        <p>Where you met, what they do, and what you said you'd do next — attached to every person, ready when you need it.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div class="tag">Follow up</div>
+        <h3>Stay in their orbit</h3>
+        <p>Gentle reminders nudge you before a good connection goes cold. Turn a handshake into a working relationship.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SHOWCASE
+══════════════════════════════════════════════ -->
+<div class="showcase-section aud" data-aud="communities">
+  <div class="wrap">
+    <div class="showcase">
+      <div class="showcase-copy reveal">
+        <span class="label">The community dashboard</span>
+        <h3>One dashboard for your <em>whole network.</em></h3>
+        <p>Members, events, check-ins and retention — in one place, instead of five spreadsheets and a chat export.</p>
+        <div class="feat-list">
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M15 11a3.2 3.2 0 1 0 0-6"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 15.5c2.4.6 4 2.2 4 4.5"/></svg></span>
+            <div><b>A living member CRM</b><p>Every member with their role, events attended, and last time you saw them — sorted, searchable, always current.</p></div>
+          </div>
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+            <div><b>Event check-ins &amp; RSVPs</b><p>Run the door from your phone. Every check-in feeds the network graph and your attendance history.</p></div>
+          </div>
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></span>
+            <div><b>Retention &amp; at-risk alerts</b><p>See who's slipping away before they're gone, and get a nudge to bring your quiet members back in.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-art reveal">
+        <div class="art-glow"></div>
+        <img class="shot-img desktop" src="shots/pl-desktop.png" alt="Makers Klub web dashboard" loading="lazy">
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ABOUT -->
-<section class="section">
-  <div class="about-grid">
-    <div class="about-left">
-      <span class="label">What it is</span>
-      <h2 class="title">The room<br/>you've been<br/><em>looking for.</em></h2>
-    </div>
-    <div class="about-right">
-      <p class="about-pull">
-        "Both sides of the table — in the same room. That's where the interesting things happen."
-      </p>
-      <div class="about-body">
-        <p>Makers Klub is a members-only community in Berlin for creative freelancers and the business owners who want to work with them. We run regular events — socials, co-working days, and curated lunches — designed to close the gap between two groups who need each other but rarely find each other well.</p>
-        <p>This is not a networking platform. There are no algorithms, no cold DMs, no performance. Just a well-curated room, a good coffee, and people who are serious about what they do.</p>
+<div class="showcase-section aud" data-aud="professionals">
+  <div class="wrap">
+    <div class="showcase reverse">
+      <div class="showcase-copy reveal">
+        <span class="label">The networking app</span>
+        <h3>Your whole network, <em>in your pocket.</em></h3>
+        <p>Every person, every event, every follow-up — captured the moment you meet and ready when you need it.</p>
+        <div class="feat-list">
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+            <div><b>Met-at memory</b><p>Open anyone and instantly recall where you met, what they do, and the conversation you had.</p></div>
+          </div>
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+            <div><b>Smart follow-up reminders</b><p>Set it once and forget it — Makers Klub nudges you before a promising contact goes quiet.</p></div>
+          </div>
+          <div class="feat">
+            <span class="feat-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+            <div><b>Notes, tags &amp; timeline</b><p>Tag people, jot a note, and see your whole history together — so every conversation builds on the last.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="showcase-art reveal">
+        <div class="art-glow"></div>
+        <div class="shot-trio">
+          <img class="shot-img side" src="shots/pl-brief.png" alt="Makers Klub onboarding" loading="lazy">
+          <img class="shot-img" src="shots/pl-home.png" alt="Makers Klub match feed" loading="lazy">
+          <img class="shot-img side" src="shots/pl-memory.png" alt="Makers Klub memory" loading="lazy">
+        </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- VALUES -->
-<section class="values-section">
-  <div class="values-inner">
-    <span class="label">How we run things</span>
-    <h2 class="title">Small, <em>intentional,</em><br/>worth attending.</h2>
-    <div class="values-grid">
-      <div class="value-card">
-        <span class="value-icon">🎯</span>
-        <h3>Quality over quantity</h3>
-        <p>We're not trying to scale to thousands of members. Every event should feel considered. Every introduction should feel worth making. The value is in the curation, not the numbers.</p>
-      </div>
-      <div class="value-card">
-        <span class="value-icon">🤝</span>
-        <h3>Both sides of the table</h3>
-        <p>A community of only creatives is a support group. A community of only clients is a pitch fest. Makers Klub works because it holds both — and keeps the ratio honest.</p>
-      </div>
-      <div class="value-card">
-        <span class="value-icon">🏙️</span>
-        <h3>Real work, not performance</h3>
-        <p>No panels, no thought leadership, no building-in-public theatre. Members show up with actual problems and leave with actual leads. Berlin-rooted, internationally minded.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WHO IT'S FOR -->
-<section class="section">
-  <div class="who-grid">
-    <div class="who-left">
-      <span class="label">Who it's for</span>
-      <h2 class="title">The right room,<br/>not the<br/><em>biggest</em> room.</h2>
-      <div class="who-tags">
-        <span class="who-tag">Brand designers</span>
-        <span class="who-tag">Photographers</span>
-        <span class="who-tag">Videographers</span>
-        <span class="who-tag">UX / UI designers</span>
-        <span class="who-tag">Content creators</span>
-        <span class="who-tag">Developers</span>
-        <span class="who-tag">Early-stage founders</span>
-        <span class="who-tag">Studio owners</span>
-        <span class="who-tag">Small business owners</span>
-      </div>
-    </div>
-    <div class="who-right">
-      <div class="who-box">
-        <p>Makers Klub is <strong>invite-only and approval-based</strong>. Members join via application — we review everyone personally. The community works because everyone in the room is genuinely worth meeting.</p>
-        <p><strong>Berlin-based or operating in Berlin.</strong> Independent-minded, quality-conscious, and allergic to corporate networking events.</p>
-        <p>If that sounds like you, you'll fit right in.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- EVENTS HEADER -->
-<section class="events-section" id="events">
-  <div class="events-inner">
-    <div class="events-header">
+<!-- ══════════════════════════════════════════════
+     BRIDGE — TWO SIDES
+══════════════════════════════════════════════ -->
+<section class="sec hide-on-community" id="who">
+  <div class="wrap">
+    <div class="sec-head reveal">
       <div>
-        <span class="label">The events</span>
-        <h2 class="title" style="margin-bottom:0;">Three ways to<br/><em>show up.</em></h2>
+        <span class="label">One platform</span>
+        <h2 class="title">Two sides. <em>One network.</em></h2>
       </div>
-      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See what's on →</a>
+      <p class="body-l">Communities run the events. Professionals build their networks. On Makers Klub they share the same graph — so every connection counts for both.</p>
+    </div>
+    <div class="audience reveal">
+      <div class="aud-card founders">
+        <span class="aud-tag">For organizers</span>
+        <h3>Retain the network <em>you worked to build.</em></h3>
+        <p>Turn attendance into relationships, and relationships into a community that compounds event after event.</p>
+        <div class="aud-list">
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Every member &amp; event in one CRM</div>
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>See who's connecting — and who's drifting</div>
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>A branded app your members actually use</div>
+        </div>
+        <button class="btn-outline on-dark mt-28" data-go="communities">See the community view →</button>
+      </div>
+      <div class="aud-card creatives">
+        <span class="aud-tag">For members</span>
+        <h3>Carry your network <em>wherever you go.</em></h3>
+        <p>The people you meet at one community's events are yours to keep — across every event, forever.</p>
+        <div class="aud-list">
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Remember everyone, with full context</div>
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Never miss a follow-up again</div>
+          <div class="aud-li"><span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>One network across every community you join</div>
+        </div>
+        <button class="btn-ochre mt-28" data-go="professionals">See the professional view →</button>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- EVENT: AFTER-HOURS SOCIALS -->
-<section class="event-type-section">
-  <div class="event-type-inner">
-    <div class="event-type-text">
-      <span class="label">Monthly</span>
-      <h2 class="title">After-Hours<br/><em>Socials</em></h2>
-      <p class="body-l">Creatives and business owners in the same room, on purpose. No agenda, no formalities — just drinks at a good venue and conversations that tend to go somewhere. The mix of people is the format.</p>
-      <a href="https://luma.com/h7qwhc0h" target="_blank" class="btn-ochre">See upcoming dates →</a>
+<!-- ══════════════════════════════════════════════
+     FEATURE GRID
+══════════════════════════════════════════════ -->
+<section class="sec fgrid-section aud" data-aud="communities">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="label">Inside the platform</span>
+      <h2 class="title">Everything an organizer <em>needs to retain.</em></h2>
     </div>
-    <div class="event-type-photo">
-      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="After-Hours Socials" />
-    </div>
-  </div>
-</section>
-
-<!-- EVENT: TALKS & WORKSHOPS -->
-<section class="event-type-section event-type-section--reversed">
-  <div class="event-type-inner">
-    <div class="event-type-photo">
-      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Talks and Workshops" />
-    </div>
-    <div class="event-type-text">
-      <span class="label">Regular</span>
-      <h2 class="title">Talks &<br/><em>Workshops</em></h2>
-      <p class="body-l">Practical sessions led by community members and invited guests. Portfolio reviews, skills deep-dives, and honest conversations about what it actually takes to run a creative business in Berlin.</p>
-      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming dates →</a>
+    <div class="fgrid reveal">
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M15 11a3.2 3.2 0 1 0 0-6"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M16 15.5c2.4.6 4 2.2 4 4.5"/></svg></span><h4>Member CRM</h4><p>Every member, role and history in one searchable, always-current database.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><h4>Event check-ins</h4><p>Run the door, capture attendance, and feed it straight into your network.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="9" r="2.5"/><circle cx="9" cy="18" r="2.5"/><path d="M8 7.5 16 9M7.5 16l1-6"/></svg></span><h4>Connection graph</h4><p>Watch your community's real relationships form, event after event.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></span><h4>Retention insights</h4><p>Know your at-risk members before they quietly disappear.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 8-8 8 8 0 0 1 8 8M4 12a8 8 0 0 0 8 8 8 8 0 0 0 8-8M4 12h16"/></svg></span><h4>Integrations</h4><p>Sync Luma, Eventbrite or a plain CSV — your data, where it already lives.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span><h4>Branded member app</h4><p>Give your community an app they'll open — with your name on it.</p></div>
     </div>
   </div>
 </section>
 
-<!-- EVENT: PITCH DAYS -->
-<section class="event-type-section">
-  <div class="event-type-inner">
-    <div class="event-type-text">
-      <span class="label">Monthly</span>
-      <h2 class="title">Pitch<br/><em>Days</em></h2>
-      <p class="body-l">Founders and creative professionals pitch their ideas, projects, or work to a room of peers. Real feedback, real questions, no fluff. If you're building something and want to pressure-test it — this is the room.</p>
-      <a href="https://luma.com/8fb00b7z" target="_blank" class="btn-ochre">See upcoming dates →</a>
+<section class="sec fgrid-section aud" data-aud="professionals">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="label">Inside the app</span>
+      <h2 class="title">Everything you need <em>to stay connected.</em></h2>
     </div>
-    <div class="event-type-photo">
-      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Pitch Days" />
+    <div class="fgrid reveal">
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span><h4>Personal CRM</h4><p>A private address book that remembers more than a name and a number.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></span><h4>Met-at context</h4><p>Every contact tagged with where you met and what you talked about.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><h4>Follow-up reminders</h4><p>Smart nudges so a promising chat never slips through the cracks.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span><h4>Notes &amp; tags</h4><p>Capture the detail that matters and find anyone by what they do.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span><h4>Connection timeline</h4><p>See your whole history with a person, so each chat builds on the last.</p></div>
+      <div class="fcard"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6Z"/><path d="m9 12 2 2 4-4"/></svg></span><h4>Works at any event</h4><p>Not just Makers Klub nights — every conference, meetup and mixer you attend.</p></div>
     </div>
   </div>
 </section>
 
-<!-- PLATFORM TEASE -->
-<div class="platform-strip">
-  <div class="platform-inner">
-    <div class="platform-text">
-      <span class="label">Coming soon</span>
-      <h3>The Makers Klub <em>platform.</em></h3>
-      <p>A private platform to manage your connections, stay on top of follow-ups, and discover opportunities posted by the community. Built for independent creatives — not sales teams.</p>
-      <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline" style="margin-top: 24px; display: inline-block;">Join the waitlist</a>
-    </div>
-    <div class="platform-screenshot">
-      <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05133.jpg" alt="Makers Klub platform preview" />
-    </div>
-  </div>
-</div>
+<!-- ══════════════════════════════════════════════
+     FINAL CTA
+══════════════════════════════════════════════ -->
+<section class="cta-section hide-on-community" id="join">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <div class="aud" data-aud="communities">
+        <span class="label">For communities</span>
+        <h2 class="title">Stop losing the <em>network you built.</em></h2>
+        <p>Join 120+ organizers turning events into communities that last. Early access opens this year.</p>
+      </div>
+      <div class="aud" data-aud="professionals">
+        <span class="label">For professionals</span>
+        <h2 class="title">Never lose a <em>connection again.</em></h2>
+        <p>Join 340 founding members turning events into a network that works. Free to start.</p>
+      </div>
 
-<!-- CTA -->
-<section class="cta-section" id="join">
-  <div class="cta-glow"></div>
-  <div class="cta-inner">
-    <span class="label">Get started</span>
-    <h2 class="title">Come to<br/>the next <em>event.</em></h2>
-    <p class="body-l">The best way to understand what Makers Klub is — is to come to one. Check the calendar and find something that fits.</p>
-    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre" style="padding: 15px 32px; font-size: 15px;">See upcoming events →</a>
-    <p class="cta-note">Approval-based. Berlin-based. Free to start.</p>
+      <form class="waitlist" id="form-cta" novalidate>
+        <div class="wl-row">
+          <input class="wl-input" type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+          <button type="submit" class="btn-ochre lg" id="cta-submit">Join the waitlist →</button>
+        </div>
+        <div class="wl-note center">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          No spam, ever. We'll only email you about launch.
+        </div>
+      </form>
+      <div class="wl-success" id="success-cta">
+        <span class="tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span>You're on the list. Watch your inbox — we launch this year.</span>
+      </div>
+    </div>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════
+     COMMUNITY TAB  (Makers Klub Berlin community)
+══════════════════════════════════════════════ -->
+<div class="aud" data-aud="mk-community">
+
+  <!-- Hero -->
+  <div class="comm-hero">
+    <div class="wrap comm-hero-top">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Berlin · Members-only community</div>
+        <h1>
+          Where <em>creatives</em><br/>
+          and business owners<br/>
+          come <em>together.</em>
+        </h1>
+      </div>
+      <div>
+        <p class="comm-hero-body">
+          Makers Klub brings freelancers, founders, and solopreneurs in creative industries together — through curated events, shared working sessions, and the kind of introductions you can't engineer on LinkedIn.
+        </p>
+        <div class="comm-hero-actions">
+          <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See upcoming events →</a>
+          <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline">Join the waitlist</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap pb-0">
+      <div class="carousel-track-wrap">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05041.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05080.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05088.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05104.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05121.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05123.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05126.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05133.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05066.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05041.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05080.jpg" alt="Makers Klub session" /></div>
+          <div class="hero-photo"><img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05088.jpg" alt="Makers Klub session" /></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="about-grid">
+        <div>
+          <span class="label">What it is</span>
+          <h2 class="title">The room<br/>you've been<br/><em>looking for.</em></h2>
+        </div>
+        <div>
+          <p class="about-pull">"Both sides of the table — in the same room. That's where the interesting things happen."</p>
+          <div class="about-body">
+            <p>Makers Klub is a members-only community in Berlin for creative freelancers and the business owners who want to work with them. We run regular events — socials, co-working days, and curated lunches — designed to close the gap between two groups who need each other but rarely find each other well.</p>
+            <p>This is not a networking platform. There are no algorithms, no cold DMs, no performance. Just a well-curated room, a good coffee, and people who are serious about what they do.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <div class="values-section">
+    <div class="values-inner">
+      <span class="label">How we run things</span>
+      <h2 class="title">Small, <em>intentional,</em><br/>worth attending.</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <span class="value-icon">🎯</span>
+          <h3>Quality over quantity</h3>
+          <p>We're not trying to scale to thousands of members. Every event should feel considered. Every introduction should feel worth making. The value is in the curation, not the numbers.</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">🤝</span>
+          <h3>Both sides of the table</h3>
+          <p>A community of only creatives is a support group. A community of only clients is a pitch fest. Makers Klub works because it holds both — and keeps the ratio honest.</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">🏙️</span>
+          <h3>Real work, not performance</h3>
+          <p>No panels, no thought leadership, no building-in-public theatre. Members show up with actual problems and leave with actual leads. Berlin-rooted, internationally minded.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Who it's for -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="who-grid">
+        <div>
+          <span class="label">Who it's for</span>
+          <h2 class="title">The right room,<br/>not the<br/><em>biggest</em> room.</h2>
+          <div class="who-tags">
+            <span class="who-tag">Brand designers</span>
+            <span class="who-tag">Photographers</span>
+            <span class="who-tag">Videographers</span>
+            <span class="who-tag">UX / UI designers</span>
+            <span class="who-tag">Content creators</span>
+            <span class="who-tag">Developers</span>
+            <span class="who-tag">Early-stage founders</span>
+            <span class="who-tag">Studio owners</span>
+            <span class="who-tag">Small business owners</span>
+          </div>
+        </div>
+        <div>
+          <div class="who-box">
+            <p>Makers Klub is <strong>invite-only and approval-based</strong>. Members join via application — we review everyone personally. The community works because everyone in the room is genuinely worth meeting.</p>
+            <p><strong>Berlin-based or operating in Berlin.</strong> Independent-minded, quality-conscious, and allergic to corporate networking events.</p>
+            <p>If that sounds like you, you'll fit right in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events header -->
+  <div class="events-hdr">
+    <div class="events-hdr-inner">
+      <div class="events-hdr-row">
+        <div>
+          <span class="label">The events</span>
+          <h2 class="title mb-0">Three ways to<br/><em>show up.</em></h2>
+        </div>
+        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre">See what's on →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- After-Hours Socials -->
+  <div class="evt-section">
+    <div class="evt-inner">
+      <div>
+        <span class="label">Monthly</span>
+        <h2 class="title">After-Hours<br/><em>Socials</em></h2>
+        <p class="body-l">Creatives and business owners in the same room, on purpose. No agenda, no formalities — just drinks at a good venue and conversations that tend to go somewhere.</p>
+        <a href="https://luma.com/h7qwhc0h" target="_blank" class="btn-ochre mt-32">See upcoming dates →</a>
+      </div>
+      <div class="evt-photo">
+        <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05077.jpg" alt="After-Hours Socials" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Talks & Workshops -->
+  <div class="evt-section">
+    <div class="evt-inner">
+      <div class="evt-photo">
+        <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05098.jpg" alt="Talks and Workshops" />
+      </div>
+      <div>
+        <span class="label">Regular</span>
+        <h2 class="title">Talks &amp;<br/><em>Workshops</em></h2>
+        <p class="body-l">Practical sessions led by community members and invited guests. Portfolio reviews, skills deep-dives, and honest conversations about what it actually takes to run a creative business in Berlin.</p>
+        <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre mt-32">See upcoming dates →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitch Days -->
+  <div class="evt-section">
+    <div class="evt-inner">
+      <div>
+        <span class="label">Monthly</span>
+        <h2 class="title">Pitch<br/><em>Days</em></h2>
+        <p class="body-l">Founders and creative professionals pitch their ideas, projects, or work to a room of peers. Real feedback, real questions, no fluff. If you're building something and want to pressure-test it — this is the room.</p>
+        <a href="https://luma.com/8fb00b7z" target="_blank" class="btn-ochre mt-32">See upcoming dates →</a>
+      </div>
+      <div class="evt-photo">
+        <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05060.jpg" alt="Pitch Days" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform strip -->
+  <div class="platform-strip">
+    <div class="platform-inner">
+      <div class="platform-text">
+        <span class="label">Coming soon</span>
+        <h3>The Makers Klub <em>platform.</em></h3>
+        <p>A private platform to manage your connections, stay on top of follow-ups, and discover opportunities posted by the community. Built for independent creatives — not sales teams.</p>
+        <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-outline mt-24">Join the waitlist</a>
+      </div>
+      <div class="platform-screenshot">
+        <img src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/DSC05133.jpg" alt="Makers Klub platform preview" />
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="comm-cta">
+    <div class="comm-cta-glow"></div>
+    <div class="comm-cta-inner">
+      <span class="label">Get started</span>
+      <h2 class="title">Come to<br/>the next <em>event.</em></h2>
+      <p class="body-l">The best way to understand what Makers Klub is — is to come to one. Check the calendar and find something that fits.</p>
+      <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" class="btn-ochre lg">See upcoming events →</a>
+      <p class="comm-cta-note">Approval-based. Berlin-based. Free to start.</p>
+    </div>
+  </div>
+
+</div><!-- /mk-community -->
 
 <!-- FOOTER -->
 <footer>
-  <a href="#" class="footer-logo">
-    <img src="logo.svg" alt="Makers Klub" />
-    <span class="footer-logo-text">Makers Klub</span>
-  </a>
-  <div class="footer-links">
-    <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank">Events</a>
-    <a href="https://tally.so/r/J9JAjJ" target="_blank">Platform waitlist</a>
-    <a href="https://linkedin.com/company/makers-klub" target="_blank">LinkedIn</a>
-    <a href="/impressum.html">Impressum</a>
-    <a href="/datenschutz.html">Datenschutz</a>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="top">
+          <img src="logo.svg" alt="Makers Klub">
+          <b>Makers Klub</b>
+        </div>
+        <p>The IRL networking CRM. Helping communities retain their network — and professionals build one that works for them.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Communities</h4>
+        <a href="#" data-go="communities">Community CRM</a>
+        <a href="#" data-go="communities">Event check-ins</a>
+        <a href="#" data-go="communities">Retention insights</a>
+        <a href="#" data-go="communities">Integrations</a>
+      </div>
+      <div class="foot-col">
+        <h4>Professionals</h4>
+        <a href="#" data-go="professionals">Networking app</a>
+        <a href="#" data-go="professionals">Follow-ups</a>
+        <a href="#" data-go="professionals">Notes &amp; tags</a>
+        <a href="#join">Join the waitlist</a>
+      </div>
+      <div class="foot-col">
+        <h4>Find us</h4>
+        <a href="#">Twitter / X</a>
+        <a href="https://linkedin.com/company/makers-klub" target="_blank">LinkedIn</a>
+        <a href="#">Instagram</a>
+        <a href="mailto:hello@makersklub.de">hello@makersklub.de</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Makers Klub · Berlin</div>
+      <div>The IRL networking CRM · Launching 2026</div>
+    </div>
   </div>
-  <p class="footer-copy">© 2025 Makers Klub. Berlin.</p>
 </footer>
 
-  <script type="module" src="main.js"></script>
+<script>
+  const AUD_KEY = 'mk_aud';
+
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 30);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  function setAud(aud, scrollToTop) {
+    if (!['communities','professionals','mk-community'].includes(aud)) aud = 'professionals';
+    document.body.dataset.aud = aud;
+    try { localStorage.setItem(AUD_KEY, aud); } catch (_) {}
+    document.querySelectorAll('.nav-link[data-aud]').forEach(b =>
+      b.classList.toggle('active', b.dataset.aud === aud));
+    const ctaBtn = document.getElementById('cta-submit');
+    if (ctaBtn) ctaBtn.textContent = aud === 'communities' ? 'Get early access →' : 'Join the waitlist →';
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.aud[data-aud="' + aud + '"] .reveal').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.95) el.classList.add('in');
+      });
+    });
+    if (scrollToTop) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.nav-link[data-aud]').forEach(btn => {
+    btn.addEventListener('click', () => setAud(btn.dataset.aud));
+  });
+
+  document.querySelectorAll('[data-go]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      setAud(el.dataset.go, true);
+    });
+  });
+
+  let savedAud = 'professionals';
+  try { savedAud = localStorage.getItem(AUD_KEY) || 'professionals'; } catch (_) {}
+  setAud(savedAud);
+
+  function wireForm(formId, successId) {
+    const form = document.getElementById(formId);
+    const success = document.getElementById(successId);
+    if (!form) return;
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = form.querySelector('.wl-input');
+      if (!email.value || !email.validity.valid) {
+        email.focus();
+        email.style.borderColor = '#c0392b';
+        return;
+      }
+      try {
+        const list = JSON.parse(localStorage.getItem('mk_waitlist') || '[]');
+        list.push({ email: email.value, audience: document.body.dataset.aud, at: Date.now() });
+        localStorage.setItem('mk_waitlist', JSON.stringify(list));
+      } catch (_) {}
+      form.classList.add('hide');
+      success.classList.add('show');
+    });
+    form.querySelector('.wl-input')?.addEventListener('input', e => { e.target.style.borderColor = ''; });
+  }
+  wireForm('form-comm', 'success-comm');
+  wireForm('form-pro', 'success-pro');
+  wireForm('form-cta', 'success-cta');
+
+  // Carousel
+  (function() {
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+    let x = 0, speed = 0.6, paused = false, dragging = false, dragStartX = 0, dragStartScroll = 0;
+    function getSetWidth() {
+      const items = track.children, count = Math.floor(items.length / 2);
+      let w = 0;
+      for (let i = 0; i < count; i++) w += items[i].offsetWidth + 12;
+      return w;
+    }
+    function tick() {
+      if (!paused && !dragging) {
+        x -= speed;
+        if (Math.abs(x) >= getSetWidth()) x = 0;
+        track.style.transform = `translateX(${x}px)`;
+      }
+      requestAnimationFrame(tick);
+    }
+    track.addEventListener('mousedown', e => { dragging = true; dragStartX = e.clientX; dragStartScroll = x; track.style.transition = 'none'; });
+    window.addEventListener('mousemove', e => { if (!dragging) return; x = dragStartScroll + (e.clientX - dragStartX); track.style.transform = `translateX(${x}px)`; });
+    window.addEventListener('mouseup', () => { dragging = false; });
+    track.addEventListener('touchstart', e => { dragging = true; dragStartX = e.touches[0].clientX; dragStartScroll = x; }, { passive: true });
+    track.addEventListener('touchmove', e => { if (!dragging) return; x = dragStartScroll + (e.touches[0].clientX - dragStartX); track.style.transform = `translateX(${x}px)`; }, { passive: true });
+    track.addEventListener('touchend', () => { dragging = false; });
+    track.addEventListener('mouseenter', () => { paused = true; });
+    track.addEventListener('mouseleave', () => { paused = false; });
+    requestAnimationFrame(tick);
+  })();
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  setTimeout(() => document.querySelectorAll('.reveal:not(.in)').forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('in');
+  }), 1400);
+</script>
+
 </body>
 </html>
