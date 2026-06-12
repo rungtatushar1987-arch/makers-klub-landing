@@ -1243,6 +1243,9 @@ p.body-l {
 .showcase.reverse { direction: rtl; }
 .showcase.reverse > * { direction: ltr; }
 
+.showcase-wide-art { grid-template-columns: 1fr 1.5fr; }
+.showcase-wide-art .showcase-art { margin-right: -48px; }
+
 .showcase-copy h3 {
   font-family: 'Fraunces', serif;
   font-size: clamp(26px, 3vw, 36px);
@@ -1307,7 +1310,7 @@ p.body-l {
   z-index: 1;
   width: 100%;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 0;
   display: block;
 }
 
@@ -1318,8 +1321,8 @@ p.body-l {
 }
 
 .shot-trio .shot-img.side {
-  width: 28%;
-  opacity: 0.65;
+  width: 100%;
+  opacity: 1;
   border-radius: 12px;
 }
 
