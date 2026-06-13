@@ -11,16 +11,16 @@
 
 <!-- NAV -->
 <nav id="nav">
-  <a class="nav-logo" href="#top">
+  <a class="nav-logo" href="/" onclick="try{localStorage.removeItem('mk_aud')}catch(_){}">
     <img src="logo.svg" alt="Makers Klub">
     <b>Makers Klub</b>
   </a>
   <div class="nav-links">
-    <button class="nav-link active" data-aud="professionals">For professionals</button>
-    <button class="nav-link" data-aud="communities">For communities &amp; businesses</button>
-    <button class="nav-link" data-aud="mk-community">Makers Klub Community</button>
+    <!-- <button class="nav-link active" data-aud="professionals">For professionals</button> -->
+    <button class="nav-link" data-aud="communities" style="display:none">For communities &amp; businesses</button>
   </div>
   <div class="nav-right">
+    <button class="nav-link" data-aud="mk-community">Our community &amp; Events</button>
     <a href="https://tally.so/r/J9JAjJ" target="_blank" class="btn-ochre">Join the waitlist →</a>
   </div>
 </nav>
@@ -74,16 +74,6 @@
       <div class="wl-note" style="margin-top:10px;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Free to start. No spam — only a nudge when we launch in your city.
-      </div>
-
-      <div class="proof">
-        <div class="proof-stack">
-          <span class="av" style="background:#f0a92e">T</span>
-          <span class="av" style="background:#7a4ed8">S</span>
-          <span class="av" style="background:#0891b2">J</span>
-          <span class="av" style="background:#92400e">+</span>
-        </div>
-        <span class="proof-txt"><b>340 founding members</b> already in line</span>
       </div>
     </div>
 
@@ -231,7 +221,7 @@
       </div>
       <div class="showcase-art reveal">
         <div class="art-glow"></div>
-        <img class="shot-img" src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/pl-scr-2.png" alt="Makers Klub app" loading="lazy">
+        <img class="shot-img" src="https://ld1getdcu5h4jiyg.public.blob.vercel-storage.com/images/pl-scr-4.png" alt="Makers Klub app" loading="lazy">
       </div>
     </div>
   </div>
