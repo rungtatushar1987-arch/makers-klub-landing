@@ -1445,6 +1445,49 @@ p.body-l {
 
 .fcard p { font-size: 14px; color: var(--fg-2); line-height: 1.7; }
 
+/* ── APP FEATURES TRUST BAR ── */
+.trust.app-features {
+  padding: 64px 48px;
+}
+
+.trust.app-features .sec-head {
+  margin-bottom: 48px;
+}
+
+.trust.app-features .sec-head .label {
+  color: var(--ochre);
+  opacity: 1;
+}
+
+.trust.app-features .title,
+.trust.app-features .title em {
+  color: white;
+}
+
+.trust.app-features .fcard {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.trust.app-features .fcard:hover {
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+
+.trust.app-features .fcard .ic {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--ochre);
+}
+
+.trust.app-features .fcard h4 {
+  color: white;
+}
+
+.trust.app-features .fcard p {
+  color: rgba(255,255,255,0.55);
+}
+
 /* ── FEATURE GRID SECTION VARIANT ── */
 .sec.fgrid-section {
   background: var(--cream-2);
