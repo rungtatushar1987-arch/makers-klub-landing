@@ -1086,7 +1086,7 @@ p.body-l {
 .hero-visual {
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid var(--cream-3);
+  border: 0;
   box-shadow: 0 16px 48px rgba(15,30,61,0.14);
   background: var(--cream-2);
   aspect-ratio: 4/3;
