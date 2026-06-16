@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
+import { useSession } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import { supabase, type Profile, ACTION_TAGS, getInitials } from '../supabase'
+import { getSupabaseClient, type Profile, ACTION_TAGS, getInitials } from '../supabase'
 
 const AV_COLORS = [
   { bg: '#fcb813', fg: '#0a1340' },
@@ -25,6 +26,7 @@ type Connection = {
 }
 
 export default function Members() {
+  const { session } = useSession()
   const { connections: rawConnections, loading } = useKlub()
   const connections = rawConnections as unknown as Connection[]
 
@@ -62,12 +64,16 @@ export default function Members() {
   async function clearTag(conn: Connection, tag: string) {
     const tags = conn.tags.filter(t => t !== tag)
     updateConn(conn.id, { tags })
-    await supabase.from('connections').update({ tags }).eq('id', conn.id)
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
+    await db.from('connections').update({ tags }).eq('id', conn.id)
   }
 
   async function saveConnection(conn: Connection) {
     setSavingConn(conn.id)
-    await supabase.from('connections').update({
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
+    await db.from('connections').update({
       notes: conn.notes, tags: conn.tags, follow_up: conn.follow_up
     }).eq('id', conn.id)
     setSavingConn(null)
@@ -88,33 +94,18 @@ export default function Members() {
       </div>
 
       <div className="mkw-main-body">
-
-        {/* ── Filters ── */}
         <div className="mkw-filter-bar">
           <span className="mkw-filter-label">Filter</span>
-          <select
-            value={filterEvent}
-            onChange={e => setFilterEvent(e.target.value)}
-            className={`mkw-filter-select${filterEvent !== 'all' ? ' active' : ''}`}
-          >
+          <select value={filterEvent} onChange={e => setFilterEvent(e.target.value)} className={`mkw-filter-select${filterEvent !== 'all' ? ' active' : ''}`}>
             <option value="all">All events</option>
             {eventNames.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
-          <select
-            value={filterTag}
-            onChange={e => setFilterTag(e.target.value)}
-            className={`mkw-filter-select${filterTag !== 'all' ? ' active' : ''}`}
-          >
+          <select value={filterTag} onChange={e => setFilterTag(e.target.value)} className={`mkw-filter-select${filterTag !== 'all' ? ' active' : ''}`}>
             <option value="all">All action items</option>
             {ACTION_TAGS.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
           {activeFilters > 0 && (
-            <button
-              className="mkw-filter-clear"
-              onClick={() => { setFilterEvent('all'); setFilterTag('all') }}
-            >
-              Clear
-            </button>
+            <button className="mkw-filter-clear" onClick={() => { setFilterEvent('all'); setFilterTag('all') }}>Clear</button>
           )}
         </div>
 
@@ -140,128 +131,55 @@ export default function Members() {
                 backdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
                 WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
                 border: `1px solid ${isEditing ? 'var(--mk-violet)' : 'var(--glass-border)'}`,
-                boxShadow: isEditing
-                  ? '0 0 0 3px rgba(122,78,216,0.12), var(--glass-shadow)'
-                  : 'var(--glass-shadow), var(--glass-hi)',
-                borderRadius: 'var(--r-sm)',
-                overflow: 'hidden',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
+                boxShadow: isEditing ? '0 0 0 3px rgba(122,78,216,0.12), var(--glass-shadow)' : 'var(--glass-shadow), var(--glass-hi)',
+                borderRadius: 'var(--r-sm)', overflow: 'hidden', transition: 'border-color 0.15s, box-shadow 0.15s',
               }}>
-                {/* ── Main row ── */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px 18px' }}>
-                  {/* Avatar */}
-                  <div style={{
-                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                    background: c.bg, color: c.fg,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
-                  }}>
+                  <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: c.bg, color: c.fg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15 }}>
                     {getInitials(conn.profile?.full_name)}
                   </div>
-
-                  {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
-                      color: 'var(--ink-1)', marginBottom: 3,
-                      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
-                    }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: 'var(--ink-1)', marginBottom: 3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       {conn.profile?.full_name || 'Member'}
                       {conn.follow_up && (
-                        <span style={{
-                          padding: '2px 9px', borderRadius: 999,
-                          background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)',
-                          fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
-                        }}>↻ Follow up</span>
+                        <span style={{ padding: '2px 9px', borderRadius: 999, background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700 }}>↻ Follow up</span>
                       )}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', marginBottom: conn.notes || conn.tags?.length > 0 ? 8 : 0 }}>
-                      {conn.profile?.role_category
-                        ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1)
-                        : 'Maker'}
+                      {conn.profile?.role_category ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1) : 'Maker'}
                       {conn.event_name ? ` · ${conn.event_name}` : ''}
                       {' · '}
                       {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-
-                    {/* Note quote */}
                     {conn.notes && !isEditing && (
-                      <div style={{
-                        fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13,
-                        color: 'var(--ink-2)', padding: '9px 13px',
-                        borderLeft: '3px solid var(--accent)',
-                        background: 'rgba(252,184,19,0.08)',
-                        borderRadius: '0 var(--r-xs) var(--r-xs) 0',
-                        lineHeight: 1.5, marginBottom: conn.tags?.length > 0 ? 8 : 0,
-                      }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13, color: 'var(--ink-2)', padding: '9px 13px', borderLeft: '3px solid var(--accent)', background: 'rgba(252,184,19,0.08)', borderRadius: '0 var(--r-xs) var(--r-xs) 0', lineHeight: 1.5, marginBottom: conn.tags?.length > 0 ? 8 : 0 }}>
                         {conn.notes}
                       </div>
                     )}
-
-                    {/* Tags */}
                     {conn.tags?.length > 0 && !isEditing && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {conn.tags.map(tag => (
-                          <span key={tag} style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 4,
-                            background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)',
-                            fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-                            padding: '3px 10px', borderRadius: 999,
-                          }}>
+                          <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 999 }}>
                             {tag}
-                            <button
-                              onClick={() => clearTag(conn, tag)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mk-yellow-deep)', fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}
-                            >×</button>
+                            <button onClick={() => clearTag(conn, tag)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mk-yellow-deep)', fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}>×</button>
                           </span>
                         ))}
                       </div>
                     )}
                   </div>
-
-                  {/* Right actions */}
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    {conn.profile?.linkedin_url && (
-                      <SocialLink href={conn.profile.linkedin_url} label="LinkedIn" />
-                    )}
-                    {conn.profile?.instagram_url && (
-                      <SocialLink
-                        href={conn.profile.instagram_url.startsWith('http') ? conn.profile.instagram_url : `https://${conn.profile.instagram_url}`}
-                        label="Instagram"
-                      />
-                    )}
-                    {conn.profile?.website_url && (
-                      <SocialLink
-                        href={conn.profile.website_url.startsWith('http') ? conn.profile.website_url : `https://${conn.profile.website_url}`}
-                        label="Website"
-                      />
-                    )}
-                    <button
-                      className="mkw-row-action"
-                      onClick={() => setEditingConn(isEditing ? null : conn.id)}
-                    >
-                      {isEditing ? 'Cancel' : 'Edit'}
-                    </button>
+                    {conn.profile?.linkedin_url && <SocialLink href={conn.profile.linkedin_url} label="LinkedIn" />}
+                    {conn.profile?.instagram_url && <SocialLink href={conn.profile.instagram_url.startsWith('http') ? conn.profile.instagram_url : `https://${conn.profile.instagram_url}`} label="Instagram" />}
+                    {conn.profile?.website_url && <SocialLink href={conn.profile.website_url.startsWith('http') ? conn.profile.website_url : `https://${conn.profile.website_url}`} label="Website" />}
+                    <button className="mkw-row-action" onClick={() => setEditingConn(isEditing ? null : conn.id)}>{isEditing ? 'Cancel' : 'Edit'}</button>
                   </div>
                 </div>
 
-                {/* ── Edit panel ── */}
                 {isEditing && (
-                  <div style={{
-                    borderTop: '1px solid var(--hairline)',
-                    padding: '16px 18px',
-                    background: 'rgba(255,255,255,0.35)',
-                    display: 'flex', flexDirection: 'column', gap: 16,
-                  }}>
+                  <div style={{ borderTop: '1px solid var(--hairline)', padding: '16px 18px', background: 'rgba(255,255,255,0.35)', display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <div>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Note</div>
-                      <textarea
-                        className="mkw-form-textarea" rows={2}
-                        placeholder="How did you meet? What did you talk about?"
-                        value={conn.notes || ''}
-                        onChange={e => updateConn(conn.id, { notes: e.target.value })}
-                        style={{ fontSize: 13 }}
-                      />
+                      <textarea className="mkw-form-textarea" rows={2} placeholder="How did you meet? What did you talk about?" value={conn.notes || ''} onChange={e => updateConn(conn.id, { notes: e.target.value })} style={{ fontSize: 13 }} />
                     </div>
                     <div>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Action items</div>
@@ -269,33 +187,17 @@ export default function Members() {
                         {[...ACTION_TAGS, ...conn.tags.filter((t: string) => !ACTION_TAGS.includes(t))].map(tag => {
                           const selected = conn.tags.includes(tag)
                           return (
-                            <button key={tag} onClick={() => toggleTag(conn, tag)} style={{
-                              padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
-                              fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-                              border: `1px solid ${selected ? 'var(--mk-navy)' : 'var(--hairline-strong)'}`,
-                              background: selected ? 'var(--mk-navy)' : 'transparent',
-                              color: selected ? '#fff' : 'var(--ink-2)',
-                              transition: 'all 0.12s',
-                            }}>{tag}</button>
+                            <button key={tag} onClick={() => toggleTag(conn, tag)} style={{ padding: '7px 14px', borderRadius: 999, cursor: 'pointer', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, border: `1px solid ${selected ? 'var(--mk-navy)' : 'var(--hairline-strong)'}`, background: selected ? 'var(--mk-navy)' : 'transparent', color: selected ? '#fff' : 'var(--ink-2)', transition: 'all 0.12s' }}>{tag}</button>
                           )
                         })}
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--ink-2)', cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 500 }}>
-                        <input
-                          type="checkbox"
-                          checked={conn.follow_up}
-                          onChange={e => updateConn(conn.id, { follow_up: e.target.checked })}
-                          style={{ accentColor: 'var(--mk-yellow)', width: 15, height: 15 }}
-                        />
+                        <input type="checkbox" checked={conn.follow_up} onChange={e => updateConn(conn.id, { follow_up: e.target.checked })} style={{ accentColor: 'var(--mk-yellow)', width: 15, height: 15 }} />
                         Remind me to follow up
                       </label>
-                      <button
-                        className="mk-btn mk-btn-primary mk-btn-sm"
-                        onClick={() => saveConnection(conn)}
-                        disabled={savingConn === conn.id}
-                      >
+                      <button className="mk-btn mk-btn-primary mk-btn-sm" onClick={() => saveConnection(conn)} disabled={savingConn === conn.id}>
                         {savingConn === conn.id ? 'Saving…' : 'Save →'}
                       </button>
                     </div>
@@ -312,17 +214,7 @@ export default function Members() {
 
 function SocialLink({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} target="_blank" rel="noreferrer" style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      padding: '5px 11px', borderRadius: 999,
-      background: 'var(--glass-bg)',
-      backdropFilter: 'blur(var(--glass-blur))',
-      border: '1px solid var(--glass-border)',
-      fontSize: 11, fontWeight: 600, color: 'var(--ink-2)',
-      textDecoration: 'none', whiteSpace: 'nowrap',
-      fontFamily: 'var(--font-display)',
-      transition: 'color 0.12s',
-    }}>
+    <a href={href} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 11px', borderRadius: 999, background: 'var(--glass-bg)', backdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)', fontSize: 11, fontWeight: 600, color: 'var(--ink-2)', textDecoration: 'none', whiteSpace: 'nowrap', fontFamily: 'var(--font-display)', transition: 'color 0.12s' }}>
       {label}
     </a>
   )

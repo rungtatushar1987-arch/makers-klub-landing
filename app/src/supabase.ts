@@ -3,7 +3,27 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
+// Static anon client — for unauthenticated/public reads only.
+// Prefer getSupabaseClient(token) anywhere a signed-in user's identity matters.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+/**
+ * Returns a Supabase client that attaches a Clerk session JWT on every request.
+ * Use this inside React components/hooks where you have access to a Clerk session token.
+ *
+ * Usage:
+ *   const { session } = useSession()
+ *   const token = await session?.getToken({ template: 'supabase' })
+ *   const db = getSupabaseClient(token)
+ *   const { data } = await db.from('profiles').select('*')
+ */
+export function getSupabaseClient(token: string | null | undefined) {
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  })
+}
 
 export type Profile = {
   clerk_user_id: string

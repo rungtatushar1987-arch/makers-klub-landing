@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useUser } from '@clerk/clerk-react'
-import { supabase, type Profile } from '../supabase'
+import { useUser, useSession } from '@clerk/clerk-react'
+import { getSupabaseClient, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import './Profile.css'
 
@@ -25,12 +25,12 @@ function calcProgress(p: Partial<Profile>): { pct: number; fieldsLeft: number; i
     !!p.website_url?.trim(),
   ]
   const filled = has.filter(Boolean).length
-  // Complete only when ALL 6 fields are filled
   return { pct: Math.round((filled / 6) * 100), fieldsLeft: 6 - filled, isComplete: filled === 6 }
 }
 
 export default function Profile() {
   const { user } = useUser()
+  const { session } = useSession()
   const { events } = useKlub()
   const [profile, setProfile] = useState<Partial<Profile>>({})
   const [savedProfile, setSavedProfile] = useState<Partial<Profile>>({})
@@ -46,22 +46,22 @@ export default function Profile() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.from('profiles').select('*').eq('clerk_user_id', user?.id).single()
+      const token = await session?.getToken({ template: 'supabase' })
+      const db = getSupabaseClient(token)
+      const { data } = await db.from('profiles').select('*').eq('clerk_user_id', user?.id).single()
       if (data) { setProfile(data); setSavedProfile(data) }
       setLoading(false)
     }
-    if (user) load()
-  }, [user])
+    if (user && session) load()
+  }, [user, session])
 
   function update(field: keyof Profile, value: string) {
     setProfile(prev => ({ ...prev, [field]: value }))
     if (['linkedin_url', 'instagram_url', 'website_url'].includes(field)) setSocialError(false)
   }
 
-  // Progress is based on saved profile state (not live form state)
   const { pct, fieldsLeft, isComplete } = calcProgress(savedProfile)
 
-  // QR unlocks with name + bio + role + at least one social (lower bar than "complete")
   const savedHasSocial =
     !!savedProfile.linkedin_url?.trim() ||
     !!savedProfile.instagram_url?.trim() ||
@@ -72,13 +72,11 @@ export default function Profile() {
     !!savedProfile.role_category &&
     savedHasSocial
 
-  // Live form state: at least one social entered
   const hasSocial =
     !!profile.linkedin_url?.trim() ||
     !!profile.instagram_url?.trim() ||
     !!profile.website_url?.trim()
 
-  // Save & unlock button gate (locked layout only): all QR-unlock fields filled in form
   const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && !!profile.role_category && hasSocial
 
   async function save() {
@@ -87,7 +85,9 @@ export default function Profile() {
     const slug = profile.slug || (profile.full_name
       ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user?.id.slice(-6)
       : undefined)
-    await supabase.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
+    await db.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
     const updated = { ...profile, slug }
     setSavedProfile(updated)
     setSaving(false)
@@ -107,16 +107,10 @@ export default function Profile() {
       </div>
 
       <div className="mkw-main-body">
-        {saved && (
-          <div className="prof-saved-toast">✓ Profile saved</div>
-        )}
+        {saved && <div className="prof-saved-toast">✓ Profile saved</div>}
 
         <div className="prof-layout">
-
-          {/* ── LEFT: form ── */}
           <div className="prof-left">
-
-            {/* Progress — only shown when not fully complete */}
             {!isComplete && (
               <div className="prof-progress-card">
                 <div className="prof-progress-label">Your profile</div>
@@ -130,7 +124,6 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Personal */}
             <div className="prof-section">
               <div className="prof-section-label">Personal</div>
               <div className="mkw-form-group">
@@ -151,7 +144,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Social */}
             <div className="prof-section">
               <div className="prof-section-label">Social links</div>
               {!isProfileUnlocked && (
@@ -180,13 +172,9 @@ export default function Profile() {
             >
               {saving ? 'Saving…' : isProfileUnlocked ? 'Save profile' : 'Save & unlock →'}
             </button>
-
           </div>
 
-          {/* ── RIGHT: sidebar ── */}
           <div className="prof-right">
-
-            {/* QR card */}
             <div className="prof-qr-card">
               <div className="prof-qr-blur-wrap">
                 <div className="prof-qr-blur-grid">
@@ -197,15 +185,10 @@ export default function Profile() {
                 <div className="prof-qr-lock">{isProfileUnlocked ? '✓' : '🔒'}</div>
               </div>
               <div className="prof-qr-title">{isProfileUnlocked ? 'Your QR code is live' : 'Your QR code is locked'}</div>
-              <div className="prof-qr-sub">
-                At Makers Klub events, members scan each other's QR codes on the app to connect instantly. Complete your profile to unlock yours.
-              </div>
-              {!isComplete && (
-                <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to complete your profile</div>
-              )}
+              <div className="prof-qr-sub">At Makers Klub events, members scan each other's QR codes on the app to connect instantly. Complete your profile to unlock yours.</div>
+              {!isComplete && <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to complete your profile</div>}
             </div>
 
-            {/* Events waiting */}
             <div className="prof-events-card">
               <div className="prof-events-num">{upcomingCount}</div>
               <div className="prof-events-title">upcoming event{upcomingCount !== 1 ? 's' : ''} waiting to be discovered</div>
@@ -213,12 +196,10 @@ export default function Profile() {
               <a href="/events" className="prof-events-link">Browse events →</a>
             </div>
 
-            {/* Tip */}
             <div className="prof-tip-card">
               <div className="prof-tip-label">Why it matters</div>
               <div className="prof-tip-text">Members with a complete profile get 3× more connection requests after events. Your bio is the first thing someone sees when they scan your QR.</div>
             </div>
-
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useUser } from '@clerk/clerk-react'
-import { supabase, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
+import { useUser, useSession } from '@clerk/clerk-react'
+import { getSupabaseClient, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
 
 type KlubContextType = {
   connections: Connection[]
@@ -22,6 +22,7 @@ const KlubContext = createContext<KlubContextType | null>(null)
 
 export function KlubProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
+  const { session } = useSession()
   const [connections, setConnections] = useState<Connection[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
@@ -30,10 +31,13 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
-    if (!user) { setLoading(false); return }
+    if (!user || !session) { setLoading(false); return }
+
+    const token = await session.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
 
     // Ensure a profile row exists for this user
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await db
       .from('profiles')
       .select('clerk_user_id')
       .eq('clerk_user_id', user.id)
@@ -42,7 +46,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     if (!existingProfile) {
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.emailAddresses[0]?.emailAddress || ''
       const slug = fullName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user.id.slice(-6)
-      await supabase.from('profiles').insert({
+      await db.from('profiles').insert({
         clerk_user_id: user.id,
         full_name: fullName,
         bio: '',
@@ -57,11 +61,11 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     }
 
     const [{ data: connsData }, { data: eventsData }, { data: rsvpData }, { data: allRsvpData }, { data: profilesAllData }] = await Promise.all([
-      supabase.from('connections').select('*').eq('clerk_user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('events').select('*').order('date'),
-      supabase.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
-      supabase.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
-      supabase.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20)
+      db.from('connections').select('*').eq('clerk_user_id', user.id).order('created_at', { ascending: false }),
+      db.from('events').select('*').order('date'),
+      db.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
+      db.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
+      db.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20)
     ])
 
     if (eventsData) setEvents(eventsData)
@@ -75,7 +79,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     if (connsData) {
       const ids = connsData.map((c: Connection) => c.connected_clerk_user_id)
       if (ids.length > 0) {
-        const { data: profilesData } = await supabase.from('profiles').select('*').in('clerk_user_id', ids)
+        const { data: profilesData } = await db.from('profiles').select('*').in('clerk_user_id', ids)
         const profileMap = new Map((profilesData || []).map((p: Profile) => [p.clerk_user_id, p]))
         setConnections(connsData.map((c: Connection) => ({
           ...c,
@@ -88,20 +92,22 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       }
     }
     setLoading(false)
-  }, [user])
+  }, [user, session])
 
   useEffect(() => {
-    if (user) load()
-  }, [user, load])
+    if (user && session) load()
+  }, [user, session, load])
 
   async function toggleRsvp(event: Event) {
     if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
     const going = rsvpd.has(event.id)
     if (going) {
-      await supabase.from('event_rsvps').delete().eq('clerk_user_id', user?.id).eq('event_id', event.id)
+      await db.from('event_rsvps').delete().eq('clerk_user_id', user?.id).eq('event_id', event.id)
       setRsvpd(prev => { const s = new Set(prev); s.delete(event.id); return s })
     } else {
-      await supabase.from('event_rsvps').insert({ clerk_user_id: user?.id, event_id: event.id, status: 'going' })
+      await db.from('event_rsvps').insert({ clerk_user_id: user?.id, event_id: event.id, status: 'going' })
       setRsvpd(prev => new Set([...prev, event.id]))
     }
   }
@@ -111,7 +117,9 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function saveConnection(conn: Connection) {
-    await supabase.from('connections').update({
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
+    await db.from('connections').update({
       notes: conn.notes,
       action_tags: conn.action_tags,
       remind_followup: conn.remind_followup
@@ -121,7 +129,9 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   async function clearTag(conn: Connection, tag: string) {
     const tags = conn.action_tags.filter(t => t !== tag)
     updateConnection(conn.id, { action_tags: tags })
-    await supabase.from('connections').update({ action_tags: tags }).eq('id', conn.id)
+    const token = await session?.getToken({ template: 'supabase' })
+    const db = getSupabaseClient(token)
+    await db.from('connections').update({ action_tags: tags }).eq('id', conn.id)
   }
 
   function addConnection(conn: Connection) {
