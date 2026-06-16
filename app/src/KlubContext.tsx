@@ -33,7 +33,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const load = useCallback(async () => {
     if (!user || !session) { setLoading(false); return }
 
-    const token = await session.getToken({ template: 'supabase' })
+    const token = await session.getToken()
     const db = getSupabaseClient(token)
 
     // Ensure a profile row exists for this user
@@ -100,7 +100,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
   async function toggleRsvp(event: Event) {
     if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     const going = rsvpd.has(event.id)
     if (going) {
@@ -117,7 +117,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function saveConnection(conn: Connection) {
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     await db.from('connections').update({
       notes: conn.notes,
@@ -129,7 +129,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   async function clearTag(conn: Connection, tag: string) {
     const tags = conn.action_tags.filter(t => t !== tag)
     updateConnection(conn.id, { action_tags: tags })
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     await db.from('connections').update({ action_tags: tags }).eq('id', conn.id)
   }

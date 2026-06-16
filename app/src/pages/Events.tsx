@@ -42,7 +42,7 @@ export default function Events() {
     if (expandedPast === event.id) { setExpandedPast(null); return }
     if (attendees[event.id]) { setExpandedPast(event.id); return }
     setLoadingPast(event.id)
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     const { data: rsvpData } = await db
       .from('event_rsvps').select('clerk_user_id').eq('event_id', event.id).eq('status', 'going')
@@ -64,7 +64,7 @@ export default function Events() {
 
   async function connectAttendee(attendee: Attendee, eventTitle: string) {
     setConnectingUser(attendee.clerk_user_id)
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     const { data } = await db.from('connections').insert({
       clerk_user_id: user?.id,

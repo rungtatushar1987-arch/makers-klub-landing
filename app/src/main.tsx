@@ -17,11 +17,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       publishableKey={PUBLISHABLE_KEY}
       signInUrl="/login"
       signUpUrl="/signup"
-      tokenCache={{
-        getToken: (key: string) => Promise.resolve(localStorage.getItem(key)),
-        saveToken: (key: string, value: string) => { localStorage.setItem(key, value); return Promise.resolve() },
-        clearToken: (key: string) => { localStorage.removeItem(key); return Promise.resolve() }
-      }}
     >
       <App />
     </ClerkProvider>

@@ -64,14 +64,14 @@ export default function Members() {
   async function clearTag(conn: Connection, tag: string) {
     const tags = conn.tags.filter(t => t !== tag)
     updateConn(conn.id, { tags })
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     await db.from('connections').update({ tags }).eq('id', conn.id)
   }
 
   async function saveConnection(conn: Connection) {
     setSavingConn(conn.id)
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     await db.from('connections').update({
       notes: conn.notes, tags: conn.tags, follow_up: conn.follow_up

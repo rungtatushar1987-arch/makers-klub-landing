@@ -46,7 +46,7 @@ export default function Profile() {
 
   useEffect(() => {
     async function load() {
-      const token = await session?.getToken({ template: 'supabase' })
+      const token = await session?.getToken()
       const db = getSupabaseClient(token)
       const { data } = await db.from('profiles').select('*').eq('clerk_user_id', user?.id).single()
       if (data) { setProfile(data); setSavedProfile(data) }
@@ -85,7 +85,7 @@ export default function Profile() {
     const slug = profile.slug || (profile.full_name
       ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user?.id.slice(-6)
       : undefined)
-    const token = await session?.getToken({ template: 'supabase' })
+    const token = await session?.getToken()
     const db = getSupabaseClient(token)
     await db.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
     const updated = { ...profile, slug }
