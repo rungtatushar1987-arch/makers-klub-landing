@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { getSupabaseClient, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
+import { getSupabaseClient, acceptConnection, declineConnection, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
 
 type KlubContextType = {
-  connections: Connection[]
+  connections: Connection[]           // accepted only (both directions)
+  incomingRequests: Connection[]      // pending incoming — shown as Accept/Deny
   events: Event[]
   rsvpd: Set<string>
   allRsvps: { clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]
@@ -15,6 +16,8 @@ type KlubContextType = {
   saveConnection: (conn: Connection) => Promise<void>
   clearTag: (conn: Connection, tag: string) => Promise<void>
   addConnection: (conn: Connection) => void
+  acceptRequest: (conn: Connection) => Promise<void>
+  declineRequest: (conn: Connection) => Promise<void>
   refresh: () => Promise<void>
 }
 
@@ -24,6 +27,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const { session } = useSession()
   const [connections, setConnections] = useState<Connection[]>([])
+  const [incomingRequests, setIncomingRequests] = useState<Connection[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
   const [allRsvps, setAllRsvps] = useState<{ clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]>([])
@@ -60,12 +64,22 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       })
     }
 
-    const [{ data: connsData }, { data: eventsData }, { data: rsvpData }, { data: allRsvpData }, { data: profilesAllData }] = await Promise.all([
-      db.from('connections').select('*').eq('clerk_user_id', user.id).order('created_at', { ascending: false }),
+    const [
+      { data: outgoingData },
+      { data: incomingData },
+      { data: eventsData },
+      { data: rsvpData },
+      { data: allRsvpData },
+      { data: profilesAllData },
+    ] = await Promise.all([
+      // Outgoing: rows where this user is the scanner, not declined
+      db.from('connections').select('*').eq('clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
+      // Incoming: rows where this user is the target, not declined
+      db.from('connections').select('*').eq('connected_clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
       db.from('events').select('*').order('date'),
       db.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
       db.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
-      db.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20)
+      db.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20),
     ])
 
     if (eventsData) setEvents(eventsData)
@@ -76,21 +90,46 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       setAllRsvps(allRsvpData.map((r: any) => ({ ...r, profile: profileMap.get(r.clerk_user_id) })))
     }
 
-    if (connsData) {
-      const ids = connsData.map((c: Connection) => c.connected_clerk_user_id)
-      if (ids.length > 0) {
-        const { data: profilesData } = await db.from('profiles').select('*').in('clerk_user_id', ids)
-        const profileMap = new Map((profilesData || []).map((p: Profile) => [p.clerk_user_id, p]))
-        setConnections(connsData.map((c: Connection) => ({
-          ...c,
-          action_tags: c.action_tags || [],
-          remind_followup: c.remind_followup || false,
-          profile: profileMap.get(c.connected_clerk_user_id)
-        })))
-      } else {
-        setConnections([])
-      }
+    // Build a combined profile map for both directions
+    const allConnRows = [...(outgoingData || []), ...(incomingData || [])]
+    const otherIds = allConnRows.map((c: any) =>
+      outgoingData?.includes(c) ? c.connected_clerk_user_id : c.clerk_user_id
+    )
+    const uniqueIds = [...new Set(otherIds)]
+    let profileMap = new Map<string, Profile>()
+    if (uniqueIds.length > 0) {
+      const { data: profilesData } = await db.from('profiles').select('*').in('clerk_user_id', uniqueIds)
+      profileMap = new Map((profilesData || []).map((p: Profile) => [p.clerk_user_id, p]))
     }
+
+    const outgoingRows: Connection[] = (outgoingData || []).map((c: any) => ({
+      ...c,
+      action_tags: c.action_tags || [],
+      remind_followup: c.remind_followup || false,
+      status: c.status || 'accepted',
+      direction: 'outgoing' as const,
+      profile: profileMap.get(c.connected_clerk_user_id),
+    }))
+
+    const incomingRows: Connection[] = (incomingData || []).map((c: any) => ({
+      ...c,
+      action_tags: c.action_tags || [],
+      remind_followup: c.remind_followup || false,
+      status: c.status || 'accepted',
+      direction: 'incoming' as const,
+      profile: profileMap.get(c.clerk_user_id),
+    }))
+
+    // Accepted connections from both directions
+    const accepted = [
+      ...outgoingRows.filter(c => c.status === 'accepted'),
+      ...incomingRows.filter(c => c.status === 'accepted'),
+    ]
+    // Incoming pending only — these need Accept/Deny
+    const pendingIncoming = incomingRows.filter(c => c.status === 'pending')
+
+    setConnections(accepted)
+    setIncomingRequests(pendingIncoming)
     setLoading(false)
   }, [user, session])
 
@@ -138,12 +177,29 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     setConnections(prev => [conn, ...prev])
   }
 
+  async function acceptRequest(conn: Connection) {
+    const token = await session?.getToken()
+    const ok = await acceptConnection(conn.id, token)
+    if (!ok) return
+    // Move from incomingRequests → connections
+    setIncomingRequests(prev => prev.filter(c => c.id !== conn.id))
+    setConnections(prev => [{ ...conn, status: 'accepted' }, ...prev])
+  }
+
+  async function declineRequest(conn: Connection) {
+    const token = await session?.getToken()
+    const ok = await declineConnection(conn.id, token)
+    if (!ok) return
+    setIncomingRequests(prev => prev.filter(c => c.id !== conn.id))
+  }
+
   return (
     <KlubContext.Provider value={{
-      connections, events, rsvpd, allRsvps, allProfiles, loading,
+      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, loading,
       isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
-      refresh: load
+      acceptRequest, declineRequest,
+      refresh: load,
     }}>
       {children}
     </KlubContext.Provider>

@@ -9,13 +9,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 /**
  * Returns a Supabase client that attaches a Clerk session JWT on every request.
- * Use this inside React components/hooks where you have access to a Clerk session token.
- *
- * Usage:
- *   const { session } = useSession()
- *   const token = await session?.getToken({ template: 'supabase' })
- *   const db = getSupabaseClient(token)
- *   const { data } = await db.from('profiles').select('*')
  */
 export function getSupabaseClient(token: string | null | undefined) {
   return createClient(supabaseUrl, supabaseAnonKey, {
@@ -51,6 +44,8 @@ export type Event = {
   cover_color: string
 }
 
+export type ConnectionStatus = 'pending' | 'accepted' | 'declined'
+
 export type Connection = {
   id: string
   clerk_user_id: string
@@ -59,8 +54,10 @@ export type Connection = {
   notes: string
   action_tags: string[]
   remind_followup: boolean
+  status: ConnectionStatus
   created_at: string
   profile?: Profile
+  direction?: 'outgoing' | 'incoming'
 }
 
 export const ACTION_TAGS = [
@@ -83,4 +80,32 @@ export function getInitials(name?: string) {
 
 export function getAvatarColor(index: number) {
   return AVATAR_COLORS[index % AVATAR_COLORS.length]
+}
+
+/**
+ * Accept an incoming connection request.
+ * Only the target user (connected_clerk_user_id) can call this — enforced by RLS.
+ */
+export async function acceptConnection(connectionId: string, token?: string | null): Promise<boolean> {
+  const db = getSupabaseClient(token)
+  const { error } = await db
+    .from('connections')
+    .update({ status: 'accepted' })
+    .eq('id', connectionId)
+  if (error) console.error('acceptConnection error:', error)
+  return !error
+}
+
+/**
+ * Decline an incoming connection request.
+ * Only the target user (connected_clerk_user_id) can call this — enforced by RLS.
+ */
+export async function declineConnection(connectionId: string, token?: string | null): Promise<boolean> {
+  const db = getSupabaseClient(token)
+  const { error } = await db
+    .from('connections')
+    .update({ status: 'declined' })
+    .eq('id', connectionId)
+  if (error) console.error('declineConnection error:', error)
+  return !error
 }
