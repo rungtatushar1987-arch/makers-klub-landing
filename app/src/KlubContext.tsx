@@ -133,9 +133,63 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     setLoading(false)
   }, [user, session])
 
+  // Lightweight connections-only refresh — used for polling and visibility events
+  const refreshConnections = useCallback(async () => {
+    if (!user || !session) return
+    const token = await session.getToken()
+    const db = getSupabaseClient(token)
+    const [{ data: outgoingData }, { data: incomingData }] = await Promise.all([
+      db.from('connections').select('*').eq('clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
+      db.from('connections').select('*').eq('connected_clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
+    ])
+    const allRows = [...(outgoingData || []), ...(incomingData || [])]
+    const uniqueIds = [...new Set(allRows.map((c: any) =>
+      outgoingData?.find((o: any) => o.id === c.id) ? c.connected_clerk_user_id : c.clerk_user_id
+    ))]
+    let profileMap = new Map<string, Profile>()
+    if (uniqueIds.length > 0) {
+      const { data: profilesData } = await db.from('profiles').select('*').in('clerk_user_id', uniqueIds)
+      profileMap = new Map((profilesData || []).map((p: Profile) => [p.clerk_user_id, p]))
+    }
+    const outgoingRows: Connection[] = (outgoingData || []).map((c: any) => ({
+      ...c, action_tags: c.action_tags || [], remind_followup: c.remind_followup || false,
+      status: c.status || 'accepted', direction: 'outgoing' as const,
+      profile: profileMap.get(c.connected_clerk_user_id),
+    }))
+    const incomingRows: Connection[] = (incomingData || []).map((c: any) => ({
+      ...c, action_tags: c.action_tags || [], remind_followup: c.remind_followup || false,
+      status: c.status || 'accepted', direction: 'incoming' as const,
+      profile: profileMap.get(c.clerk_user_id),
+    }))
+    setConnections([
+      ...outgoingRows.filter(c => c.status === 'accepted'),
+      ...incomingRows.filter(c => c.status === 'accepted'),
+    ])
+    setIncomingRequests(incomingRows.filter(c => c.status === 'pending'))
+  }, [user, session])
+
   useEffect(() => {
     if (user && session) load()
   }, [user, session, load])
+
+  // Re-fetch connections when tab becomes visible
+  useEffect(() => {
+    if (!user || !session) return
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') refreshConnections()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [user?.id, session, refreshConnections])
+
+  // Poll connections every 30 s so accepted requests reflect without needing a tab switch
+  useEffect(() => {
+    if (!user || !session) return
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') refreshConnections()
+    }, 30_000)
+    return () => clearInterval(interval)
+  }, [user?.id, session, refreshConnections])
 
   async function toggleRsvp(event: Event) {
     if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
