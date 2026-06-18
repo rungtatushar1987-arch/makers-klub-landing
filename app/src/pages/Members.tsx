@@ -80,6 +80,24 @@ export default function Members() {
 
       <div className="mkw-main-body">
 
+        {/* ── FILTER BAR ── */}
+        {conns.length > 0 && (
+          <div className="mkw-filter-bar">
+            <span className="mkw-filter-label">Filter</span>
+            <select value={filterEvent} onChange={e => setFilterEvent(e.target.value)} className={`mkw-filter-select${filterEvent !== 'all' ? ' active' : ''}`}>
+              <option value="all">All events</option>
+              {eventNames.map(name => <option key={name} value={name}>{name}</option>)}
+            </select>
+            <select value={filterTag} onChange={e => setFilterTag(e.target.value)} className={`mkw-filter-select${filterTag !== 'all' ? ' active' : ''}`}>
+              <option value="all">All action items</option>
+              {ACTION_TAGS.map(tag => <option key={tag} value={tag}>{tag}</option>)}
+            </select>
+            {activeFilters > 0 && (
+              <button className="mkw-filter-clear" onClick={() => { setFilterEvent('all'); setFilterTag('all') }}>Clear</button>
+            )}
+          </div>
+        )}
+
         {/* ── INCOMING REQUESTS ── */}
         {incomingRequests.length > 0 && (
           <div style={{
@@ -166,21 +184,7 @@ export default function Members() {
           </div>
         )}
 
-        {/* ── FILTER BAR ── */}
-        <div className="mkw-filter-bar">
-          <span className="mkw-filter-label">Filter</span>
-          <select value={filterEvent} onChange={e => setFilterEvent(e.target.value)} className={`mkw-filter-select${filterEvent !== 'all' ? ' active' : ''}`}>
-            <option value="all">All events</option>
-            {eventNames.map(name => <option key={name} value={name}>{name}</option>)}
-          </select>
-          <select value={filterTag} onChange={e => setFilterTag(e.target.value)} className={`mkw-filter-select${filterTag !== 'all' ? ' active' : ''}`}>
-            <option value="all">All action items</option>
-            {ACTION_TAGS.map(tag => <option key={tag} value={tag}>{tag}</option>)}
-          </select>
-          {activeFilters > 0 && (
-            <button className="mkw-filter-clear" onClick={() => { setFilterEvent('all'); setFilterTag('all') }}>Clear</button>
-          )}
-        </div>
+        {/* ── FILTER BAR (original, removed) ── */}
 
         {activeFilters > 0 && (
           <div style={{ fontSize: 12, color: 'var(--ink-3)', marginBottom: 16, fontFamily: 'var(--font-body)' }}>
