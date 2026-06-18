@@ -62,7 +62,7 @@ export default function Events() {
     setExpandedPast(event.id)
   }
 
-  async function connectAttendee(attendee: Attendee, eventTitle: string) {
+  async function connectAttendee(attendee: Attendee, eventTitle: string, eventDate: string) {
     setConnectingUser(attendee.clerk_user_id)
     const token = await session?.getToken()
     const db = getSupabaseClient(token)
@@ -70,9 +70,11 @@ export default function Events() {
       clerk_user_id: user?.id,
       connected_clerk_user_id: attendee.clerk_user_id,
       event_name: eventTitle,
+      event_date: eventDate,
       action_tags: pendingConn.action_tags,
       notes: pendingConn.notes,
-      remind_followup: pendingConn.remind_followup
+      remind_followup: pendingConn.remind_followup,
+      status: 'pending',
     }).select().single()
     if (data) {
       addConnection({ ...data, profile: attendee.profile })
@@ -295,7 +297,7 @@ export default function Events() {
                                               className="mk-btn mk-btn-primary mk-btn-sm"
                                               style={{ fontSize: 11, padding: '6px 12px' }}
                                               disabled={connectingUser === attendee.clerk_user_id}
-                                              onClick={() => connectAttendee(attendee, event.title)}
+                                              onClick={() => connectAttendee(attendee, event.title, event.date)}
                                             >
                                               {connectingUser === attendee.clerk_user_id ? 'Connecting…' : 'Connect →'}
                                             </button>
