@@ -328,6 +328,14 @@
   line-height: 1.6;
 }
 
+.prof-tip-nudge {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  padding: 3px 0;
+}
+
 @media (max-width: 900px) {
   .prof-layout { grid-template-columns: 1fr; }
   .prof-right { position: static; }

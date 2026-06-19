@@ -196,10 +196,29 @@ export default function Profile() {
               <a href="/events" className="prof-events-link">Browse events →</a>
             </div>
 
-            <div className="prof-tip-card">
-              <div className="prof-tip-label">Why it matters</div>
-              <div className="prof-tip-text">Members with a complete profile get 3× more connection requests after events. Your bio is the first thing someone sees when they scan your QR.</div>
-            </div>
+            {(() => {
+              const ROLE_PLURAL: Record<string, string> = {
+                founder: 'Founders', designer: 'Designers', photographer: 'Photographers',
+                videographer: 'Videographers', creator: 'Creators', developer: 'Developers', other: 'Members',
+              }
+              const FIELD_LABEL: Record<string, string> = {
+                linkedin_url: 'a LinkedIn', instagram_url: 'an Instagram', website_url: 'a website',
+              }
+              const rolePlural = ROLE_PLURAL[savedProfile.role_category || ''] || 'Members'
+              const socialFields = ['linkedin_url', 'instagram_url', 'website_url'] as const
+              const nudges = socialFields
+                .filter(f => !savedProfile[f]?.trim())
+                .map(f => `${rolePlural} with ${FIELD_LABEL[f]} get more collabs at our events`)
+              if (nudges.length === 0) return null
+              return (
+                <div className="prof-tip-card">
+                  <div className="prof-tip-label">Complete your profile</div>
+                  {nudges.map((msg, i) => (
+                    <div key={i} className="prof-tip-nudge">↑ {msg}</div>
+                  ))}
+                </div>
+              )
+            })()}
           </div>
         </div>
       </div>

@@ -24,6 +24,7 @@ export default function Dashboard() {
 
   const upcoming = events.filter(e => new Date(e.date) >= now)
   const attended = events.filter(e => new Date(e.date) < now && rsvpd.has(e.id))
+  const eventsAttended = new Set(connections.map(c => c.event_name).filter(Boolean)).size
   const registeredUpcoming = upcoming.filter(e => rsvpd.has(e.id))
   const recommendedUpcoming = upcoming.filter(e => !rsvpd.has(e.id))
   const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
@@ -109,7 +110,7 @@ export default function Dashboard() {
             {/* Hero match card — violet→blue gradient */}
             <HeroMatchCard
               connections={connections}
-              attended={attended}
+              eventsAttended={eventsAttended}
               pendingCount={pendingConnections.length}
             />
 
@@ -122,7 +123,7 @@ export default function Dashboard() {
               </div>
               <div className="mkw-stat">
                 <div className="lbl">Events</div>
-                <div className="num">{attended.length}</div>
+                <div className="num">{eventsAttended}</div>
                 <div className="delta">Sessions attended</div>
               </div>
               <div className="mkw-stat">
@@ -309,11 +310,11 @@ export default function Dashboard() {
 // avatar stack; otherwise shows placeholder state.
 function HeroMatchCard({
   connections,
-  attended,
+  eventsAttended,
   pendingCount,
 }: {
   connections: ReturnType<typeof useKlub>['connections']
-  attended: Event[]
+  eventsAttended: number
   pendingCount: number
 }) {
   const month = new Date().toLocaleDateString('en', { month: 'long' }).toUpperCase()
@@ -377,7 +378,7 @@ function HeroMatchCard({
         marginBottom: 18, position: 'relative', fontFamily: 'var(--font-body)',
       }}>
         {hasGroup
-          ? `${attended.length} session${attended.length !== 1 ? 's' : ''} attended · ${connections.length} connection${connections.length !== 1 ? 's' : ''} made`
+          ? `${eventsAttended} session${eventsAttended !== 1 ? 's' : ''} attended · ${connections.length} connection${connections.length !== 1 ? 's' : ''} made`
           : 'Join your first event to meet your group.'}
       </p>
 

@@ -227,7 +227,7 @@ export default function Members() {
                       )}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', marginBottom: conn.notes || tags.length > 0 ? 8 : 0 }}>
-                      {conn.profile?.role_category ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1) : 'Maker'}
+                      {conn.profile?.bio || (conn.profile?.role_category ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1) : 'Maker')}
                       {conn.event_name ? ` · ${conn.event_name}` : ''}
                       {' · '}
                       {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
