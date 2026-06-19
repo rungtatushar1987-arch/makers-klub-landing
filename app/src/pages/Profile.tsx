@@ -176,24 +176,22 @@ export default function Profile() {
 
           <div className="prof-right">
             <div className="prof-qr-card">
-              <div className="prof-qr-blur-wrap">
-                <div className="prof-qr-blur-grid">
-                  {[1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1, 0,1,0,1,0, 1,0,1,0,1].map((on, i) => (
-                    <div key={i} className={on ? 'prof-qr-dot' : 'prof-qr-dot-empty'} />
-                  ))}
-                </div>
-                <div className="prof-qr-lock">{isProfileUnlocked ? '✓' : '🔒'}</div>
+              <div className="prof-qr-pwa-icon">
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="10" y="2" width="24" height="40" rx="4" fill="var(--mk-navy)" />
+                  <rect x="13" y="6" width="18" height="28" rx="2" fill="white" opacity="0.08" />
+                  <rect x="18" y="36" width="8" height="2" rx="1" fill="white" opacity="0.4" />
+                  <rect x="15" y="10" width="6" height="6" rx="1" fill="var(--mk-yellow)" />
+                  <rect x="23" y="10" width="6" height="6" rx="1" fill="var(--mk-yellow)" opacity="0.6" />
+                  <rect x="15" y="18" width="6" height="6" rx="1" fill="var(--mk-yellow)" opacity="0.6" />
+                  <rect x="23" y="18" width="6" height="6" rx="1" fill="var(--mk-yellow)" />
+                  <rect x="15" y="26" width="6" height="2" rx="1" fill="var(--mk-yellow)" opacity="0.4" />
+                  <rect x="23" y="26" width="6" height="2" rx="1" fill="var(--mk-yellow)" opacity="0.4" />
+                </svg>
               </div>
-              <div className="prof-qr-title">{isProfileUnlocked ? 'Your QR code is live' : 'Your QR code is locked'}</div>
-              <div className="prof-qr-sub">At Makers Klub events, members scan each other's QR codes on the app to connect instantly. Complete your profile to unlock yours.</div>
-              {!isComplete && <div className="prof-qr-hint">{fieldsLeft} field{fieldsLeft !== 1 ? 's' : ''} left to complete your profile</div>}
-            </div>
-
-            <div className="prof-events-card">
-              <div className="prof-events-num">{upcomingCount}</div>
-              <div className="prof-events-title">upcoming event{upcomingCount !== 1 ? 's' : ''} waiting to be discovered</div>
-              <div className="prof-events-sub">Complete your profile so we can match you to the right events and people in the Klub.</div>
-              <a href="/events" className="prof-events-link">Browse events →</a>
+              <div className="prof-qr-title">Use the app to access your QR</div>
+              <div className="prof-qr-sub">Your personal QR code lives in the Makers Klub app. Open it on your phone to show your QR at events — or scan someone else's to connect instantly.</div>
+              <a href="https://app.makersklub.com" target="_blank" rel="noopener noreferrer" className="prof-qr-app-link">Open app →</a>
             </div>
 
             {(() => {
@@ -219,6 +217,13 @@ export default function Profile() {
                 </div>
               )
             })()}
+
+            <div className="prof-events-card">
+              <div className="prof-events-num">{upcomingCount}</div>
+              <div className="prof-events-title">upcoming event{upcomingCount !== 1 ? 's' : ''} waiting to be discovered</div>
+              <div className="prof-events-sub">Complete your profile so we can match you to the right events and people in the Klub.</div>
+              <a href="/events" className="prof-events-link">Browse events →</a>
+            </div>
           </div>
         </div>
       </div>

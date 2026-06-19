@@ -216,6 +216,34 @@
   box-shadow: 0 2px 8px rgba(38,40,90,0.10);
 }
 
+.prof-qr-pwa-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, rgba(122,78,216,0.15) 0%, rgba(59,109,217,0.12) 100%);
+  border: 1px solid rgba(122,78,216,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prof-qr-app-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 18px;
+  border-radius: var(--r-pill);
+  background: var(--mk-navy);
+  color: var(--mk-yellow);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.prof-qr-app-link:hover { opacity: 0.8; }
+
 .prof-qr-title {
   font-family: var(--font-display);
   font-weight: 700;
