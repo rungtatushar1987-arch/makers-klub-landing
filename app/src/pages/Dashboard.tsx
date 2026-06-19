@@ -28,6 +28,7 @@ export default function Dashboard() {
   const registeredUpcoming = upcoming.filter(e => rsvpd.has(e.id))
   const recommendedUpcoming = upcoming.filter(e => !rsvpd.has(e.id))
   const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
+  const followUpCount = connections.filter(c => c.remind_followup).length
 
   if (loading) return (
     <div className="mkw-loading" style={{ color: 'var(--ink-3)', fontFamily: 'var(--font-display)' }}>
@@ -111,7 +112,7 @@ export default function Dashboard() {
             <HeroMatchCard
               connections={connections}
               eventsAttended={eventsAttended}
-              pendingCount={pendingConnections.length}
+              pendingCount={followUpCount}
             />
 
             {/* Stats */}
@@ -128,10 +129,10 @@ export default function Dashboard() {
               </div>
               <div className="mkw-stat">
                 <div className="lbl">Follow-ups</div>
-                <div className="num" style={{ color: pendingConnections.length > 0 ? 'var(--mk-yellow-deep)' : undefined }}>
-                  {pendingConnections.length}
+                <div className="num" style={{ color: followUpCount > 0 ? 'var(--mk-yellow-deep)' : undefined }}>
+                  {followUpCount}
                 </div>
-                <div className="delta">{pendingConnections.length > 0 ? 'Waiting' : 'All clear'}</div>
+                <div className="delta">{followUpCount > 0 ? 'Waiting' : 'All clear'}</div>
               </div>
             </div>
 
