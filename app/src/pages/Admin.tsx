@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import { getSupabaseClient, getInitials, type Profile, type Event } from '../supabase'
@@ -100,6 +100,9 @@ export default function Admin() {
   // Events tab
   const [events, setEvents] = useState<AdminEvent[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
+  const [eventFormOpen, setEventFormOpen] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<AdminEvent | null>(null)
+  const [deletingEventId, setDeletingEventId] = useState<string | null>(null)
 
   // Stats
   const [stats, setStats] = useState({
@@ -255,6 +258,45 @@ export default function Admin() {
     setTogglingPaying(null)
   }
 
+  // ── Event CRUD ──────────────────────────────────────────────────────────────
+
+  async function createEvent(fields: EventFormFields) {
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { data, error } = await db.from('events').insert({
+      ...fields,
+      org_id: MK_ORG,
+    }).select().single()
+    if (!error && data) {
+      const newEv: AdminEvent = { ...data, rsvp_count: 0 }
+      setEvents(prev => [newEv, ...prev].sort((a, b) => b.date.localeCompare(a.date)))
+      setStats(s => ({ ...s, totalEvents: s.totalEvents + 1 }))
+    }
+    setEventFormOpen(false)
+  }
+
+  async function updateEvent(id: string, fields: EventFormFields) {
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { data, error } = await db.from('events').update(fields).eq('id', id).select().single()
+    if (!error && data) {
+      setEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e))
+    }
+    setEditingEvent(null)
+  }
+
+  async function deleteEvent(id: string) {
+    setDeletingEventId(id)
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { error } = await db.from('events').delete().eq('id', id)
+    if (!error) {
+      setEvents(prev => prev.filter(e => e.id !== id))
+      setStats(s => ({ ...s, totalEvents: s.totalEvents - 1 }))
+    }
+    setDeletingEventId(null)
+  }
+
   // ── Guard ───────────────────────────────────────────────────────────────────
 
   if (isAdmin === null) return (
@@ -370,14 +412,46 @@ export default function Admin() {
 
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
-          eventsLoading ? (
-            <p style={{ color: 'var(--ink-3)', fontSize: 14, padding: '48px 0', textAlign: 'center' }}>Loading…</p>
-          ) : (
-            <div className="mkw-card" style={{ padding: 0, overflow: 'hidden' }}>
-              <EventTableHead />
-              {events.map(e => <EventRow key={e.id} event={e} />)}
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+              <button
+                onClick={() => setEventFormOpen(true)}
+                style={{
+                  padding: '10px 22px', borderRadius: 999, border: 'none',
+                  background: 'var(--mk-navy)', color: '#fff',
+                  fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                + Add event
+              </button>
             </div>
-          )
+            {eventsLoading ? (
+              <p style={{ color: 'var(--ink-3)', fontSize: 14, padding: '48px 0', textAlign: 'center' }}>Loading…</p>
+            ) : (
+              <div className="mkw-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <EventTableHead />
+                {events.length === 0 && (
+                  <p style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14 }}>No events yet. Add your first one.</p>
+                )}
+                {events.map(e => (
+                  <EventRow
+                    key={e.id} event={e}
+                    deleting={deletingEventId === e.id}
+                    onEdit={() => setEditingEvent(e)}
+                    onDelete={() => deleteEvent(e.id)}
+                  />
+                ))}
+              </div>
+            )}
+            {(eventFormOpen || editingEvent) && (
+              <EventFormModal
+                event={editingEvent}
+                onSave={(fields) => editingEvent ? updateEvent(editingEvent.id, fields) : createEvent(fields)}
+                onClose={() => { setEventFormOpen(false); setEditingEvent(null) }}
+              />
+            )}
+          </>
         )}
 
         {/* ══ ANALYTICS ══ */}
@@ -410,7 +484,7 @@ export default function Admin() {
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const COL_MEMBERS = '1fr 100px 110px 120px 80px 80px 100px'
-const COL_EVENTS  = '48px 1fr 140px 72px 80px'
+const COL_EVENTS  = '48px 1fr 140px 72px 80px 88px'
 
 function MemberTableHead() {
   return (
@@ -515,17 +589,21 @@ function EventTableHead() {
       <span>Event</span><span>Location</span>
       <span style={{ textAlign: 'center' }}>RSVPs</span>
       <span style={{ textAlign: 'center' }}>Status</span>
+      <span />
     </div>
   )
 }
 
-function EventRow({ event: e }: { event: AdminEvent }) {
+function EventRow({ event: e, deleting, onEdit, onDelete }: {
+  event: AdminEvent; deleting: boolean; onEdit: () => void; onDelete: () => void
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const isPast = new Date(e.date) < new Date()
   const day = new Date(e.date).getDate()
   const mon = new Date(e.date).toLocaleString('en', { month: 'short' }).toUpperCase()
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', opacity: isPast ? 0.65 : 1, transition: 'background 0.12s' }}
+      style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', opacity: isPast ? 0.75 : 1, transition: 'background 0.12s' }}
       onMouseEnter={ev => (ev.currentTarget.style.background = 'rgba(255,255,255,0.5)')}
       onMouseLeave={ev => (ev.currentTarget.style.background = '')}
     >
@@ -536,18 +614,217 @@ function EventRow({ event: e }: { event: AdminEvent }) {
       <div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--ink-1)', marginBottom: 3 }}>{e.title}</div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-2)' }}>{e.type}</span>
+          {e.type && <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-2)' }}>{e.type}</span>}
           <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>{formatDate(e.date)}</span>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: 'var(--ink-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.location}</div>
+      <div style={{ fontSize: 12, color: 'var(--ink-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.location || '—'}</div>
       <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--ink-1)' }}>{e.rsvp_count}</div>
       <div style={{ textAlign: 'center' }}>
         {isPast
           ? <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-3)' }}>Past</span>
           : <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(52,210,123,0.12)', color: '#1a7a4a' }}>Upcoming</span>}
       </div>
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+        {confirmDelete ? (
+          <>
+            <button
+              onClick={() => { onDelete(); setConfirmDelete(false) }}
+              disabled={deleting}
+              style={{ padding: '4px 10px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.15)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer', opacity: deleting ? 0.5 : 1 }}
+            >
+              {deleting ? '…' : 'Yes'}
+            </button>
+            <button
+              onClick={() => setConfirmDelete(false)}
+              style={{ padding: '4px 10px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-3)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+            >
+              No
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onEdit}
+              style={{ padding: '4px 10px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => setConfirmDelete(true)}
+              style={{ padding: '4px 10px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.10)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Delete
+            </button>
+          </>
+        )}
+      </div>
     </div>
+  )
+}
+
+// ── Event form ────────────────────────────────────────────────────────────────
+
+type EventFormFields = {
+  title: string
+  date: string
+  end_date: string
+  location: string
+  address: string
+  type: string
+  description: string
+  luma_url: string
+}
+
+const BLANK_FORM: EventFormFields = {
+  title: '', date: '', end_date: '', location: '', address: '',
+  type: 'Networking', description: '', luma_url: '',
+}
+
+const EVENT_TYPES = ['Networking', 'Workshop', 'Social', 'Panel', 'Fireside', 'Hackathon', 'Other']
+
+function toLocalDatetime(iso: string): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function EventFormModal({ event, onSave, onClose }: {
+  event: AdminEvent | null
+  onSave: (fields: EventFormFields) => Promise<void>
+  onClose: () => void
+}) {
+  const [form, setForm] = useState<EventFormFields>(event ? {
+    title: event.title || '',
+    date: toLocalDatetime(event.date),
+    end_date: toLocalDatetime(event.end_date),
+    location: event.location || '',
+    address: event.address || '',
+    type: event.type || 'Networking',
+    description: event.description || '',
+    luma_url: event.luma_url || '',
+  } : BLANK_FORM)
+  const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<Partial<EventFormFields>>({})
+
+  function set(k: keyof EventFormFields, v: string) {
+    setForm(f => ({ ...f, [k]: v }))
+    setErrors(e => ({ ...e, [k]: undefined }))
+  }
+
+  async function handleSubmit(ev: React.FormEvent) {
+    ev.preventDefault()
+    const errs: Partial<EventFormFields> = {}
+    if (!form.title.trim()) errs.title = 'Required'
+    if (!form.date) errs.date = 'Required'
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    setSaving(true)
+    await onSave({
+      ...form,
+      date: new Date(form.date).toISOString(),
+      end_date: form.end_date ? new Date(form.end_date).toISOString() : '',
+    })
+    setSaving(false)
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 14px', borderRadius: 10,
+    border: '1.5px solid var(--hairline-strong)',
+    background: 'var(--glass-bg-strong)', color: 'var(--ink-1)',
+    fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none',
+    boxSizing: 'border-box',
+  }
+  const labelStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
+    letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)',
+    marginBottom: 6, display: 'block',
+  }
+  const errStyle: React.CSSProperties = { fontSize: 11, color: 'var(--danger)', marginTop: 4 }
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(10,19,64,0.45)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }} />
+      <div style={{
+        position: 'fixed', top: '50%', left: '50%', zIndex: 201,
+        transform: 'translate(-50%, -50%)',
+        width: 'min(560px, calc(100vw - 48px))',
+        maxHeight: 'calc(100vh - 80px)', overflowY: 'auto',
+        background: 'var(--surface)',
+        backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+        border: '1px solid var(--glass-border)', borderRadius: 20,
+        boxShadow: '0 32px 80px rgba(10,19,64,0.22), 0 0 0 1px rgba(255,255,255,0.5)',
+        padding: 32,
+      }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, width: 32, height: 32, borderRadius: '50%', background: 'rgba(12,19,48,0.08)', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--ink-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, color: 'var(--ink-1)', marginBottom: 24 }}>
+          {event ? 'Edit event' : 'New event'}
+        </h2>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div>
+            <label style={labelStyle}>Title *</label>
+            <input style={{ ...inputStyle, borderColor: errors.title ? 'var(--danger)' : undefined }} value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. Makers Drinks #12" />
+            {errors.title && <div style={errStyle}>{errors.title}</div>}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Start date & time *</label>
+              <input type="datetime-local" style={{ ...inputStyle, borderColor: errors.date ? 'var(--danger)' : undefined }} value={form.date} onChange={e => set('date', e.target.value)} />
+              {errors.date && <div style={errStyle}>{errors.date}</div>}
+            </div>
+            <div>
+              <label style={labelStyle}>End date & time</label>
+              <input type="datetime-local" style={inputStyle} value={form.end_date} onChange={e => set('end_date', e.target.value)} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Type</label>
+            <select style={inputStyle} value={form.type} onChange={e => set('type', e.target.value)}>
+              {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Venue name</label>
+              <input style={inputStyle} value={form.location} onChange={e => set('location', e.target.value)} placeholder="e.g. Factory Berlin" />
+            </div>
+            <div>
+              <label style={labelStyle}>Address</label>
+              <input style={inputStyle} value={form.address} onChange={e => set('address', e.target.value)} placeholder="e.g. Rheinsberger Str. 76" />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Description</label>
+            <textarea
+              style={{ ...inputStyle, resize: 'vertical', minHeight: 88 }}
+              value={form.description}
+              onChange={e => set('description', e.target.value)}
+              placeholder="What's this event about?"
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Luma URL</label>
+            <input style={inputStyle} value={form.luma_url} onChange={e => set('luma_url', e.target.value)} placeholder="https://lu.ma/…" />
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
+            <button type="button" onClick={onClose} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} style={{ padding: '10px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+              {saving ? 'Saving…' : event ? 'Save changes' : 'Create event'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   )
 }
 
