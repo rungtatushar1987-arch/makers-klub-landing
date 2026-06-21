@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-import { useUser, useSession } from '@clerk/clerk-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useUser, useSession, useClerk } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 import { getInitials, getSupabaseClient } from '../supabase'
 import { useEffect, useState } from 'react'
@@ -9,6 +9,8 @@ const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
 export default function Sidebar() {
   const { user } = useUser()
   const { session } = useSession()
+  const { signOut } = useClerk()
+  const navigate = useNavigate()
   const { isOnboarding } = useKlub()
   const [isAdmin, setIsAdmin] = useState(false)
 
@@ -69,7 +71,7 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* Footer user card */}
+      {/* Footer user card + logout */}
       <div className="mkw-side-foot">
         <div className="av">{initials}</div>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -77,6 +79,36 @@ export default function Sidebar() {
           <div className="sub">{user?.emailAddresses[0]?.emailAddress}</div>
         </div>
       </div>
+
+      <button
+        onClick={() => signOut(() => navigate('/login'))}
+        style={{
+          margin: '8px 16px 16px',
+          width: 'calc(100% - 32px)',
+          padding: '9px 0',
+          borderRadius: 999,
+          border: '1.5px solid var(--hairline-strong)',
+          background: 'transparent',
+          color: 'var(--ink-3)',
+          fontFamily: 'var(--font-display)',
+          fontSize: 12,
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'rgba(224,82,79,0.08)'
+          e.currentTarget.style.color = 'var(--danger)'
+          e.currentTarget.style.borderColor = 'rgba(224,82,79,0.3)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'transparent'
+          e.currentTarget.style.color = 'var(--ink-3)'
+          e.currentTarget.style.borderColor = 'var(--hairline-strong)'
+        }}
+      >
+        Sign out
+      </button>
     </aside>
   )
 }
