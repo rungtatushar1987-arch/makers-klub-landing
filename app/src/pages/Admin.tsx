@@ -14,6 +14,7 @@ type OrgMember = {
   profile?: Profile
   events_attended: number
   last_seen: string | null
+  connections_made: number
 }
 
 type AdminEvent = Event & {
@@ -35,13 +36,49 @@ const AV_COLORS = [
 ]
 function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
 
-function relativeDate(iso: string | null): string {
+function ordinalSuffix(d: number): string {
+  if (d === 1 || d === 21 || d === 31) return 'st'
+  if (d === 2 || d === 22) return 'nd'
+  if (d === 3 || d === 23) return 'rd'
+  return 'th'
+}
+
+function formatDate(iso: string | null): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  const day = d.getDate()
+  const month = d.toLocaleString('en', { month: 'long' })
+  const year = d.getFullYear()
+  return `${day}${ordinalSuffix(day)} ${month}, ${year}`
+}
+
+function lastEventRelative(iso: string | null): string {
   if (!iso) return '—'
   const diff = (Date.now() - new Date(iso).getTime()) / 86400000
   if (diff < 1) return 'Today'
   if (diff < 2) return 'Yesterday'
-  if (diff < 8) return `${Math.floor(diff)}d ago`
-  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  if (diff < 30) return `${Math.floor(diff)} days ago`
+  const months = Math.floor(diff / 30.5)
+  return `${months} month${months > 1 ? 's' : ''} ago`
+}
+
+type EngagementBand = { label: string; color: string; bg: string; min: number }
+const ENGAGEMENT_BANDS: EngagementBand[] = [
+  { label: 'New',      color: '#8a94a8', bg: 'rgba(138,148,168,0.12)', min: -1 },
+  { label: 'Observer', color: '#3b6dd9', bg: 'rgba(59,109,217,0.12)',  min: 1  },
+  { label: 'Regular',  color: '#7a4ed8', bg: 'rgba(122,78,216,0.12)',  min: 31 },
+  { label: 'Core',     color: '#f4822a', bg: 'rgba(244,130,42,0.12)',  min: 61 },
+  { label: 'Champion', color: '#ca8e00', bg: 'rgba(252,184,19,0.18)',  min: 81 },
+]
+function getEngagementBand(score: number, eventsAttended: number): EngagementBand {
+  if (eventsAttended === 0) return ENGAGEMENT_BANDS[0]
+  return [...ENGAGEMENT_BANDS].reverse().find(b => score >= b.min) || ENGAGEMENT_BANDS[1]
+}
+function memberEngagementScore(m: OrgMember, pastEvents: number): number {
+  if (pastEvents === 0) return 0
+  const attendanceScore = Math.min(100, Math.round((m.events_attended / pastEvents) * 100))
+  const connectionScore = Math.min(100, m.connections_made * 20)
+  return Math.round(attendanceScore * 0.6 + connectionScore * 0.4)
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -135,14 +172,20 @@ export default function Admin() {
 
     const ids = orgRows.map((r: any) => r.clerk_user_id)
 
-    const [{ data: profiles }, { data: rsvpData }, { data: pastEvents }] = await Promise.all([
+    const [{ data: profiles }, { data: rsvpData }, { data: pastEvents }, { data: connData }] = await Promise.all([
       db.from('profiles').select('*').in('clerk_user_id', ids),
       db.from('event_rsvps').select('clerk_user_id, event_id, created_at').in('clerk_user_id', ids),
       db.from('events').select('id, date').eq('org_id', MK_ORG).lt('date', new Date().toISOString()),
+      db.from('connections').select('clerk_user_id').eq('status', 'accepted').in('clerk_user_id', ids),
     ])
 
     const profileMap = new Map((profiles || []).map((p: any) => [p.clerk_user_id, p]))
     const pastIds = new Set((pastEvents || []).map((e: any) => e.id))
+
+    const connCount = new Map<string, number>()
+    for (const c of (connData || []) as any[]) {
+      connCount.set(c.clerk_user_id, (connCount.get(c.clerk_user_id) || 0) + 1)
+    }
 
     const rsvpByUser = new Map<string, { count: number; latest: string | null }>()
     for (const r of (rsvpData || []) as any[]) {
@@ -154,7 +197,7 @@ export default function Admin() {
 
     const rows: OrgMember[] = orgRows.map((r: any) => {
       const rsvp = rsvpByUser.get(r.clerk_user_id) || { count: 0, latest: null }
-      return { ...r, profile: profileMap.get(r.clerk_user_id), events_attended: rsvp.count, last_seen: rsvp.latest }
+      return { ...r, profile: profileMap.get(r.clerk_user_id), events_attended: rsvp.count, last_seen: rsvp.latest, connections_made: connCount.get(r.clerk_user_id) || 0 }
     })
 
     setMembers(rows)
@@ -315,7 +358,7 @@ export default function Admin() {
                 {filteredMembers.map((m, i) => (
                   <MemberRow
                     key={m.id} member={m} index={i}
-                    isAtRisk={atRisk.some(a => a.id === m.id)}
+                    pastEvents={stats.pastEvents}
                     toggling={togglingPaying === m.id}
                     onTogglePaying={() => togglePaying(m.id, m.is_paying)}
                   />
@@ -366,25 +409,31 @@ export default function Admin() {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const COL_MEMBERS = '1fr 120px 72px 90px 96px 80px'
+const COL_MEMBERS = '1fr 100px 110px 120px 80px 80px 100px'
 const COL_EVENTS  = '48px 1fr 140px 72px 80px'
 
 function MemberTableHead() {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: COL_MEMBERS, gap: 8, padding: '12px 20px', borderBottom: '1px solid var(--hairline)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)' }}>
       <span>Member</span><span>Role</span>
-      <span style={{ textAlign: 'center' }}>Events</span>
-      <span style={{ textAlign: 'center' }}>Last seen</span>
+      <span style={{ textAlign: 'center' }}>Events attended</span>
+      <span style={{ textAlign: 'center' }}>Last event attended</span>
+      <span style={{ textAlign: 'center' }}>Connections</span>
       <span style={{ textAlign: 'center' }}>Paying</span>
-      <span style={{ textAlign: 'center' }}>Status</span>
+      <span style={{ textAlign: 'center' }}>Engagement</span>
     </div>
   )
 }
 
-function MemberRow({ member: m, index: i, isAtRisk, toggling, onTogglePaying }: {
-  member: OrgMember; index: number; isAtRisk: boolean; toggling: boolean; onTogglePaying: () => void
+function MemberRow({ member: m, index: i, pastEvents, toggling, onTogglePaying }: {
+  member: OrgMember; index: number; pastEvents: number; toggling: boolean; onTogglePaying: () => void
 }) {
   const av = avColor(i)
+  const score = memberEngagementScore(m, pastEvents)
+  const engBand = getEngagementBand(score, m.events_attended)
+  const attendancePct = pastEvents > 0 ? Math.round((m.events_attended / pastEvents) * 100) : 0
+  const isAtRisk = m.events_attended > 0 && (!m.last_seen || (Date.now() - new Date(m.last_seen).getTime()) > 60 * 86400000)
+
   return (
     <div
       style={{ display: 'grid', gridTemplateColumns: COL_MEMBERS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', transition: 'background 0.12s' }}
@@ -412,14 +461,24 @@ function MemberRow({ member: m, index: i, isAtRisk, toggling, onTogglePaying }: 
           : <span style={{ color: 'var(--ink-3)', fontSize: 12 }}>—</span>}
       </div>
 
-      {/* Events attended */}
-      <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: m.events_attended > 0 ? 'var(--ink-1)' : 'var(--ink-3)' }}>
-        {m.events_attended}
+      {/* Events attended + attendance % */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: m.events_attended > 0 ? 'var(--ink-1)' : 'var(--ink-3)' }}>
+          {m.events_attended}
+        </span>
+        {pastEvents > 0 && (
+          <span style={{ fontSize: 11, color: 'var(--ink-3)', marginLeft: 4 }}>({attendancePct}%)</span>
+        )}
       </div>
 
-      {/* Last seen */}
+      {/* Last event attended */}
       <div style={{ textAlign: 'center', fontSize: 12, color: isAtRisk ? 'var(--danger)' : 'var(--ink-3)' }}>
-        {relativeDate(m.last_seen)}
+        {lastEventRelative(m.last_seen)}
+      </div>
+
+      {/* Connections made */}
+      <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: m.connections_made > 0 ? 'var(--mk-violet)' : 'var(--ink-3)' }}>
+        {m.connections_made}
       </div>
 
       {/* Paying toggle */}
@@ -436,14 +495,14 @@ function MemberRow({ member: m, index: i, isAtRisk, toggling, onTogglePaying }: 
         </button>
       </div>
 
-      {/* Status badge */}
+      {/* Engagement score badge */}
       <div style={{ textAlign: 'center' }}>
-        {isAtRisk
-          ? <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(224,82,79,0.12)', color: 'var(--danger)' }}>At risk</span>
-          : m.events_attended === 0
-            ? <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>New</span>
-            : <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(52,210,123,0.12)', color: '#1a7a4a' }}>Active</span>
-        }
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: engBand.bg, color: engBand.color }}>
+          {engBand.label}
+        </span>
+        {m.events_attended > 0 && (
+          <div style={{ fontSize: 9, color: 'var(--ink-3)', marginTop: 3, fontFamily: 'var(--font-display)' }}>{score}/100</div>
+        )}
       </div>
     </div>
   )
@@ -476,7 +535,10 @@ function EventRow({ event: e }: { event: AdminEvent }) {
       </div>
       <div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--ink-1)', marginBottom: 3 }}>{e.title}</div>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-2)' }}>{e.type}</span>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-2)' }}>{e.type}</span>
+          <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>{formatDate(e.date)}</span>
+        </div>
       </div>
       <div style={{ fontSize: 12, color: 'var(--ink-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.location}</div>
       <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--ink-1)' }}>{e.rsvp_count}</div>
@@ -674,7 +736,7 @@ function AtRiskList({ members }: { members: OrgMember[] }) {
                 <div className="mkw-row-name">{m.profile?.full_name || '(no name)'}</div>
                 <div className="mkw-row-meta">{m.profile?.role_category || '—'} · {m.events_attended} event{m.events_attended !== 1 ? 's' : ''} attended</div>
               </div>
-              <span style={{ fontSize: 11, color: 'var(--danger)', flexShrink: 0, fontFamily: 'var(--font-body)' }}>Last seen {relativeDate(m.last_seen)}</span>
+              <span style={{ fontSize: 11, color: 'var(--danger)', flexShrink: 0, fontFamily: 'var(--font-body)' }}>Last seen {lastEventRelative(m.last_seen)}</span>
             </div>
           )
         })}
