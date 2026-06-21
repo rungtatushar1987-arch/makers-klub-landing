@@ -113,7 +113,9 @@ export default function Signup() {
     <div className="mkw-login">
       {/* Brand */}
       <div className="mkw-login-brand">
-        <img src="/logo.svg" alt="Makers Klub" className="mkw-login-logo" />
+        <div className="mkw-brand-logo">
+          <img src="logo.svg" alt="Makers Klub" />
+        </div>
         <span className="mkw-login-name">Makers Klub</span>
       </div>
 

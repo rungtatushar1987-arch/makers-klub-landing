@@ -1,33 +1,38 @@
+/* ===== Login / Signup — Aurora Glass treatment ===== */
 
-/* ===== Custom Signup form ===== */
+/* Glass card */
 .mkw-signup-card {
-  background: var(--mk-white);
-  border-radius: var(--r-xl);
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-hi), 0 32px 80px rgba(10,19,64,0.28);
+  border-radius: var(--r-lg);
   padding: 40px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.18);
 }
 
 .mkw-signup-head { margin-bottom: 28px; }
 
 .mkw-signup-eyebrow {
+  font-family: var(--font-display);
   font-size: 11px; font-weight: 700; letter-spacing: 2.2px;
-  text-transform: uppercase; color: var(--mk-ochre); margin-bottom: 8px;
+  text-transform: uppercase; color: var(--mk-yellow-deep); margin-bottom: 8px;
 }
 
 .mkw-signup-title {
   font-family: var(--font-display); font-weight: 800;
-  font-size: 28px; letter-spacing: -0.6px; color: var(--mk-navy);
+  font-size: 28px; letter-spacing: -0.6px; color: var(--ink-1);
   margin-bottom: 8px; line-height: 1.1;
 }
 
 .mkw-signup-sub {
-  font-size: 13px; color: var(--fg-2);
+  font-size: 13px; color: var(--ink-2);
 }
-.mkw-signup-sub a { color: var(--mk-navy); font-weight: 600; text-decoration: none; }
+.mkw-signup-sub a { color: var(--mk-violet); font-weight: 600; text-decoration: none; }
 .mkw-signup-sub a:hover { text-decoration: underline; }
-.mkw-signup-sub strong { color: var(--mk-navy); font-weight: 600; }
+.mkw-signup-sub strong { color: var(--ink-1); font-weight: 600; }
 
 .mkw-signup-form { display: flex; flex-direction: column; gap: 16px; }
 
@@ -35,8 +40,7 @@
 .mkw-signup-row .mkw-form-group { min-width: 0; }
 .mkw-signup-row .mkw-form-input { width: 100%; }
 
-/* Reuse .mkw-form-group / .mkw-form-label / .mkw-form-input — already defined above */
-
+/* Verification code input */
 .mkw-code-input {
   font-family: var(--font-display);
   font-size: 28px; font-weight: 800;
@@ -44,30 +48,54 @@
   padding: 14px 20px;
 }
 
+/* Error state */
 .mkw-signup-error {
-  font-size: 13px; color: #c0392b;
-  background: rgba(192,57,43,0.08);
+  font-size: 13px; color: var(--danger);
+  background: rgba(224,82,79,0.10);
+  border: 1px solid rgba(224,82,79,0.20);
   border-radius: var(--r-sm);
   padding: 10px 14px;
   line-height: 1.5;
+  font-family: var(--font-body);
 }
 
+/* Submit button full-width */
 .mkw-signup-submit { width: 100%; justify-content: center; }
 
+/* Resend code link-button */
 .mkw-signup-resend {
   background: none; border: none; cursor: pointer;
-  font-size: 13px; color: var(--fg-3); font-family: var(--font-body);
+  font-size: 13px; color: var(--ink-3); font-family: var(--font-body);
   text-align: center; padding: 4px 0;
   transition: color 0.12s;
 }
-.mkw-signup-resend:hover { color: var(--mk-navy); }
+.mkw-signup-resend:hover { color: var(--mk-violet); }
 
-/* Password rules */
+/* Password strength rules */
 .mkw-password-rules { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
 .mkw-password-rule {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--fg-3);
+  font-size: 12px; color: var(--ink-3);
+  font-family: var(--font-body);
   transition: color 0.15s;
 }
-.mkw-password-rule.valid { color: #2d9e6b; }
+.mkw-password-rule.valid { color: var(--ok); }
 .mkw-rule-icon { font-size: 11px; width: 14px; text-align: center; font-weight: 700; }
+
+/* ── Ochre CTA button variant (used as mk-btn-ochre) ── */
+.mk-btn-ochre {
+  background: var(--mk-yellow);
+  color: var(--mk-navy);
+  border-color: var(--mk-yellow);
+  box-shadow: var(--shadow-cta);
+}
+.mk-btn-ochre:hover {
+  background: var(--mk-yellow-soft);
+  border-color: var(--mk-yellow-soft);
+  box-shadow: 0 12px 28px rgba(252,184,19,0.50);
+}
+.mk-btn-ochre:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
