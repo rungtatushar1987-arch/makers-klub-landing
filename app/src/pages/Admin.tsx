@@ -101,7 +101,7 @@ export default function Admin() {
   const [events, setEvents] = useState<AdminEvent[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
   const [eventFormOpen, setEventFormOpen] = useState(false)
-  const [editingEvent, setEditingEvent] = useState<AdminEvent | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<AdminEvent | null>(null)
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null)
 
   // Stats
@@ -282,7 +282,7 @@ export default function Admin() {
     if (!error && data) {
       setEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e))
     }
-    setEditingEvent(null)
+    setSelectedEvent(null)
   }
 
   async function deleteEvent(id: string) {
@@ -293,6 +293,7 @@ export default function Admin() {
     if (!error) {
       setEvents(prev => prev.filter(e => e.id !== id))
       setStats(s => ({ ...s, totalEvents: s.totalEvents - 1 }))
+      setSelectedEvent(null)
     }
     setDeletingEventId(null)
   }
@@ -360,7 +361,7 @@ export default function Admin() {
         </div>
 
         {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 24, alignItems: 'center' }}>
           {(['members', 'events', 'analytics'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding: '9px 20px', borderRadius: 999,
@@ -373,6 +374,19 @@ export default function Admin() {
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
+          {tab === 'events' && (
+            <button
+              onClick={() => setEventFormOpen(true)}
+              style={{
+                marginLeft: 'auto', padding: '9px 22px', borderRadius: 999, border: 'none',
+                background: 'var(--mk-navy)', color: '#fff',
+                fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              + Add event
+            </button>
+          )}
         </div>
 
         {/* ══ MEMBERS ══ */}
@@ -413,19 +427,6 @@ export default function Admin() {
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
           <>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-              <button
-                onClick={() => setEventFormOpen(true)}
-                style={{
-                  padding: '10px 22px', borderRadius: 999, border: 'none',
-                  background: 'var(--mk-navy)', color: '#fff',
-                  fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                + Add event
-              </button>
-            </div>
             {eventsLoading ? (
               <p style={{ color: 'var(--ink-3)', fontSize: 14, padding: '48px 0', textAlign: 'center' }}>Loading…</p>
             ) : (
@@ -435,20 +436,17 @@ export default function Admin() {
                   <p style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14 }}>No events yet. Add your first one.</p>
                 )}
                 {events.map(e => (
-                  <EventRow
-                    key={e.id} event={e}
-                    deleting={deletingEventId === e.id}
-                    onEdit={() => setEditingEvent(e)}
-                    onDelete={() => deleteEvent(e.id)}
-                  />
+                  <EventRow key={e.id} event={e} onClick={() => setSelectedEvent(e)} />
                 ))}
               </div>
             )}
-            {(eventFormOpen || editingEvent) && (
+            {(eventFormOpen || selectedEvent) && (
               <EventFormModal
-                event={editingEvent}
-                onSave={(fields) => editingEvent ? updateEvent(editingEvent.id, fields) : createEvent(fields)}
-                onClose={() => { setEventFormOpen(false); setEditingEvent(null) }}
+                event={selectedEvent}
+                deleting={!!selectedEvent && deletingEventId === selectedEvent.id}
+                onSave={(fields) => selectedEvent ? updateEvent(selectedEvent.id, fields) : createEvent(fields)}
+                onDelete={selectedEvent ? () => deleteEvent(selectedEvent.id) : undefined}
+                onClose={() => { setEventFormOpen(false); setSelectedEvent(null) }}
               />
             )}
           </>
@@ -484,7 +482,7 @@ export default function Admin() {
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const COL_MEMBERS = '1fr 100px 110px 120px 80px 80px 100px'
-const COL_EVENTS  = '48px 1fr 140px 72px 80px 88px'
+const COL_EVENTS  = '48px 1fr 140px 72px 80px'
 
 function MemberTableHead() {
   return (
@@ -589,21 +587,18 @@ function EventTableHead() {
       <span>Event</span><span>Location</span>
       <span style={{ textAlign: 'center' }}>RSVPs</span>
       <span style={{ textAlign: 'center' }}>Status</span>
-      <span />
     </div>
   )
 }
 
-function EventRow({ event: e, deleting, onEdit, onDelete }: {
-  event: AdminEvent; deleting: boolean; onEdit: () => void; onDelete: () => void
-}) {
-  const [confirmDelete, setConfirmDelete] = useState(false)
+function EventRow({ event: e, onClick }: { event: AdminEvent; onClick: () => void }) {
   const isPast = new Date(e.date) < new Date()
   const day = new Date(e.date).getDate()
   const mon = new Date(e.date).toLocaleString('en', { month: 'short' }).toUpperCase()
   return (
     <div
-      style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', opacity: isPast ? 0.75 : 1, transition: 'background 0.12s' }}
+      onClick={onClick}
+      style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', opacity: isPast ? 0.75 : 1, transition: 'background 0.12s', cursor: 'pointer' }}
       onMouseEnter={ev => (ev.currentTarget.style.background = 'rgba(255,255,255,0.5)')}
       onMouseLeave={ev => (ev.currentTarget.style.background = '')}
     >
@@ -624,41 +619,6 @@ function EventRow({ event: e, deleting, onEdit, onDelete }: {
         {isPast
           ? <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-3)' }}>Past</span>
           : <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(52,210,123,0.12)', color: '#1a7a4a' }}>Upcoming</span>}
-      </div>
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-        {confirmDelete ? (
-          <>
-            <button
-              onClick={() => { onDelete(); setConfirmDelete(false) }}
-              disabled={deleting}
-              style={{ padding: '4px 10px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.15)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer', opacity: deleting ? 0.5 : 1 }}
-            >
-              {deleting ? '…' : 'Yes'}
-            </button>
-            <button
-              onClick={() => setConfirmDelete(false)}
-              style={{ padding: '4px 10px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-3)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-            >
-              No
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={onEdit}
-              style={{ padding: '4px 10px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => setConfirmDelete(true)}
-              style={{ padding: '4px 10px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.10)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-            >
-              Delete
-            </button>
-          </>
-        )}
       </div>
     </div>
   )
@@ -691,11 +651,16 @@ function toLocalDatetime(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-function EventFormModal({ event, onSave, onClose }: {
+function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
   event: AdminEvent | null
+  deleting: boolean
   onSave: (fields: EventFormFields) => Promise<void>
+  onDelete?: () => void
   onClose: () => void
 }) {
+  const isNew = event === null
+  const [isEditing, setIsEditing] = useState(isNew)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState<EventFormFields>(event ? {
     title: event.title || '',
     date: toLocalDatetime(event.date),
@@ -709,12 +674,28 @@ function EventFormModal({ event, onSave, onClose }: {
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Partial<EventFormFields>>({})
 
-  function set(k: keyof EventFormFields, v: string) {
+  function setField(k: keyof EventFormFields, v: string) {
     setForm(f => ({ ...f, [k]: v }))
     setErrors(e => ({ ...e, [k]: undefined }))
   }
 
-  async function handleSubmit(ev: React.FormEvent) {
+  function cancelEdit() {
+    if (isNew) { onClose(); return }
+    setIsEditing(false)
+    setErrors({})
+    setForm({
+      title: event!.title || '',
+      date: toLocalDatetime(event!.date),
+      end_date: toLocalDatetime(event!.end_date),
+      location: event!.location || '',
+      address: event!.address || '',
+      type: event!.type || 'Networking',
+      description: event!.description || '',
+      luma_url: event!.luma_url || '',
+    })
+  }
+
+  async function handleSave(ev: React.FormEvent) {
     ev.preventDefault()
     const errs: Partial<EventFormFields> = {}
     if (!form.title.trim()) errs.title = 'Required'
@@ -729,19 +710,25 @@ function EventFormModal({ event, onSave, onClose }: {
     setSaving(false)
   }
 
-  const inputStyle: React.CSSProperties = {
+  const readOnly = !isEditing
+
+  const inputStyle = (hasError?: boolean): React.CSSProperties => ({
     width: '100%', padding: '10px 14px', borderRadius: 10,
-    border: '1.5px solid var(--hairline-strong)',
-    background: 'var(--glass-bg-strong)', color: 'var(--ink-1)',
+    border: `1.5px solid ${hasError ? 'var(--danger)' : readOnly ? 'transparent' : 'var(--hairline-strong)'}`,
+    background: readOnly ? 'transparent' : 'var(--glass-bg-strong)',
+    color: 'var(--ink-1)',
     fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none',
     boxSizing: 'border-box',
-  }
+    cursor: readOnly ? 'default' : 'text',
+  })
   const labelStyle: React.CSSProperties = {
     fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
     letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)',
     marginBottom: 6, display: 'block',
   }
   const errStyle: React.CSSProperties = { fontSize: 11, color: 'var(--danger)', marginTop: 4 }
+
+  const isPast = event ? new Date(event.date) < new Date() : false
 
   return (
     <>
@@ -758,69 +745,125 @@ function EventFormModal({ event, onSave, onClose }: {
         padding: 32,
       }}>
         <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, width: 32, height: 32, borderRadius: '50%', background: 'rgba(12,19,48,0.08)', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--ink-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, color: 'var(--ink-1)', marginBottom: 24 }}>
-          {event ? 'Edit event' : 'New event'}
-        </h2>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, color: 'var(--ink-1)', margin: 0, flex: 1 }}>
+            {isNew ? 'New event' : isEditing ? 'Edit event' : form.title}
+          </h2>
+          {!isNew && !isEditing && (
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: isPast ? 'rgba(12,19,48,0.07)' : 'rgba(52,210,123,0.12)', color: isPast ? 'var(--ink-3)' : '#1a7a4a' }}>
+              {isPast ? 'Past' : 'Upcoming'}
+            </span>
+          )}
+        </div>
+
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
-            <label style={labelStyle}>Title *</label>
-            <input style={{ ...inputStyle, borderColor: errors.title ? 'var(--danger)' : undefined }} value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. Makers Drinks #12" />
+            <label style={labelStyle}>Title {isEditing && '*'}</label>
+            <input style={inputStyle(!!errors.title)} value={form.title} onChange={e => setField('title', e.target.value)} placeholder="e.g. Makers Drinks #12" readOnly={readOnly} />
             {errors.title && <div style={errStyle}>{errors.title}</div>}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Start date & time *</label>
-              <input type="datetime-local" style={{ ...inputStyle, borderColor: errors.date ? 'var(--danger)' : undefined }} value={form.date} onChange={e => set('date', e.target.value)} />
+              <label style={labelStyle}>Start {isEditing && '*'}</label>
+              <input type="datetime-local" style={inputStyle(!!errors.date)} value={form.date} onChange={e => setField('date', e.target.value)} readOnly={readOnly} />
               {errors.date && <div style={errStyle}>{errors.date}</div>}
             </div>
             <div>
-              <label style={labelStyle}>End date & time</label>
-              <input type="datetime-local" style={inputStyle} value={form.end_date} onChange={e => set('end_date', e.target.value)} />
+              <label style={labelStyle}>End</label>
+              <input type="datetime-local" style={inputStyle()} value={form.end_date} onChange={e => setField('end_date', e.target.value)} readOnly={readOnly} />
             </div>
           </div>
 
           <div>
             <label style={labelStyle}>Type</label>
-            <select style={inputStyle} value={form.type} onChange={e => set('type', e.target.value)}>
-              {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            {readOnly
+              ? <div style={{ fontSize: 14, color: 'var(--ink-1)', padding: '10px 0', fontFamily: 'var(--font-body)' }}>{form.type || '—'}</div>
+              : <select style={inputStyle()} value={form.type} onChange={e => setField('type', e.target.value)}>
+                  {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+            }
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Venue name</label>
-              <input style={inputStyle} value={form.location} onChange={e => set('location', e.target.value)} placeholder="e.g. Factory Berlin" />
+              <label style={labelStyle}>Venue</label>
+              <input style={inputStyle()} value={form.location} onChange={e => setField('location', e.target.value)} placeholder="e.g. Factory Berlin" readOnly={readOnly} />
             </div>
             <div>
               <label style={labelStyle}>Address</label>
-              <input style={inputStyle} value={form.address} onChange={e => set('address', e.target.value)} placeholder="e.g. Rheinsberger Str. 76" />
+              <input style={inputStyle()} value={form.address} onChange={e => setField('address', e.target.value)} placeholder="e.g. Rheinsberger Str. 76" readOnly={readOnly} />
             </div>
           </div>
 
           <div>
             <label style={labelStyle}>Description</label>
             <textarea
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 88 }}
+              style={{ ...inputStyle(), resize: isEditing ? 'vertical' : 'none', minHeight: 88 }}
               value={form.description}
-              onChange={e => set('description', e.target.value)}
-              placeholder="What's this event about?"
+              onChange={e => setField('description', e.target.value)}
+              placeholder={isEditing ? "What's this event about?" : ''}
+              readOnly={readOnly}
             />
           </div>
 
           <div>
             <label style={labelStyle}>Luma URL</label>
-            <input style={inputStyle} value={form.luma_url} onChange={e => set('luma_url', e.target.value)} placeholder="https://lu.ma/…" />
+            {readOnly
+              ? <div style={{ fontSize: 13, color: 'var(--mk-violet)', padding: '10px 0', fontFamily: 'var(--font-body)', wordBreak: 'break-all' }}>
+                  {form.luma_url ? <a href={form.luma_url} target="_blank" rel="noreferrer" style={{ color: 'var(--mk-violet)' }}>{form.luma_url}</a> : '—'}
+                </div>
+              : <input style={inputStyle()} value={form.luma_url} onChange={e => setField('luma_url', e.target.value)} placeholder="https://lu.ma/…" />
+            }
           </div>
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
-            <button type="button" onClick={onClose} style={{ padding: '10px 22px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-              Cancel
-            </button>
-            <button type="submit" disabled={saving} style={{ padding: '10px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'Saving…' : event ? 'Save changes' : 'Create event'}
-            </button>
+          {/* Footer buttons */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', alignItems: 'center', marginTop: 4, paddingTop: 4, borderTop: '1px solid var(--hairline)' }}>
+            {/* Left side: Remove */}
+            <div>
+              {!isNew && onDelete && !isEditing && (
+                confirmDelete ? (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>Delete this event?</span>
+                    <button
+                      type="button"
+                      onClick={onDelete}
+                      disabled={deleting}
+                      style={{ padding: '7px 16px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.15)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: deleting ? 0.5 : 1 }}
+                    >
+                      {deleting ? 'Removing…' : 'Yes, remove'}
+                    </button>
+                    <button type="button" onClick={() => setConfirmDelete(false)} style={{ padding: '7px 16px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => setConfirmDelete(true)} style={{ padding: '9px 18px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.10)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Remove
+                  </button>
+                )
+              )}
+            </div>
+
+            {/* Right side: Edit / Save / Cancel */}
+            <div style={{ display: 'flex', gap: 10, marginLeft: 'auto' }}>
+              {isEditing ? (
+                <>
+                  <button type="button" onClick={cancelEdit} style={{ padding: '9px 20px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={saving} style={{ padding: '9px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+                    {saving ? 'Saving…' : isNew ? 'Create event' : 'Save'}
+                  </button>
+                </>
+              ) : (
+                <button type="button" onClick={() => setIsEditing(true)} style={{ padding: '9px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  Edit
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>
