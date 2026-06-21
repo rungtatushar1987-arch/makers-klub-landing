@@ -223,9 +223,9 @@ export default function Admin() {
         {/* Stats bar */}
         <div className="mkw-stats" style={{ marginBottom: 28 }}>
           {[
-            { lbl: 'Members',    num: stats.totalMembers,    delta: 'In the org' },
+            { lbl: 'Members',    num: stats.totalMembers,    delta: 'In your community' },
             { lbl: 'Events',     num: stats.totalEvents,     delta: 'Total hosted' },
-            { lbl: 'Engagement', num: `${engagementPct}%`,   delta: 'RSVPs ÷ members × events' },
+            { lbl: 'RSVP rate',   num: `${engagementPct}%`,   delta: '% of members per event' },
 
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
@@ -445,7 +445,7 @@ function HealthGrid({ stats, members, atRisk, engagementPct }: { stats: { totalM
   const cells = [
     { label: 'Total members',  value: stats.totalMembers,               sub: 'In the org' },
     { label: 'Events hosted',  value: stats.totalEvents,                sub: 'All time' },
-    { label: 'Engagement',     value: `${engagementPct}%`,             sub: 'RSVPs ÷ (members × events)' },
+    { label: 'RSVP rate',      value: `${engagementPct}%`,             sub: '% of members per event' },
     { label: 'Paying members', value: members.filter(m => m.is_paying).length, sub: 'Manual flag' },
     { label: 'Active members', value: members.filter(m => m.events_attended > 0 && !atRisk.some(a => a.id === m.id)).length, sub: 'Attended & current' },
 
