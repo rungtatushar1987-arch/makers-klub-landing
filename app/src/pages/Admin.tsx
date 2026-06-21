@@ -67,6 +67,12 @@ export default function Admin() {
   // Stats
   const [stats, setStats] = useState({ totalMembers: 0, totalEvents: 0, totalRsvps: 0 })
 
+  // Engagement % = totalRsvps / (totalMembers × totalEvents) × 100
+  // 100% means every member RSVPd to every event
+  const engagementPct = stats.totalMembers > 0 && stats.totalEvents > 0
+    ? Math.round((stats.totalRsvps / (stats.totalMembers * stats.totalEvents)) * 100)
+    : 0
+
   // ── Auth guard ──────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -217,10 +223,10 @@ export default function Admin() {
         {/* Stats bar */}
         <div className="mkw-stats" style={{ marginBottom: 28 }}>
           {[
-            { lbl: 'Members',  num: stats.totalMembers,  delta: 'In the org' },
-            { lbl: 'Events',   num: stats.totalEvents,   delta: 'Total hosted' },
-            { lbl: 'RSVPs',    num: stats.totalRsvps,    delta: 'Across events' },
-            { lbl: 'At risk',  num: atRisk.length,       delta: 'Quiet 60+ days', danger: atRisk.length > 0 },
+            { lbl: 'Members',    num: stats.totalMembers,    delta: 'In the org' },
+            { lbl: 'Events',     num: stats.totalEvents,     delta: 'Total hosted' },
+            { lbl: 'Engagement', num: `${engagementPct}%`,   delta: 'RSVPs ÷ members × events' },
+
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
               <div className="lbl">{s.lbl}</div>
@@ -296,7 +302,7 @@ export default function Admin() {
         {/* ══ ANALYTICS ══ */}
         {tab === 'analytics' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <HealthGrid stats={stats} members={realMembers} atRisk={atRisk} />
+            <HealthGrid stats={stats} members={realMembers} atRisk={atRisk} engagementPct={engagementPct} />
             <div className="mkw-card">
               <div className="mkw-h3" style={{ marginBottom: 16 }}><span>Role breakdown</span></div>
               <RoleBreakdown members={realMembers} />
@@ -435,14 +441,14 @@ function EventRow({ event: e }: { event: AdminEvent }) {
   )
 }
 
-function HealthGrid({ stats, members, atRisk }: { stats: { totalMembers: number; totalEvents: number; totalRsvps: number }; members: OrgMember[]; atRisk: OrgMember[] }) {
+function HealthGrid({ stats, members, atRisk, engagementPct }: { stats: { totalMembers: number; totalEvents: number; totalRsvps: number }; members: OrgMember[]; atRisk: OrgMember[]; engagementPct: number }) {
   const cells = [
-    { label: 'Total members',  value: stats.totalMembers,  sub: 'In the org' },
-    { label: 'Events hosted',  value: stats.totalEvents,   sub: 'All time' },
-    { label: 'Total RSVPs',    value: stats.totalRsvps,    sub: 'Across events' },
+    { label: 'Total members',  value: stats.totalMembers,               sub: 'In the org' },
+    { label: 'Events hosted',  value: stats.totalEvents,                sub: 'All time' },
+    { label: 'Engagement',     value: `${engagementPct}%`,             sub: 'RSVPs ÷ (members × events)' },
     { label: 'Paying members', value: members.filter(m => m.is_paying).length, sub: 'Manual flag' },
     { label: 'Active members', value: members.filter(m => m.events_attended > 0 && !atRisk.some(a => a.id === m.id)).length, sub: 'Attended & current' },
-    { label: 'At-risk members', value: atRisk.length, sub: '60+ days quiet', danger: atRisk.length > 0 },
+
   ]
   return (
     <div className="mkw-card">
