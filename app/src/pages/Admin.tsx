@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import { getSupabaseClient, getInitials, type Profile, type Event } from '../supabase'
+import './Admin.css'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,19 +112,15 @@ export default function Admin() {
   })
 
   // ── Derived signal scores (each 0–100) ──────────────────────────────────────
-  // RSVP rate (35%): % of members that typically register per event
   const rsvpRate = stats.totalMembers > 0 && stats.pastEvents > 0
     ? Math.min(100, Math.round((stats.totalRsvps / (stats.totalMembers * stats.pastEvents)) * 100))
     : 0
-  // Member reach (25%): % of members who have ever RSVPd
   const memberReach = stats.totalMembers > 0
     ? Math.min(100, Math.round((stats.uniqueRsvpers / stats.totalMembers) * 100))
     : 0
-  // Connection rate (30%): % of members who have made at least one connection
   const connectionRate = stats.totalMembers > 0
     ? Math.min(100, Math.round((stats.membersWithConnections / stats.totalMembers) * 100))
     : 0
-  // Repeat attendance (10%): % of RSVPs from members who attended more than once
   const realMembers_ = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
   const repeatAttendees = realMembers_.filter(m => m.events_attended > 1).length
   const repeatRate = realMembers_.length > 0
@@ -138,8 +135,6 @@ export default function Admin() {
   )
 
   const enoughData = stats.pastEvents >= 3
-
-  // RSVP rate shown in stats bar
   const engagementPct = rsvpRate
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
@@ -301,7 +296,7 @@ export default function Admin() {
   // ── Guard ───────────────────────────────────────────────────────────────────
 
   if (isAdmin === null) return (
-    <div className="mkw-loading" style={{ color: 'var(--ink-3)', fontFamily: 'var(--font-display)' }}>Checking access…</div>
+    <div className="mkw-loading">Checking access…</div>
   )
 
   // ── Derived ─────────────────────────────────────────────────────────────────
@@ -324,66 +319,46 @@ export default function Admin() {
 
   return (
     <>
-      {/* Page head */}
       <div className="mkw-pagehead">
         <div>
           <div className="eyebrow">Organiser</div>
           <h1>Dashboard</h1>
         </div>
         <div className="actions">
-          <span style={{
-            fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700,
-            letterSpacing: 1.5, textTransform: 'uppercase',
-            color: 'var(--mk-yellow-deep)', background: 'rgba(252,184,19,0.14)',
-            padding: '5px 14px', borderRadius: 999,
-          }}>
-            Makers Klub · Admin
-          </span>
+          <span className="adm-badge">Makers Klub · Admin</span>
         </div>
       </div>
 
       <div className="mkw-main-body">
 
         {/* Stats bar */}
-        <div className="mkw-stats" style={{ marginBottom: 28 }}>
+        <div className="mkw-stats adm-stats">
           {[
-            { lbl: 'Members',    num: stats.totalMembers,    delta: 'In your community' },
-            { lbl: 'Events',     num: stats.totalEvents,     delta: 'Total hosted' },
-            { lbl: 'RSVP rate',   num: `${engagementPct}%`,   delta: 'members typically rsvp for your events' },
-
+            { lbl: 'Members',   num: stats.totalMembers,  delta: 'In your community' },
+            { lbl: 'Events',    num: stats.totalEvents,   delta: 'Total hosted' },
+            { lbl: 'RSVP rate', num: `${engagementPct}%`, delta: 'members typically rsvp for your events' },
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
               <div className="lbl">{s.lbl}</div>
-              <div className="num" style={s.danger ? { color: 'var(--danger)' } : undefined}>{s.num}</div>
+              <div className="num">{s.num}</div>
               <div className="delta">{s.delta}</div>
             </div>
           ))}
         </div>
 
         {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, alignItems: 'center' }}>
+        <div className="adm-tabs">
           {(['members', 'events', 'analytics'] as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              padding: '9px 20px', borderRadius: 999,
-              border: tab === t ? 'none' : '1.5px solid var(--hairline-strong)',
-              background: tab === t ? 'var(--mk-navy)' : 'var(--glass-bg)',
-              color: tab === t ? '#fff' : 'var(--ink-2)',
-              fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
-              cursor: 'pointer', backdropFilter: 'blur(12px)', transition: 'all 0.15s',
-            }}>
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`adm-tab${tab === t ? ' active' : ''}`}
+            >
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
           {tab === 'events' && (
-            <button
-              onClick={() => setEventFormOpen(true)}
-              style={{
-                marginLeft: 'auto', padding: '9px 22px', borderRadius: 999, border: 'none',
-                background: 'var(--mk-navy)', color: '#fff',
-                fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
+            <button className="adm-add-btn" onClick={() => setEventFormOpen(true)}>
               + Add event
             </button>
           )}
@@ -393,23 +368,18 @@ export default function Admin() {
         {tab === 'members' && (
           <>
             <input
-              value={search} onChange={e => setSearch(e.target.value)}
+              className="adm-search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               placeholder="Search members…"
-              style={{
-                display: 'block', width: '100%', maxWidth: 360, marginBottom: 20,
-                padding: '11px 18px', border: '1.5px solid var(--hairline-strong)',
-                borderRadius: 999, background: 'var(--glass-bg-strong)',
-                backdropFilter: 'blur(12px)', color: 'var(--ink-1)',
-                fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none',
-              }}
             />
             {membersLoading ? (
-              <p style={{ color: 'var(--ink-3)', fontSize: 14, padding: '48px 0', textAlign: 'center' }}>Loading…</p>
+              <p className="adm-tab-loading">Loading…</p>
             ) : (
-              <div className="mkw-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="mkw-card adm-table-card">
                 <MemberTableHead />
                 {filteredMembers.length === 0 && (
-                  <p style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14 }}>No members found.</p>
+                  <p className="adm-table-empty">No members found.</p>
                 )}
                 {filteredMembers.map((m, i) => (
                   <MemberRow
@@ -428,12 +398,12 @@ export default function Admin() {
         {tab === 'events' && (
           <>
             {eventsLoading ? (
-              <p style={{ color: 'var(--ink-3)', fontSize: 14, padding: '48px 0', textAlign: 'center' }}>Loading…</p>
+              <p className="adm-tab-loading">Loading…</p>
             ) : (
-              <div className="mkw-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="mkw-card adm-table-card">
                 <EventTableHead />
                 {events.length === 0 && (
-                  <p style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14 }}>No events yet. Add your first one.</p>
+                  <p className="adm-table-empty">No events yet. Add your first one.</p>
                 )}
                 {events.map(e => (
                   <EventRow key={e.id} event={e} onClick={() => setSelectedEvent(e)} />
@@ -454,7 +424,7 @@ export default function Admin() {
 
         {/* ══ ANALYTICS ══ */}
         {tab === 'analytics' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="adm-analytics">
             <HealthScore
               score={healthScore}
               enoughData={enoughData}
@@ -481,18 +451,16 @@ export default function Admin() {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const COL_MEMBERS = '1fr 100px 110px 120px 80px 80px 100px'
-const COL_EVENTS  = '48px 1fr 140px 72px 80px'
-
 function MemberTableHead() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: COL_MEMBERS, gap: 8, padding: '12px 20px', borderBottom: '1px solid var(--hairline)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)' }}>
-      <span>Member</span><span>Role</span>
-      <span style={{ textAlign: 'center' }}>Events attended</span>
-      <span style={{ textAlign: 'center' }}>Last event attended</span>
-      <span style={{ textAlign: 'center' }}>Connections</span>
-      <span style={{ textAlign: 'center' }}>Paying</span>
-      <span style={{ textAlign: 'center' }}>Engagement</span>
+    <div className="adm-thead adm-thead--members">
+      <span>Member</span>
+      <span>Role</span>
+      <span className="adm-col-center">Events attended</span>
+      <span className="adm-col-center">Last event attended</span>
+      <span className="adm-col-center">Connections</span>
+      <span className="adm-col-center">Paying</span>
+      <span className="adm-col-center">Engagement</span>
     </div>
   )
 }
@@ -507,73 +475,63 @@ function MemberRow({ member: m, index: i, pastEvents, toggling, onTogglePaying }
   const isAtRisk = m.events_attended > 0 && (!m.last_seen || (Date.now() - new Date(m.last_seen).getTime()) > 60 * 86400000)
 
   return (
-    <div
-      style={{ display: 'grid', gridTemplateColumns: COL_MEMBERS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', transition: 'background 0.12s' }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.5)')}
-      onMouseLeave={e => (e.currentTarget.style.background = '')}
-    >
+    <div className="adm-mrow">
       {/* Avatar + name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: av.bg, color: av.fg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700 }}>
+      <div className="adm-mrow-identity">
+        <div className="adm-mrow-av" style={{ background: av.bg, color: av.fg }}>
           {getInitials(m.profile?.full_name)}
         </div>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--ink-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div className="adm-mrow-name-wrap">
+          <div className="adm-mrow-name">
             {m.profile?.full_name || '(no name)'}
-            {m.org_role === 'owner' && <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)', padding: '2px 7px', borderRadius: 999 }}>Owner</span>}
+            {m.org_role === 'owner' && <span className="adm-mrow-owner">Owner</span>}
           </div>
-          <div style={{ fontSize: 11, color: 'var(--ink-3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{m.profile?.bio || '—'}</div>
+          <div className="adm-mrow-bio">{m.profile?.bio || '—'}</div>
         </div>
       </div>
 
       {/* Role category */}
       <div>
         {m.profile?.role_category
-          ? <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(122,78,216,0.12)', color: 'var(--mk-violet)' }}>{m.profile.role_category}</span>
-          : <span style={{ color: 'var(--ink-3)', fontSize: 12 }}>—</span>}
+          ? <span className="adm-role-badge">{m.profile.role_category}</span>
+          : <span className="adm-role-empty">—</span>}
       </div>
 
       {/* Events attended + attendance % */}
-      <div style={{ textAlign: 'center' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: m.events_attended > 0 ? 'var(--ink-1)' : 'var(--ink-3)' }}>
-          {m.events_attended}
-        </span>
-        {pastEvents > 0 && (
-          <span style={{ fontSize: 11, color: 'var(--ink-3)', marginLeft: 4 }}>({attendancePct}%)</span>
-        )}
+      <div className="adm-col-num" style={{ color: m.events_attended > 0 ? 'var(--ink-1)' : 'var(--ink-3)' }}>
+        {m.events_attended}
+        {pastEvents > 0 && <span className="adm-attend-pct">({attendancePct}%)</span>}
       </div>
 
       {/* Last event attended */}
-      <div style={{ textAlign: 'center', fontSize: 12, color: isAtRisk ? 'var(--danger)' : 'var(--ink-3)' }}>
+      <div className="adm-last-event" style={{ color: isAtRisk ? 'var(--danger)' : 'var(--ink-3)' }}>
         {lastEventRelative(m.last_seen)}
       </div>
 
       {/* Connections made */}
-      <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: m.connections_made > 0 ? 'var(--mk-violet)' : 'var(--ink-3)' }}>
+      <div className="adm-col-num" style={{ color: m.connections_made > 0 ? 'var(--mk-violet)' : 'var(--ink-3)' }}>
         {m.connections_made}
       </div>
 
       {/* Paying toggle */}
-      <div style={{ textAlign: 'center' }}>
-        <button onClick={onTogglePaying} disabled={toggling} style={{
-          padding: '4px 12px', borderRadius: 999,
-          border: m.is_paying ? 'none' : '1.5px solid var(--hairline-strong)',
-          background: m.is_paying ? 'rgba(52,210,123,0.15)' : 'transparent',
-          color: m.is_paying ? '#1a7a4a' : 'var(--ink-3)',
-          fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-          cursor: 'pointer', opacity: toggling ? 0.5 : 1,
-        }}>
+      <div className="adm-col-center">
+        <button
+          onClick={onTogglePaying}
+          disabled={toggling}
+          className={`adm-paying-btn ${m.is_paying ? 'adm-paying-btn--on' : 'adm-paying-btn--off'}`}
+          style={{ opacity: toggling ? 0.5 : 1 }}
+        >
           {m.is_paying ? '✓ Paying' : 'Free'}
         </button>
       </div>
 
       {/* Engagement score badge */}
-      <div style={{ textAlign: 'center' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: engBand.bg, color: engBand.color }}>
+      <div className="adm-col-center">
+        <span className="adm-eng-badge" style={{ background: engBand.bg, color: engBand.color }}>
           {engBand.label}
         </span>
         {m.events_attended > 0 && (
-          <div style={{ fontSize: 9, color: 'var(--ink-3)', marginTop: 3, fontFamily: 'var(--font-display)' }}>{score}/100</div>
+          <div className="adm-eng-score">{score}/100</div>
         )}
       </div>
     </div>
@@ -582,11 +540,12 @@ function MemberRow({ member: m, index: i, pastEvents, toggling, onTogglePaying }
 
 function EventTableHead() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '12px 20px', borderBottom: '1px solid var(--hairline)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'var(--ink-3)' }}>
+    <div className="adm-thead adm-thead--events">
       <span />
-      <span>Event</span><span>Location</span>
-      <span style={{ textAlign: 'center' }}>RSVPs</span>
-      <span style={{ textAlign: 'center' }}>Status</span>
+      <span>Event</span>
+      <span>Location</span>
+      <span className="adm-col-center">RSVPs</span>
+      <span className="adm-col-center">Status</span>
     </div>
   )
 }
@@ -596,29 +555,27 @@ function EventRow({ event: e, onClick }: { event: AdminEvent; onClick: () => voi
   const day = new Date(e.date).getDate()
   const mon = new Date(e.date).toLocaleString('en', { month: 'short' }).toUpperCase()
   return (
-    <div
-      onClick={onClick}
-      style={{ display: 'grid', gridTemplateColumns: COL_EVENTS, gap: 8, padding: '14px 20px', alignItems: 'center', borderBottom: '1px solid var(--hairline)', opacity: isPast ? 0.75 : 1, transition: 'background 0.12s', cursor: 'pointer' }}
-      onMouseEnter={ev => (ev.currentTarget.style.background = 'rgba(255,255,255,0.5)')}
-      onMouseLeave={ev => (ev.currentTarget.style.background = '')}
-    >
-      <div style={{ width: 40, height: 44, borderRadius: 10, background: isPast ? 'rgba(12,19,48,0.06)' : 'var(--mk-navy)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, lineHeight: 1, color: isPast ? 'var(--ink-3)' : '#fff' }}>{day}</div>
-        <div style={{ fontSize: 7, letterSpacing: 1.2, fontWeight: 700, color: isPast ? 'var(--ink-3)' : 'var(--mk-yellow)', marginTop: 2 }}>{mon}</div>
+    <div className={`adm-erow${isPast ? ' past' : ''}`} onClick={onClick}>
+      <div
+        className="adm-date-block"
+        style={{ background: isPast ? 'rgba(12,19,48,0.06)' : 'var(--mk-navy)' }}
+      >
+        <div className="adm-date-day" style={{ color: isPast ? 'var(--ink-3)' : '#fff' }}>{day}</div>
+        <div className="adm-date-mon" style={{ color: isPast ? 'var(--ink-3)' : 'var(--mk-yellow)' }}>{mon}</div>
       </div>
       <div>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--ink-1)', marginBottom: 3 }}>{e.title}</div>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {e.type && <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-2)' }}>{e.type}</span>}
-          <span style={{ fontSize: 11, color: 'var(--ink-3)' }}>{formatDate(e.date)}</span>
+        <div className="adm-event-title">{e.title}</div>
+        <div className="adm-event-meta">
+          {e.type && <span className="adm-event-type">{e.type}</span>}
+          <span className="adm-event-date">{formatDate(e.date)}</span>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: 'var(--ink-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.location || '—'}</div>
-      <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--ink-1)' }}>{e.rsvp_count}</div>
-      <div style={{ textAlign: 'center' }}>
-        {isPast
-          ? <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(12,19,48,0.07)', color: 'var(--ink-3)' }}>Past</span>
-          : <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: 'rgba(52,210,123,0.12)', color: '#1a7a4a' }}>Upcoming</span>}
+      <div className="adm-event-location">{e.location || '—'}</div>
+      <div className="adm-event-rsvp">{e.rsvp_count}</div>
+      <div className="adm-col-center">
+        <span className={`adm-status-badge ${isPast ? 'past' : 'upcoming'}`}>
+          {isPast ? 'Past' : 'Upcoming'}
+        </span>
       </div>
     </div>
   )
@@ -711,155 +668,183 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
   }
 
   const readOnly = !isEditing
-
-  const inputStyle = (hasError?: boolean): React.CSSProperties => ({
-    width: '100%', padding: '10px 14px', borderRadius: 10,
-    border: `1.5px solid ${hasError ? 'var(--danger)' : readOnly ? 'transparent' : 'var(--hairline-strong)'}`,
-    background: readOnly ? 'transparent' : 'var(--glass-bg-strong)',
-    color: 'var(--ink-1)',
-    fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none',
-    boxSizing: 'border-box',
-    cursor: readOnly ? 'default' : 'text',
-  })
-  const labelStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
-    letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)',
-    marginBottom: 6, display: 'block',
-  }
-  const errStyle: React.CSSProperties = { fontSize: 11, color: 'var(--danger)', marginTop: 4 }
-
   const isPast = event ? new Date(event.date) < new Date() : false
+
+  function inputCls(hasError?: boolean) {
+    return ['adm-modal-input', readOnly ? 'readonly' : '', hasError ? 'error' : ''].filter(Boolean).join(' ')
+  }
 
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(10,19,64,0.45)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }} />
-      <div style={{
-        position: 'fixed', top: '50%', left: '50%', zIndex: 201,
-        transform: 'translate(-50%, -50%)',
-        width: 'min(560px, calc(100vw - 48px))',
-        maxHeight: 'calc(100vh - 80px)', overflowY: 'auto',
-        background: 'var(--surface)',
-        backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-        border: '1px solid var(--glass-border)', borderRadius: 20,
-        boxShadow: '0 32px 80px rgba(10,19,64,0.22), 0 0 0 1px rgba(255,255,255,0.5)',
-        padding: 32,
-      }}>
-        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, width: 32, height: 32, borderRadius: '50%', background: 'rgba(12,19,48,0.08)', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--ink-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+      <div className="adm-modal-backdrop" onClick={onClose} />
+      <div className="adm-modal">
+        <button className="adm-modal-close" onClick={onClose}>×</button>
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 20, color: 'var(--ink-1)', margin: 0, flex: 1 }}>
+        <div className="adm-modal-header">
+          <h2 className="adm-modal-title">
             {isNew ? 'New event' : isEditing ? 'Edit event' : form.title}
           </h2>
           {!isNew && !isEditing && (
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', padding: '3px 9px', borderRadius: 999, background: isPast ? 'rgba(12,19,48,0.07)' : 'rgba(52,210,123,0.12)', color: isPast ? 'var(--ink-3)' : '#1a7a4a' }}>
+            <span className={`adm-modal-status ${isPast ? 'past' : 'upcoming'}`}>
               {isPast ? 'Past' : 'Upcoming'}
             </span>
           )}
         </div>
 
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <form className="adm-modal-form" onSubmit={handleSave}>
           <div>
-            <label style={labelStyle}>Title {isEditing && '*'}</label>
-            <input style={inputStyle(!!errors.title)} value={form.title} onChange={e => setField('title', e.target.value)} placeholder="e.g. Makers Drinks #12" readOnly={readOnly} />
-            {errors.title && <div style={errStyle}>{errors.title}</div>}
+            <label className="adm-modal-label">Title {isEditing && '*'}</label>
+            <input
+              className={inputCls(!!errors.title)}
+              value={form.title}
+              onChange={e => setField('title', e.target.value)}
+              placeholder="e.g. Makers Drinks #12"
+              readOnly={readOnly}
+            />
+            {errors.title && <div className="adm-modal-error">{errors.title}</div>}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="adm-modal-grid-2">
             <div>
-              <label style={labelStyle}>Start {isEditing && '*'}</label>
-              <input type="datetime-local" style={inputStyle(!!errors.date)} value={form.date} onChange={e => setField('date', e.target.value)} readOnly={readOnly} />
-              {errors.date && <div style={errStyle}>{errors.date}</div>}
+              <label className="adm-modal-label">Start {isEditing && '*'}</label>
+              <input
+                type="datetime-local"
+                className={inputCls(!!errors.date)}
+                value={form.date}
+                onChange={e => setField('date', e.target.value)}
+                readOnly={readOnly}
+              />
+              {errors.date && <div className="adm-modal-error">{errors.date}</div>}
             </div>
             <div>
-              <label style={labelStyle}>End</label>
-              <input type="datetime-local" style={inputStyle()} value={form.end_date} onChange={e => setField('end_date', e.target.value)} readOnly={readOnly} />
+              <label className="adm-modal-label">End</label>
+              <input
+                type="datetime-local"
+                className={inputCls()}
+                value={form.end_date}
+                onChange={e => setField('end_date', e.target.value)}
+                readOnly={readOnly}
+              />
             </div>
           </div>
 
           <div>
-            <label style={labelStyle}>Type</label>
+            <label className="adm-modal-label">Type</label>
             {readOnly
-              ? <div style={{ fontSize: 14, color: 'var(--ink-1)', padding: '10px 0', fontFamily: 'var(--font-body)' }}>{form.type || '—'}</div>
-              : <select style={inputStyle()} value={form.type} onChange={e => setField('type', e.target.value)}>
+              ? <div className="adm-modal-type-val">{form.type || '—'}</div>
+              : <select className={inputCls()} value={form.type} onChange={e => setField('type', e.target.value)}>
                   {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
             }
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="adm-modal-grid-2">
             <div>
-              <label style={labelStyle}>Venue</label>
-              <input style={inputStyle()} value={form.location} onChange={e => setField('location', e.target.value)} placeholder="e.g. Factory Berlin" readOnly={readOnly} />
+              <label className="adm-modal-label">Venue</label>
+              <input
+                className={inputCls()}
+                value={form.location}
+                onChange={e => setField('location', e.target.value)}
+                placeholder="e.g. Factory Berlin"
+                readOnly={readOnly}
+              />
             </div>
             <div>
-              <label style={labelStyle}>Address</label>
-              <input style={inputStyle()} value={form.address} onChange={e => setField('address', e.target.value)} placeholder="e.g. Rheinsberger Str. 76" readOnly={readOnly} />
+              <label className="adm-modal-label">Address</label>
+              <input
+                className={inputCls()}
+                value={form.address}
+                onChange={e => setField('address', e.target.value)}
+                placeholder="e.g. Rheinsberger Str. 76"
+                readOnly={readOnly}
+              />
             </div>
           </div>
 
           <div>
-            <label style={labelStyle}>Description</label>
+            <label className="adm-modal-label">Description</label>
             <textarea
-              style={{ ...inputStyle(), resize: isEditing ? 'vertical' : 'none', minHeight: 88 }}
+              className={`${inputCls()} adm-modal-textarea`}
               value={form.description}
               onChange={e => setField('description', e.target.value)}
               placeholder={isEditing ? "What's this event about?" : ''}
               readOnly={readOnly}
+              style={{ resize: isEditing ? 'vertical' : 'none' }}
             />
           </div>
 
           <div>
-            <label style={labelStyle}>Luma URL</label>
+            <label className="adm-modal-label">Luma URL</label>
             {readOnly
-              ? <div style={{ fontSize: 13, color: 'var(--mk-violet)', padding: '10px 0', fontFamily: 'var(--font-body)', wordBreak: 'break-all' }}>
-                  {form.luma_url ? <a href={form.luma_url} target="_blank" rel="noreferrer" style={{ color: 'var(--mk-violet)' }}>{form.luma_url}</a> : '—'}
+              ? <div className="adm-modal-luma-link">
+                  {form.luma_url
+                    ? <a href={form.luma_url} target="_blank" rel="noreferrer">{form.luma_url}</a>
+                    : '—'}
                 </div>
-              : <input style={inputStyle()} value={form.luma_url} onChange={e => setField('luma_url', e.target.value)} placeholder="https://lu.ma/…" />
+              : <input
+                  className={inputCls()}
+                  value={form.luma_url}
+                  onChange={e => setField('luma_url', e.target.value)}
+                  placeholder="https://lu.ma/…"
+                />
             }
           </div>
 
-          {/* Footer buttons */}
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'space-between', alignItems: 'center', marginTop: 4, paddingTop: 4, borderTop: '1px solid var(--hairline)' }}>
-            {/* Left side: Remove */}
+          {/* Footer */}
+          <div className="adm-modal-footer">
+            {/* Left: Remove */}
             <div>
               {!isNew && onDelete && !isEditing && (
                 confirmDelete ? (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>Delete this event?</span>
+                  <div className="adm-modal-confirm">
+                    <span className="adm-modal-confirm-text">Delete this event?</span>
                     <button
                       type="button"
+                      className="adm-btn adm-btn-sm adm-btn-danger"
                       onClick={onDelete}
                       disabled={deleting}
-                      style={{ padding: '7px 16px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.15)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: deleting ? 0.5 : 1 }}
+                      style={{ opacity: deleting ? 0.5 : 1 }}
                     >
                       {deleting ? 'Removing…' : 'Yes, remove'}
                     </button>
-                    <button type="button" onClick={() => setConfirmDelete(false)} style={{ padding: '7px 16px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                    <button
+                      type="button"
+                      className="adm-btn adm-btn-sm adm-btn-ghost"
+                      onClick={() => setConfirmDelete(false)}
+                    >
                       Cancel
                     </button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => setConfirmDelete(true)} style={{ padding: '9px 18px', borderRadius: 999, border: 'none', background: 'rgba(224,82,79,0.10)', color: 'var(--danger)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button
+                    type="button"
+                    className="adm-btn adm-btn-md adm-btn-danger-soft"
+                    onClick={() => setConfirmDelete(true)}
+                  >
                     Remove
                   </button>
                 )
               )}
             </div>
 
-            {/* Right side: Edit / Save / Cancel */}
-            <div style={{ display: 'flex', gap: 10, marginLeft: 'auto' }}>
+            {/* Right: Edit / Cancel + Save */}
+            <div className="adm-modal-actions">
               {isEditing ? (
                 <>
-                  <button type="button" onClick={cancelEdit} style={{ padding: '9px 20px', borderRadius: 999, border: '1.5px solid var(--hairline-strong)', background: 'transparent', color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  <button type="button" className="adm-btn adm-btn-md adm-btn-ghost" onClick={cancelEdit}>
                     Cancel
                   </button>
-                  <button type="submit" disabled={saving} style={{ padding: '9px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+                  <button
+                    type="submit"
+                    className="adm-btn adm-btn-lg adm-btn-navy"
+                    disabled={saving}
+                    style={{ opacity: saving ? 0.6 : 1, cursor: saving ? 'default' : 'pointer' }}
+                  >
                     {saving ? 'Saving…' : isNew ? 'Create event' : 'Save'}
                   </button>
                 </>
               ) : (
-                <button type="button" onClick={() => setIsEditing(true)} style={{ padding: '9px 22px', borderRadius: 999, border: 'none', background: 'var(--mk-navy)', color: '#fff', fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                <button type="button" className="adm-btn adm-btn-lg adm-btn-navy" onClick={() => setIsEditing(true)}>
                   Edit
                 </button>
               )}
@@ -893,19 +878,10 @@ function HealthScore({ score, enoughData, signals, pastEvents }: {
 }) {
   const band = getBand(score)
 
-  // SVG arc params
-  const R = 72
-  const CX = 96
-  const CY = 96
-  const STROKE = 10
-  // Arc spans 210° — from 195° to 345° (bottom-left to bottom-right)
-  const START_DEG = 195
-  const SWEEP = 210
+  const R = 72, CX = 96, CY = 96, STROKE = 10
+  const START_DEG = 195, SWEEP = 210
   const toRad = (d: number) => (d * Math.PI) / 180
-  const arcPoint = (deg: number) => ({
-    x: CX + R * Math.cos(toRad(deg)),
-    y: CY + R * Math.sin(toRad(deg)),
-  })
+  const arcPoint = (deg: number) => ({ x: CX + R * Math.cos(toRad(deg)), y: CY + R * Math.sin(toRad(deg)) })
   const describeArc = (startDeg: number, sweepDeg: number) => {
     const s = arcPoint(startDeg)
     const e = arcPoint(startDeg + sweepDeg)
@@ -913,8 +889,6 @@ function HealthScore({ score, enoughData, signals, pastEvents }: {
     return `M ${s.x} ${s.y} A ${R} ${R} 0 ${large} 1 ${e.x} ${e.y}`
   }
   const filledSweep = enoughData ? (score / 100) * SWEEP : 0
-
-  // Tick marks at band boundaries
   const bandTicks = BANDS.slice(1).map(b => START_DEG + (b.min / 100) * SWEEP)
 
   return (
@@ -922,41 +896,31 @@ function HealthScore({ score, enoughData, signals, pastEvents }: {
       <div className="mkw-h3" style={{ marginBottom: 20 }}><span>Community health</span></div>
 
       {!enoughData ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: 10 }}>
-          <div style={{ fontSize: 36 }}>📊</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--ink-2)' }}>Not enough data yet</div>
-          <div style={{ fontSize: 13, color: 'var(--ink-3)', textAlign: 'center', maxWidth: 320 }}>
+        <div className="adm-hs-nodata">
+          <div className="adm-hs-nodata-emoji">📊</div>
+          <div className="adm-hs-nodata-title">Not enough data yet</div>
+          <div className="adm-hs-nodata-sub">
             Health score appears after <strong>3 past events</strong>. You have {pastEvents} so far.
           </div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 40, alignItems: 'center' }}>
-
-          {/* ── Gauge ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+        <div className="adm-hs-grid">
+          {/* Gauge */}
+          <div className="adm-gauge">
             <svg width={192} height={120} viewBox="0 0 192 120" style={{ overflow: 'visible' }}>
-              {/* Track */}
-              <path
-                d={describeArc(START_DEG, SWEEP)}
-                fill="none" stroke="var(--hairline)" strokeWidth={STROKE}
-                strokeLinecap="round"
-              />
-              {/* Filled arc */}
+              <path d={describeArc(START_DEG, SWEEP)} fill="none" stroke="var(--hairline)" strokeWidth={STROKE} strokeLinecap="round" />
               {filledSweep > 0 && (
                 <path
                   d={describeArc(START_DEG, filledSweep)}
-                  fill="none" stroke={band.color} strokeWidth={STROKE}
-                  strokeLinecap="round"
+                  fill="none" stroke={band.color} strokeWidth={STROKE} strokeLinecap="round"
                   style={{ transition: 'all 0.6s cubic-bezier(0.4,0,0.2,1)' }}
                 />
               )}
-              {/* Band tick marks */}
               {bandTicks.map((deg, i) => {
                 const inner = { x: CX + (R - STROKE) * Math.cos(toRad(deg)), y: CY + (R - STROKE) * Math.sin(toRad(deg)) }
                 const outer = { x: CX + (R + STROKE) * Math.cos(toRad(deg)), y: CY + (R + STROKE) * Math.sin(toRad(deg)) }
                 return <line key={i} x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y} stroke="white" strokeWidth={2} />
               })}
-              {/* Centre score */}
               <text x={CX} y={CY - 2} textAnchor="middle" dominantBaseline="middle"
                 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, fill: band.color }}>
                 {score}
@@ -967,45 +931,33 @@ function HealthScore({ score, enoughData, signals, pastEvents }: {
               </text>
             </svg>
 
-            {/* Band label */}
-            <div style={{
-              marginTop: -8,
-              padding: '5px 18px', borderRadius: 999,
-              background: band.bg,
-              fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 800,
-              color: band.color, letterSpacing: 0.3,
-            }}>
+            <div className="adm-gauge-band-label" style={{ background: band.bg, color: band.color }}>
               {band.label}
             </div>
 
-            {/* Band scale */}
-            <div style={{ display: 'flex', gap: 4, marginTop: 14 }}>
+            <div className="adm-gauge-scale">
               {BANDS.map(b => (
-                <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 24, height: 4, borderRadius: 999, background: score >= b.min ? b.color : 'var(--hairline)' }} />
-                  <div style={{ fontSize: 8, fontFamily: 'var(--font-display)', fontWeight: 700, color: score >= b.min ? b.color : 'var(--ink-3)', letterSpacing: 0.3 }}>{b.label}</div>
+                <div key={b.label} className="adm-gauge-scale-item">
+                  <div className="adm-gauge-scale-bar" style={{ background: score >= b.min ? b.color : 'var(--hairline)' }} />
+                  <div className="adm-gauge-scale-lbl" style={{ color: score >= b.min ? b.color : 'var(--ink-3)' }}>{b.label}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* ── Signal bars ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Signal bars */}
+          <div className="adm-signals">
             {signals.map(s => (
               <div key={s.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--ink-2)' }}>{s.label}</span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                    <span style={{ fontSize: 15, fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--ink-1)' }}>{s.value}%</span>
-                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--ink-3)' }}>{s.weight}% weight</span>
+                <div className="adm-signal-hdr">
+                  <span className="adm-signal-lbl">{s.label}</span>
+                  <div className="adm-signal-vals">
+                    <span className="adm-signal-pct">{s.value}%</span>
+                    <span className="adm-signal-wt">{s.weight}% weight</span>
                   </div>
                 </div>
-                <div style={{ height: 8, borderRadius: 999, background: 'var(--hairline)', overflow: 'hidden' }}>
-                  <div style={{
-                    width: `${s.value}%`, height: '100%', borderRadius: 999,
-                    background: getBand(s.value).color,
-                    transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)',
-                  }} />
+                <div className="adm-signal-track">
+                  <div className="adm-signal-fill" style={{ width: `${s.value}%`, background: getBand(s.value).color }} />
                 </div>
               </div>
             ))}
@@ -1023,14 +975,14 @@ function RoleBreakdown({ members }: { members: OrgMember[] }) {
   const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1])
   const barColors = ['#fcb813', '#7a4ed8', '#3b6dd9', '#a587f0', '#0a1340', '#34d27b']
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div className="adm-rb">
       {sorted.map(([role, count], i) => (
-        <div key={role} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 90, fontSize: 12, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--ink-2)', textAlign: 'right', flexShrink: 0, textTransform: 'capitalize' }}>{role}</div>
-          <div style={{ flex: 1, height: 10, borderRadius: 999, background: 'var(--hairline)', overflow: 'hidden' }}>
-            <div style={{ width: `${(count / total) * 100}%`, height: '100%', borderRadius: 999, background: barColors[i % barColors.length] }} />
+        <div key={role} className="adm-rb-row">
+          <div className="adm-rb-lbl">{role}</div>
+          <div className="adm-rb-track">
+            <div className="adm-rb-fill" style={{ width: `${(count / total) * 100}%`, background: barColors[i % barColors.length] }} />
           </div>
-          <div style={{ width: 28, fontSize: 12, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--ink-1)', flexShrink: 0 }}>{count}</div>
+          <div className="adm-rb-count">{count}</div>
         </div>
       ))}
     </div>
@@ -1043,9 +995,9 @@ function AtRiskList({ members }: { members: OrgMember[] }) {
     <div className="mkw-card">
       <div className="mkw-h3" style={{ marginBottom: 4 }}>
         <span style={{ color: 'var(--danger)' }}>At-risk members</span>
-        <span style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>{members.length} quiet 60+ days</span>
+        <span className="adm-atrisk-count">{members.length} quiet 60+ days</span>
       </div>
-      <p style={{ fontSize: 13, color: 'var(--ink-3)', marginBottom: 16, fontFamily: 'var(--font-body)' }}>Attended at least once, then no RSVP in 60+ days.</p>
+      <p className="adm-atrisk-desc">Attended at least once, then no RSVP in 60+ days.</p>
       <div className="mkw-rows">
         {members.map((m, i) => {
           const av = AV[i % AV.length]
@@ -1056,7 +1008,7 @@ function AtRiskList({ members }: { members: OrgMember[] }) {
                 <div className="mkw-row-name">{m.profile?.full_name || '(no name)'}</div>
                 <div className="mkw-row-meta">{m.profile?.role_category || '—'} · {m.events_attended} event{m.events_attended !== 1 ? 's' : ''} attended</div>
               </div>
-              <span style={{ fontSize: 11, color: 'var(--danger)', flexShrink: 0, fontFamily: 'var(--font-body)' }}>Last seen {lastEventRelative(m.last_seen)}</span>
+              <span className="adm-atrisk-lastseen">Last seen {lastEventRelative(m.last_seen)}</span>
             </div>
           )
         })}
