@@ -65,13 +65,42 @@ export default function Admin() {
   const [eventsLoading, setEventsLoading] = useState(true)
 
   // Stats
-  const [stats, setStats] = useState({ totalMembers: 0, totalEvents: 0, totalRsvps: 0 })
+  const [stats, setStats] = useState({
+    totalMembers: 0, totalEvents: 0, totalRsvps: 0,
+    pastEvents: 0, uniqueRsvpers: 0, membersWithConnections: 0,
+  })
 
-  // Engagement % = totalRsvps / (totalMembers × totalEvents) × 100
-  // 100% means every member RSVPd to every event
-  const engagementPct = stats.totalMembers > 0 && stats.totalEvents > 0
-    ? Math.round((stats.totalRsvps / (stats.totalMembers * stats.totalEvents)) * 100)
+  // ── Derived signal scores (each 0–100) ──────────────────────────────────────
+  // RSVP rate (35%): % of members that typically register per event
+  const rsvpRate = stats.totalMembers > 0 && stats.pastEvents > 0
+    ? Math.min(100, Math.round((stats.totalRsvps / (stats.totalMembers * stats.pastEvents)) * 100))
     : 0
+  // Member reach (25%): % of members who have ever RSVPd
+  const memberReach = stats.totalMembers > 0
+    ? Math.min(100, Math.round((stats.uniqueRsvpers / stats.totalMembers) * 100))
+    : 0
+  // Connection rate (30%): % of members who have made at least one connection
+  const connectionRate = stats.totalMembers > 0
+    ? Math.min(100, Math.round((stats.membersWithConnections / stats.totalMembers) * 100))
+    : 0
+  // Repeat attendance (10%): % of RSVPs from members who attended more than once
+  const realMembers_ = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
+  const repeatAttendees = realMembers_.filter(m => m.events_attended > 1).length
+  const repeatRate = realMembers_.length > 0
+    ? Math.min(100, Math.round((repeatAttendees / realMembers_.length) * 100))
+    : 0
+
+  const healthScore = Math.round(
+    rsvpRate * 0.35 +
+    memberReach * 0.25 +
+    connectionRate * 0.30 +
+    repeatRate * 0.10
+  )
+
+  const enoughData = stats.pastEvents >= 3
+
+  // RSVP rate shown in stats bar
+  const engagementPct = rsvpRate
 
   // ── Auth guard ──────────────────────────────────────────────────────────────
 
@@ -139,22 +168,31 @@ export default function Admin() {
     const token = await session.getToken()
     const db = getSupabaseClient(token)
 
-    const [{ data: evData }, { data: rsvpData }] = await Promise.all([
+    const [{ data: evData }, { data: rsvpData }, { data: connData }] = await Promise.all([
       db.from('events').select('*').order('date', { ascending: false }),
-      db.from('event_rsvps').select('event_id'),
+      db.from('event_rsvps').select('event_id, clerk_user_id'),
+      db.from('connections').select('clerk_user_id').eq('status', 'accepted'),
     ])
 
     const rsvpCount = new Map<string, number>()
-    for (const r of (rsvpData || []) as any[])
+    const uniqueRsvpers = new Set<string>()
+    for (const r of (rsvpData || []) as any[]) {
       rsvpCount.set(r.event_id, (rsvpCount.get(r.event_id) || 0) + 1)
+      uniqueRsvpers.add(r.clerk_user_id)
+    }
+    const membersWithConnections = new Set((connData || []).map((c: any) => c.clerk_user_id)).size
 
     const rows: AdminEvent[] = (evData || []).map((e: any) => ({ ...e, rsvp_count: rsvpCount.get(e.id) || 0 }))
+    const pastEventCount = rows.filter(e => new Date(e.date) < new Date()).length
 
     setEvents(rows)
     setStats(s => ({
       ...s,
       totalEvents: rows.length,
+      pastEvents: pastEventCount,
       totalRsvps: Array.from(rsvpCount.values()).reduce((a, b) => a + b, 0),
+      uniqueRsvpers: uniqueRsvpers.size,
+      membersWithConnections,
     }))
     setEventsLoading(false)
   }, [session])
@@ -302,7 +340,17 @@ export default function Admin() {
         {/* ══ ANALYTICS ══ */}
         {tab === 'analytics' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <HealthGrid stats={stats} members={realMembers} atRisk={atRisk} engagementPct={engagementPct} />
+            <HealthScore
+              score={healthScore}
+              enoughData={enoughData}
+              signals={[
+                { label: 'RSVP rate',        value: rsvpRate,        weight: 35 },
+                { label: 'Member reach',      value: memberReach,     weight: 25 },
+                { label: 'Connection rate',   value: connectionRate,  weight: 30 },
+                { label: 'Repeat attendance', value: repeatRate,      weight: 10 },
+              ]}
+              pastEvents={stats.pastEvents}
+            />
             <div className="mkw-card">
               <div className="mkw-h3" style={{ marginBottom: 16 }}><span>Role breakdown</span></div>
               <RoleBreakdown members={realMembers} />
@@ -441,27 +489,147 @@ function EventRow({ event: e }: { event: AdminEvent }) {
   )
 }
 
-function HealthGrid({ stats, members, atRisk, engagementPct }: { stats: { totalMembers: number; totalEvents: number; totalRsvps: number }; members: OrgMember[]; atRisk: OrgMember[]; engagementPct: number }) {
-  const cells = [
-    { label: 'Total members',  value: stats.totalMembers,               sub: 'In the org' },
-    { label: 'Events hosted',  value: stats.totalEvents,                sub: 'All time' },
-    { label: 'RSVP rate',      value: `${engagementPct}%`,             sub: '% of members per event' },
-    { label: 'Paying members', value: members.filter(m => m.is_paying).length, sub: 'Manual flag' },
-    { label: 'Active members', value: members.filter(m => m.events_attended > 0 && !atRisk.some(a => a.id === m.id)).length, sub: 'Attended & current' },
+// ── Health bands ─────────────────────────────────────────────────────────────
 
-  ]
+type Band = { label: string; color: string; bg: string; min: number }
+const BANDS: Band[] = [
+  { label: 'Critical', color: '#e0524f', bg: 'rgba(224,82,79,0.10)',   min: 0  },
+  { label: 'Poor',     color: '#f4822a', bg: 'rgba(244,130,42,0.10)',  min: 21 },
+  { label: 'Fair',     color: '#f4c430', bg: 'rgba(244,196,48,0.12)',  min: 41 },
+  { label: 'Good',     color: '#3b6dd9', bg: 'rgba(59,109,217,0.10)',  min: 61 },
+  { label: 'Awesome',  color: '#34d27b', bg: 'rgba(52,210,123,0.10)',  min: 81 },
+]
+function getBand(score: number): Band {
+  return [...BANDS].reverse().find(b => score >= b.min) || BANDS[0]
+}
+
+function HealthScore({ score, enoughData, signals, pastEvents }: {
+  score: number
+  enoughData: boolean
+  signals: { label: string; value: number; weight: number }[]
+  pastEvents: number
+}) {
+  const band = getBand(score)
+
+  // SVG arc params
+  const R = 72
+  const CX = 96
+  const CY = 96
+  const STROKE = 10
+  // Arc spans 210° — from 195° to 345° (bottom-left to bottom-right)
+  const START_DEG = 195
+  const SWEEP = 210
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const arcPoint = (deg: number) => ({
+    x: CX + R * Math.cos(toRad(deg)),
+    y: CY + R * Math.sin(toRad(deg)),
+  })
+  const describeArc = (startDeg: number, sweepDeg: number) => {
+    const s = arcPoint(startDeg)
+    const e = arcPoint(startDeg + sweepDeg)
+    const large = sweepDeg > 180 ? 1 : 0
+    return `M ${s.x} ${s.y} A ${R} ${R} 0 ${large} 1 ${e.x} ${e.y}`
+  }
+  const filledSweep = enoughData ? (score / 100) * SWEEP : 0
+
+  // Tick marks at band boundaries
+  const bandTicks = BANDS.slice(1).map(b => START_DEG + (b.min / 100) * SWEEP)
+
   return (
     <div className="mkw-card">
       <div className="mkw-h3" style={{ marginBottom: 20 }}><span>Community health</span></div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-        {cells.map(s => (
-          <div key={s.label} style={{ padding: '18px 20px', borderRadius: 14, background: s.danger ? 'rgba(224,82,79,0.06)' : 'rgba(12,19,48,0.04)', border: `1px solid ${s.danger ? 'rgba(224,82,79,0.15)' : 'var(--hairline)'}` }}>
-            <div style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: s.danger ? 'var(--danger)' : 'var(--ink-3)', marginBottom: 8 }}>{s.label}</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: s.danger ? 'var(--danger)' : 'var(--mk-violet)', lineHeight: 1 }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 6 }}>{s.sub}</div>
+
+      {!enoughData ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0', gap: 10 }}>
+          <div style={{ fontSize: 36 }}>📊</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--ink-2)' }}>Not enough data yet</div>
+          <div style={{ fontSize: 13, color: 'var(--ink-3)', textAlign: 'center', maxWidth: 320 }}>
+            Health score appears after <strong>3 past events</strong>. You have {pastEvents} so far.
           </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 40, alignItems: 'center' }}>
+
+          {/* ── Gauge ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+            <svg width={192} height={120} viewBox="0 0 192 120" style={{ overflow: 'visible' }}>
+              {/* Track */}
+              <path
+                d={describeArc(START_DEG, SWEEP)}
+                fill="none" stroke="var(--hairline)" strokeWidth={STROKE}
+                strokeLinecap="round"
+              />
+              {/* Filled arc */}
+              {filledSweep > 0 && (
+                <path
+                  d={describeArc(START_DEG, filledSweep)}
+                  fill="none" stroke={band.color} strokeWidth={STROKE}
+                  strokeLinecap="round"
+                  style={{ transition: 'all 0.6s cubic-bezier(0.4,0,0.2,1)' }}
+                />
+              )}
+              {/* Band tick marks */}
+              {bandTicks.map((deg, i) => {
+                const inner = { x: CX + (R - STROKE) * Math.cos(toRad(deg)), y: CY + (R - STROKE) * Math.sin(toRad(deg)) }
+                const outer = { x: CX + (R + STROKE) * Math.cos(toRad(deg)), y: CY + (R + STROKE) * Math.sin(toRad(deg)) }
+                return <line key={i} x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y} stroke="white" strokeWidth={2} />
+              })}
+              {/* Centre score */}
+              <text x={CX} y={CY - 2} textAnchor="middle" dominantBaseline="middle"
+                style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, fill: band.color }}>
+                {score}
+              </text>
+              <text x={CX} y={CY + 20} textAnchor="middle"
+                style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, fill: 'var(--ink-3)', letterSpacing: 1 }}>
+                / 100
+              </text>
+            </svg>
+
+            {/* Band label */}
+            <div style={{
+              marginTop: -8,
+              padding: '5px 18px', borderRadius: 999,
+              background: band.bg,
+              fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 800,
+              color: band.color, letterSpacing: 0.3,
+            }}>
+              {band.label}
+            </div>
+
+            {/* Band scale */}
+            <div style={{ display: 'flex', gap: 4, marginTop: 14 }}>
+              {BANDS.map(b => (
+                <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: 24, height: 4, borderRadius: 999, background: score >= b.min ? b.color : 'var(--hairline)' }} />
+                  <div style={{ fontSize: 8, fontFamily: 'var(--font-display)', fontWeight: 700, color: score >= b.min ? b.color : 'var(--ink-3)', letterSpacing: 0.3 }}>{b.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Signal bars ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {signals.map(s => (
+              <div key={s.label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--ink-2)' }}>{s.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                    <span style={{ fontSize: 15, fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--ink-1)' }}>{s.value}%</span>
+                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--ink-3)' }}>{s.weight}% weight</span>
+                  </div>
+                </div>
+                <div style={{ height: 8, borderRadius: 999, background: 'var(--hairline)', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${s.value}%`, height: '100%', borderRadius: 999,
+                    background: getBand(s.value).color,
+                    transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)',
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
