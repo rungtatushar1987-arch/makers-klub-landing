@@ -225,7 +225,7 @@ export default function Admin() {
           {[
             { lbl: 'Members',    num: stats.totalMembers,    delta: 'In your community' },
             { lbl: 'Events',     num: stats.totalEvents,     delta: 'Total hosted' },
-            { lbl: 'RSVP rate',   num: `${engagementPct}%`,   delta: '% of members per event' },
+            { lbl: 'RSVP rate',   num: `${engagementPct}%`,   delta: 'members typically rsvp for your events' },
 
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
