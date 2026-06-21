@@ -8,6 +8,7 @@ import Members from './pages/Members'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Admin from './pages/Admin'
 
 function AppShell() {
   return (
@@ -41,13 +42,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login"  element={<Login />} />
+        <Route path="/login"    element={<Login />} />
         <Route path="/signup/*" element={<Signup />} />
         <Route element={<ProtectedLayout />}>
           <Route path="/home"    element={<Dashboard />} />
           <Route path="/events"  element={<Events />} />
           <Route path="/network" element={<Members />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin"   element={<Admin />} />
         </Route>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
