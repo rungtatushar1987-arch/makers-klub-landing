@@ -22,6 +22,8 @@ type AdminEvent = Event & {
   rsvp_count: number
 }
 
+type EventAttendee = { clerk_user_id: string; profile?: Profile }
+
 type Tab = 'members' | 'events' | 'analytics'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -101,9 +103,12 @@ export default function Admin() {
   // Events tab
   const [events, setEvents] = useState<AdminEvent[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
+  const [eventSubTab, setEventSubTab] = useState<'upcoming' | 'past'>('upcoming')
   const [eventFormOpen, setEventFormOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<AdminEvent | null>(null)
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null)
+  const [attendees, setAttendees] = useState<Record<string, EventAttendee[]>>({})
+  const [attendeesLoading, setAttendeesLoading] = useState<string | null>(null)
 
   // Stats
   const [stats, setStats] = useState({
@@ -238,6 +243,27 @@ export default function Admin() {
     setEventsLoading(false)
   }, [session])
 
+  const loadAttendees = useCallback(async (eventId: string) => {
+    if (attendees[eventId] || attendeesLoading === eventId) return
+    setAttendeesLoading(eventId)
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { data: rsvpData } = await db
+      .from('event_rsvps').select('clerk_user_id').eq('event_id', eventId)
+    if (rsvpData) {
+      const ids = (rsvpData as any[]).map(r => r.clerk_user_id)
+      const { data: profilesData } = ids.length > 0
+        ? await db.from('profiles').select('*').in('clerk_user_id', ids)
+        : { data: [] }
+      const profileMap = new Map((profilesData || []).map((p: any) => [p.clerk_user_id, p]))
+      setAttendees(prev => ({
+        ...prev,
+        [eventId]: ids.map(id => ({ clerk_user_id: id, profile: profileMap.get(id) }))
+      }))
+    }
+    setAttendeesLoading(null)
+  }, [session, attendees, attendeesLoading])
+
   useEffect(() => {
     if (isAdmin) { loadMembers(); loadEvents() }
   }, [isAdmin])
@@ -261,6 +287,7 @@ export default function Admin() {
     const { data, error } = await db.from('events').insert({
       ...fields,
       org_id: MK_ORG,
+      ticket_price: fields.is_free ? null : (fields.ticket_price ? parseFloat(fields.ticket_price) : null),
     }).select().single()
     if (!error && data) {
       const newEv: AdminEvent = { ...data, rsvp_count: 0 }
@@ -273,7 +300,10 @@ export default function Admin() {
   async function updateEvent(id: string, fields: EventFormFields) {
     const token = await session?.getToken()
     const db = getSupabaseClient(token)
-    const { data, error } = await db.from('events').update(fields).eq('id', id).select().single()
+    const { data, error } = await db.from('events').update({
+      ...fields,
+      ticket_price: fields.is_free ? null : (fields.ticket_price ? parseFloat(fields.ticket_price) : null),
+    }).eq('id', id).select().single()
     if (!error && data) {
       setEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e))
     }
@@ -397,23 +427,53 @@ export default function Admin() {
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
           <>
+            {/* Sub-tabs */}
+            <div className="adm-sub-tabs">
+              {(['upcoming', 'past'] as const).map(t => {
+                const count = events.filter(e => t === 'upcoming' ? new Date(e.date) >= new Date() : new Date(e.date) < new Date()).length
+                return (
+                  <button
+                    key={t}
+                    onClick={() => setEventSubTab(t)}
+                    className={`adm-sub-tab${eventSubTab === t ? ' active' : ''}`}
+                  >
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                    <span className="adm-sub-tab-count">{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+
             {eventsLoading ? (
               <p className="adm-tab-loading">Loading…</p>
             ) : (
               <div className="mkw-card adm-table-card">
                 <EventTableHead />
-                {events.length === 0 && (
-                  <p className="adm-table-empty">No events yet. Add your first one.</p>
-                )}
-                {events.map(e => (
-                  <EventRow key={e.id} event={e} onClick={() => setSelectedEvent(e)} />
-                ))}
+                {(() => {
+                  const now = new Date()
+                  const shown = events.filter(e =>
+                    eventSubTab === 'upcoming' ? new Date(e.date) >= now : new Date(e.date) < now
+                  )
+                  if (shown.length === 0) return (
+                    <p className="adm-table-empty">
+                      {eventSubTab === 'upcoming' ? 'No upcoming events. Add your first one.' : 'No past events yet.'}
+                    </p>
+                  )
+                  return shown.map(e => (
+                    <EventRow
+                      key={e.id} event={e}
+                      onClick={() => { setSelectedEvent(e); loadAttendees(e.id) }}
+                    />
+                  ))
+                })()}
               </div>
             )}
             {(eventFormOpen || selectedEvent) && (
               <EventFormModal
                 event={selectedEvent}
                 deleting={!!selectedEvent && deletingEventId === selectedEvent.id}
+                attendees={selectedEvent ? (attendees[selectedEvent.id] ?? null) : null}
+                attendeesLoading={!!selectedEvent && attendeesLoading === selectedEvent.id}
                 onSave={(fields) => selectedEvent ? updateEvent(selectedEvent.id, fields) : createEvent(fields)}
                 onDelete={selectedEvent ? () => deleteEvent(selectedEvent.id) : undefined}
                 onClose={() => { setEventFormOpen(false); setSelectedEvent(null) }}
@@ -544,9 +604,18 @@ function EventTableHead() {
       <span />
       <span>Event</span>
       <span>Location</span>
+      <span className="adm-col-center">Tickets</span>
       <span className="adm-col-center">RSVPs</span>
-      <span className="adm-col-center">Status</span>
     </div>
+  )
+}
+
+function PriceTag({ event }: { event: AdminEvent }) {
+  if (event.is_free) return <span className="adm-price-badge free">Free</span>
+  return (
+    <span className="adm-price-badge paid">
+      €{event.ticket_price != null ? Number(event.ticket_price).toFixed(2) : '—'}
+    </span>
   )
 }
 
@@ -571,12 +640,8 @@ function EventRow({ event: e, onClick }: { event: AdminEvent; onClick: () => voi
         </div>
       </div>
       <div className="adm-event-location">{e.location || '—'}</div>
+      <div className="adm-col-center"><PriceTag event={e} /></div>
       <div className="adm-event-rsvp">{e.rsvp_count}</div>
-      <div className="adm-col-center">
-        <span className={`adm-status-badge ${isPast ? 'past' : 'upcoming'}`}>
-          {isPast ? 'Past' : 'Upcoming'}
-        </span>
-      </div>
     </div>
   )
 }
@@ -592,11 +657,14 @@ type EventFormFields = {
   type: string
   description: string
   luma_url: string
+  is_free: boolean
+  ticket_price: string
 }
 
 const BLANK_FORM: EventFormFields = {
   title: '', date: '', end_date: '', location: '', address: '',
   type: 'Networking', description: '', luma_url: '',
+  is_free: true, ticket_price: '',
 }
 
 const EVENT_TYPES = ['Networking', 'Workshop', 'Social', 'Panel', 'Fireside', 'Hackathon', 'Other']
@@ -608,9 +676,11 @@ function toLocalDatetime(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
+function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, onDelete, onClose }: {
   event: AdminEvent | null
   deleting: boolean
+  attendees: EventAttendee[] | null
+  attendeesLoading: boolean
   onSave: (fields: EventFormFields) => Promise<void>
   onDelete?: () => void
   onClose: () => void
@@ -627,6 +697,8 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
     type: event.type || 'Networking',
     description: event.description || '',
     luma_url: event.luma_url || '',
+    is_free: event.is_free ?? true,
+    ticket_price: event.ticket_price != null ? String(event.ticket_price) : '',
   } : BLANK_FORM)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Partial<EventFormFields>>({})
@@ -649,6 +721,8 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
       type: event!.type || 'Networking',
       description: event!.description || '',
       luma_url: event!.luma_url || '',
+      is_free: event!.is_free ?? true,
+      ticket_price: event!.ticket_price != null ? String(event!.ticket_price) : '',
     })
   }
 
@@ -663,6 +737,7 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
       ...form,
       date: new Date(form.date).toISOString(),
       end_date: form.end_date ? new Date(form.end_date).toISOString() : '',
+      ticket_price: !form.is_free && form.ticket_price ? form.ticket_price : '',
     })
     setSaving(false)
   }
@@ -694,7 +769,7 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
           {/* Title */}
           <h2 className="adm-view-title">{event!.title}</h2>
 
-          {/* Date / location icon rows */}
+          {/* Date / location / pricing icon rows */}
           <div className="adm-view-meta">
             <div className="adm-view-meta-row">
               <div className="adm-view-icon adm-view-icon--navy">📅</div>
@@ -712,6 +787,17 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
                 </div>
               </div>
             )}
+            <div className="adm-view-meta-row">
+              <div className="adm-view-icon adm-view-icon--yellow">🎟️</div>
+              <div>
+                {event!.is_free
+                  ? <div className="adm-view-meta-primary">Free entry</div>
+                  : <>
+                      <div className="adm-view-meta-primary">€{event!.ticket_price != null ? Number(event!.ticket_price).toFixed(2) : '—'} per ticket</div>
+                    </>
+                }
+              </div>
+            </div>
             {event!.rsvp_count > 0 && (
               <div className="adm-view-meta-row">
                 <div className="adm-view-icon adm-view-icon--green">👥</div>
@@ -729,6 +815,35 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
               <p className="adm-view-desc">{event!.description}</p>
             </div>
           )}
+
+          {/* Attendees */}
+          <div className="adm-view-desc-wrap">
+            <div className="adm-view-desc-label">Attendees</div>
+            {attendeesLoading ? (
+              <p className="adm-attendees-loading">Loading…</p>
+            ) : attendees === null || attendees.length === 0 ? (
+              <p className="adm-attendees-empty">No RSVPs yet.</p>
+            ) : (
+              <div className="adm-attendees-list">
+                {attendees.map((a, i) => {
+                  const c = AV_COLORS[i % AV_COLORS.length]
+                  return (
+                    <div key={a.clerk_user_id} className="adm-attendee-row">
+                      <div className="adm-attendee-av" style={{ background: c.bg, color: c.fg }}>
+                        {getInitials(a.profile?.full_name)}
+                      </div>
+                      <div className="adm-attendee-info">
+                        <div className="adm-attendee-name">{a.profile?.full_name || 'Member'}</div>
+                        {a.profile?.role_category && (
+                          <div className="adm-attendee-role">{a.profile.role_category}</div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Luma link */}
           {event!.luma_url && (
@@ -869,6 +984,41 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
               onChange={e => setField('description', e.target.value)}
               placeholder="What's this event about?"
             />
+          </div>
+
+          {/* Ticket pricing */}
+          <div>
+            <label className="adm-modal-label">Tickets</label>
+            <div className="adm-ticket-toggle">
+              <button
+                type="button"
+                className={`adm-ticket-opt${form.is_free ? ' active' : ''}`}
+                onClick={() => setForm(f => ({ ...f, is_free: true, ticket_price: '' }))}
+              >
+                Free
+              </button>
+              <button
+                type="button"
+                className={`adm-ticket-opt${!form.is_free ? ' active' : ''}`}
+                onClick={() => setForm(f => ({ ...f, is_free: false }))}
+              >
+                Paid
+              </button>
+            </div>
+            {!form.is_free && (
+              <div className="adm-ticket-price-wrap">
+                <span className="adm-ticket-currency">€</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className={`${inputCls()} adm-ticket-price-input`}
+                  value={form.ticket_price}
+                  onChange={e => setField('ticket_price', e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+            )}
           </div>
 
           <div>

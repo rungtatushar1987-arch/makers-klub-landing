@@ -42,6 +42,8 @@ export type Event = {
   description: string
   luma_url: string
   cover_color: string
+  is_free: boolean
+  ticket_price: number | null
 }
 
 export type ConnectionStatus = 'pending' | 'accepted' | 'declined'

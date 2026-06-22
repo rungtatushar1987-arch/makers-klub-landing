@@ -218,6 +218,60 @@
 .adm-paying-btn--on  { border: none; background: rgba(52,210,123,0.15); color: #1a7a4a; }
 .adm-paying-btn--off { border: 1.5px solid var(--hairline-strong); background: transparent; color: var(--ink-3); }
 
+/* ── Event sub-tabs ─────────────────────────────────────────────────────────── */
+
+.adm-sub-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.adm-sub-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.adm-sub-tab.active {
+  border-color: transparent;
+  background: var(--mk-navy);
+  color: #fff;
+}
+
+.adm-sub-tab-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+}
+
+.adm-sub-tab:not(.active) .adm-sub-tab-count {
+  background: rgba(12,19,48,0.08);
+  color: var(--ink-3);
+}
+
+/* Price badge */
+.adm-price-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.adm-price-badge.free { background: rgba(52,210,123,0.12); color: #1a7a4a; }
+.adm-price-badge.paid { background: rgba(244,130,42,0.12); color: #b85c00; }
+
 /* ── Event table ────────────────────────────────────────────────────────────── */
 
 .adm-erow {
@@ -385,6 +439,7 @@
 .adm-view-icon--navy   { background: var(--mk-navy); }
 .adm-view-icon--violet { background: rgba(122,78,216,0.12); }
 .adm-view-icon--green  { background: rgba(52,210,123,0.12); }
+.adm-view-icon--yellow { background: rgba(252,184,19,0.15); }
 
 .adm-view-meta-primary {
   font-family: var(--font-display);
@@ -439,6 +494,91 @@
 .adm-view-luma-btn:hover { opacity: 0.85; }
 
 .adm-modal-footer--view { margin-top: 0; }
+
+/* Attendees in view modal */
+.adm-attendees-loading { font-size: 13px; color: var(--ink-3); font-family: var(--font-body); }
+.adm-attendees-empty   { font-size: 13px; color: var(--ink-3); font-family: var(--font-body); }
+
+.adm-attendees-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adm-attendee-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-attendee-av {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.adm-attendee-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-1);
+}
+
+.adm-attendee-role {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  text-transform: capitalize;
+}
+
+/* Ticket toggle in form */
+.adm-ticket-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.adm-ticket-opt {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--hairline-strong);
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.adm-ticket-opt.active {
+  border-color: transparent;
+  background: var(--mk-navy);
+  color: #fff;
+}
+
+.adm-ticket-price-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-ticket-currency {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-2);
+  flex-shrink: 0;
+}
+
+.adm-ticket-price-input { max-width: 140px; }
 
 /* ── Event form modal ───────────────────────────────────────────────────────── */
 
