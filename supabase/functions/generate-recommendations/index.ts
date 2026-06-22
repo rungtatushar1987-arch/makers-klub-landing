@@ -125,7 +125,7 @@ Deno.serve(async (req: Request) => {
       { data: connData },
       { data: profileData },
     ] = await Promise.all([
-      db.from('org_members').select('id, clerk_user_id, is_paying').eq('org_id', MK_ORG),
+      db.from('org_members').select('id, clerk_user_id, is_paying, created_at').eq('org_id', MK_ORG),
       db.from('events').select('*').eq('org_id', MK_ORG).order('date', { ascending: true }),
       db.from('event_rsvps').select('clerk_user_id, event_id, created_at'),
       db.from('connections').select('clerk_user_id').eq('status', 'accepted'),
@@ -155,19 +155,24 @@ Deno.serve(async (req: Request) => {
       connCount.set(c.clerk_user_id, (connCount.get(c.clerk_user_id) || 0) + 1)
     }
 
+    // pastEvents sorted ascending by date — index = chronological position
+    const pastEventIndex = new Map(pastEvents.map((e: any, i: number) => [e.id, i]))
+
     const rsvpCountByEv = new Map<string, number>()
     const memberAtt     = new Map<string, {
-      count: number; types: Set<string>; lastSeen: string | null
+      count: number; types: Set<string>; lastSeen: string | null; lastAttendedIndex: number
     }>()
 
     for (const r of (rsvpData || []) as any[]) {
       rsvpCountByEv.set(r.event_id, (rsvpCountByEv.get(r.event_id) || 0) + 1)
       if (!pastEventIds.has(r.event_id)) continue
-      const cur = memberAtt.get(r.clerk_user_id) || { count: 0, types: new Set<string>(), lastSeen: null }
+      const cur = memberAtt.get(r.clerk_user_id) || { count: 0, types: new Set<string>(), lastSeen: null, lastAttendedIndex: -1 }
       cur.count++
       const t = eventTypeMap.get(r.event_id)
       if (t) cur.types.add(t)
       if (!cur.lastSeen || r.created_at > cur.lastSeen) cur.lastSeen = r.created_at
+      const idx = pastEventIndex.get(r.event_id) ?? -1
+      if (idx > cur.lastAttendedIndex) cur.lastAttendedIndex = idx
       memberAtt.set(r.clerk_user_id, cur)
     }
 
@@ -177,21 +182,43 @@ Deno.serve(async (req: Request) => {
     const realMembers = (orgRows as any[]).filter(r => !r.clerk_user_id.startsWith('mock_'))
 
     const snapshots = realMembers.map(r => {
-      const profile   = profileMap.get(r.clerk_user_id)
-      const att       = memberAtt.get(r.clerk_user_id) || { count: 0, types: new Set<string>(), lastSeen: null }
-      const conns     = connCount.get(r.clerk_user_id) || 0
-      const attPct    = pastEvents.length > 0 ? Math.min(100, Math.round((att.count / pastEvents.length) * 100)) : 0
+      const profile      = profileMap.get(r.clerk_user_id)
+      const att          = memberAtt.get(r.clerk_user_id) || { count: 0, types: new Set<string>(), lastSeen: null, lastAttendedIndex: -1 }
+      const conns        = connCount.get(r.clerk_user_id) || 0
+      const joinedAt     = r.created_at ? new Date(r.created_at) : null
+
+      // Only count past events that occurred after the member joined
+      const eligiblePastEvents = joinedAt
+        ? pastEvents.filter((e: any) => new Date(e.date) >= joinedAt)
+        : pastEvents
+      const eligibleCount = eligiblePastEvents.length
+
+      // Attendance rate over events they were actually eligible for
+      const attPct    = eligibleCount > 0 ? Math.min(100, Math.round((att.count / eligibleCount) * 100)) : 0
       const connScore = Math.min(100, conns * 20)
+
+      // Recency penalty: events missed since last attendance
+      // Grace period: 3 missed events. Zero at 12 missed events.
+      const eventsMissed = att.lastAttendedIndex >= 0
+        ? (pastEvents.length - 1) - att.lastAttendedIndex
+        : eligibleCount // never attended = fully penalised
+      const GRACE = 3
+      const ZERO_AT = 12
+      const recencyMultiplier = eventsMissed <= GRACE
+        ? 1
+        : Math.max(0, 1 - (eventsMissed - GRACE) / (ZERO_AT - GRACE))
+
       return {
         clerk_user_id:        r.clerk_user_id,
         full_name:            profile?.full_name     || 'Unknown',
         role_category:        profile?.role_category || '',
         events_attended:      att.count,
+        events_eligible:      eligibleCount,
         event_types_attended: Array.from(att.types),
         connections_made:     conns,
         last_seen_iso:        att.lastSeen,
         is_paying:            r.is_paying || false,
-        engagement_score:     Math.round(attPct * 0.6 + connScore * 0.4),
+        engagement_score:     Math.round(attPct * recencyMultiplier * 0.6 + connScore * 0.4),
       }
     })
 
