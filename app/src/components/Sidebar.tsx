@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
+import { NavLink, Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useUser, useSession, useClerk } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 import { getInitials, getSupabaseClient } from '../supabase'
@@ -69,24 +69,19 @@ export default function Sidebar() {
         {isAdmin && (
           <>
             <div className="mkw-nav-label" style={{ marginTop: 14 }}>Organiser</div>
-            <NavLink
-              to="/admin?tab=members"
-              className={`mkw-nav-item${onAdmin && activeTab === 'members' ? ' active' : ''}`}
-            >
-              <span className="nav-ic">👥</span> Members
-            </NavLink>
-            <NavLink
-              to="/admin?tab=events"
-              className={`mkw-nav-item${onAdmin && activeTab === 'events' ? ' active' : ''}`}
-            >
-              <span className="nav-ic">▦</span> Events
-            </NavLink>
-            <NavLink
-              to="/admin?tab=analytics"
-              className={`mkw-nav-item${onAdmin && activeTab === 'analytics' ? ' active' : ''}`}
-            >
-              <span className="nav-ic">◈</span> Analytics
-            </NavLink>
+            {([
+              { tab: 'members',   icon: '👥', label: 'Members'   },
+              { tab: 'events',    icon: '▦',  label: 'Events'    },
+              { tab: 'analytics', icon: '◈',  label: 'Analytics' },
+            ] as const).map(({ tab, icon, label }) => (
+              <Link
+                key={tab}
+                to={`/admin?tab=${tab}`}
+                className={`mkw-nav-item${onAdmin && activeTab === tab ? ' active' : ''}`}
+              >
+                <span className="nav-ic">{icon}</span> {label}
+              </Link>
+            ))}
           </>
         )}
       </nav>
