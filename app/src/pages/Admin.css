@@ -16,14 +16,6 @@
 /* Stats */
 .adm-stats { margin-bottom: 28px; }
 
-/* ── Events header (Add event button) ───────────────────────────────────────── */
-
-.adm-events-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
 .adm-add-btn {
   padding: 9px 22px;
   border-radius: 999px;
@@ -202,7 +194,10 @@
   display: flex;
   gap: 6px;
   margin-bottom: 16px;
+  align-items: center;
 }
+
+.adm-sub-tabs .adm-add-btn { margin-left: auto; }
 
 .adm-sub-tab {
   display: flex;

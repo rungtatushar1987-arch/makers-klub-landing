@@ -413,12 +413,7 @@ export default function Admin() {
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
           <>
-            <div className="adm-events-header">
-              <button className="adm-add-btn" onClick={() => setEventFormOpen(true)}>
-                + Add event
-              </button>
-            </div>
-            {/* Sub-tabs */}
+            {/* Sub-tabs + Add event on same row */}
             <div className="adm-sub-tabs">
               {(['upcoming', 'past'] as const).map(t => {
                 const count = events.filter(e => t === 'upcoming' ? new Date(e.date) >= new Date() : new Date(e.date) < new Date()).length
@@ -433,6 +428,9 @@ export default function Admin() {
                   </button>
                 )
               })}
+              <button className="adm-add-btn" onClick={() => setEventFormOpen(true)}>
+                + Add event
+              </button>
             </div>
 
             {eventsLoading ? (
