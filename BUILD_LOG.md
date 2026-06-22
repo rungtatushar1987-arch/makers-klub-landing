@@ -1048,3 +1048,44 @@ Moved the Members / Events / Analytics navigation from in-page pill buttons to t
 2. **Real member onboarding** — first non-test members
 3. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table, replacing RSVPs as attendance signal
 
+---
+
+## Session — 22 June 2026
+
+### What was built
+
+- **Recommendations / Insights tab** — proactive event-scoped action queue in the Organiser Dashboard
+  - One card per upcoming event, pre-generated (no user prompting required)
+  - Three sections per card: Invite Leads, Ticket Converts (paid events only), No-Show Risks
+  - Each item has a "Copy message" CTA
+  - UI built in Aurora Glass (navy, `--mk-violet`, `--mk-yellow`, Poppins)
+- **Files written:**
+  - `app/src/pages/Recommendations.tsx`
+  - `app/src/pages/Recommendations.css`
+  - `Admin.tsx` — `recommendations` tab added, import + render wired
+  - `Sidebar.tsx` — Insights nav item added
+- **Supabase Edge Function** — `supabase/functions/generate-recommendations/index.ts`
+  - Verifies Clerk JWT; checks `org_members` for owner/admin role
+  - Fetches all org data server-side via service role key
+  - Calls Anthropic API with `ANTHROPIC_API_KEY` from Supabase secrets
+  - Returns structured JSON — API key and raw member data never exposed to browser
+  - `Recommendations.tsx` updated to call `/functions/v1/generate-recommendations` with Clerk JWT
+### Known bug — not yet fixed
+
+- **RSVP deduplication** — Tushar appeared in both Invite Leads and No-Show Risks for the same event (AI hallucination boundary violation). Fix identified: hard-filter `inviteLeads` and `ticketConverts` post-parse — strip any `clerk_user_id` present in `rsvpdIds`. Don't trust the model to enforce data boundaries; enforce in code. Not applied yet.
+
+### Current state after this session
+
+- ✅ Recommendations tab — Aurora Glass UI, event-scoped action cards
+- ✅ Edge Function — auth-gated, server-side Anthropic call, structured JSON output
+- ⏳ RSVP deduplication fix — identified, not yet applied
+- ⏳ Deploy Edge Function — `supabase secrets set ANTHROPIC_API_KEY=...` + `supabase functions deploy generate-recommendations`
+
+### Next steps
+
+1. **Apply RSVP deduplication fix** in `supabase/functions/generate-recommendations/index.ts`
+2. **Deploy Edge Function** — set secret, deploy, smoke-test against production
+3. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
+4. **Real member onboarding** — first non-test members
+5. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table
+

@@ -7,7 +7,7 @@ import './Admin.css'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-type OrgMember = {
+export type OrgMember = {
   id: string
   clerk_user_id: string
   org_role: string
@@ -19,7 +19,7 @@ type OrgMember = {
   connections_made: number
 }
 
-type AdminEvent = Event & {
+export type AdminEvent = Event & {
   rsvp_count: number
 }
 
@@ -473,7 +473,13 @@ export default function Admin() {
         )}
 
         {/* ══ RECOMMENDATIONS ══ */}
-        {tab === 'recommendations' && <Recommendations />}
+        {tab === 'recommendations' && (
+          <Recommendations
+            members={members}
+            events={events}
+            stats={stats}
+          />
+        )}
 
         {/* ══ ANALYTICS ══ */}
         {tab === 'analytics' && (
