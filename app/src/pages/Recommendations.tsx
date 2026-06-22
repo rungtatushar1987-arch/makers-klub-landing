@@ -664,15 +664,6 @@ export default function Recommendations({
   return (
     <div className="ins-page">
 
-      {/* ── 1. Stats row ── */}
-      <div className="ins-stats-row">
-        <StatCard label="Members" value={stats.totalMembers} sub="in your community" />
-        <StatCard label="Events hosted" value={stats.pastEvents} sub="total past events" />
-        <StatCard label="Avg RSVPs / event" value={avgRsvps} sub="across past events" color="var(--mk-violet)" />
-        <StatCard label="Connection rate" value={`${connectionRate}%`} sub="members with 1+ connection" color="var(--mk-blue)" />
-        <StatCard label="Repeat attendance" value={`${repeatRate}%`} sub="attended more than once" color="var(--ok)" />
-      </div>
-
       {/* ── 2. Charts row ── */}
       <div className="ins-charts-row">
         <DoughnutChart
