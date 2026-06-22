@@ -528,152 +528,6 @@ The web dashboard `Members.tsx` already renders event context inline in the meta
 2. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
 3. **Real member onboarding** — first non-test members
 
----
-
-## Session — 22 June 2026 — Organiser Dashboard iteration
-
-### Context
-
-Continued iterating the Organiser Dashboard built in the previous session. All changes are in the web dashboard (`app/src/`). Session covered: member table improvements, event CRUD, event detail UX, CSS refactor, inline styles → CSS classes, events tab enhancements, sidebar navigation refactor, and bug fixes.
-
----
-
-### 1. Member table revamp (`Admin.tsx`)
-
-Six changes to the Members tab table:
-
-- **"Events" column renamed** to "Events attended"
-- **"Status" column replaced** with attendance % (events attended ÷ past events, shown in parentheses next to count)
-- **"Connections made" column added** — how many accepted connections each member has made inside the community
-- **Dates reformatted** to ordinal long form: `3rd June, 2026` via `formatDate()` helper using `ordinalSuffix()`
-- **"Last seen" renamed** to "Last event attended", value shown as relative time: `Today`, `Yesterday`, `N days ago`, `N months ago` via `lastEventRelative()` helper
-- **Engagement score** introduced per member — weighted formula: 60% attendance rate + 40% connections (normalised to 0–100). Displayed as a labelled pill badge using five bands:
-
-| Score | Label | Colour |
-|---|---|---|
-| 0, no events | New | Grey |
-| 1–30 | Observer | Blue |
-| 31–60 | Regular | Violet |
-| 61–80 | Core | Orange |
-| 81–100 | Champion | Gold |
-
-Helpers added: `ordinalSuffix()`, `formatDate()`, `lastEventRelative()`, `ENGAGEMENT_BANDS[]`, `getEngagementBand()`, `memberEngagementScore()`.
-
----
-
-### 2. Event CRUD (`Admin.tsx`)
-
-Full create / read / update / delete for events from the Organiser Dashboard Events tab.
-
-- **EventFormModal** component — single modal handles all three modes (view, edit, create)
-- **Create** — "+ Add event" button opens blank form; fields: title, start, end, type, venue, address, description, Luma URL. Saved via `events` insert with `org_id = MK_ORG`. Optimistically prepended to events list.
-- **Update** — existing event fields pre-populated; saved via `events` update by ID. Optimistic list update.
-- **Delete** — "Remove" button in modal footer with a confirm step ("Yes, remove" / Cancel). Row removed from list on success.
-- `AdminEvent` type = `Event & { rsvp_count: number }`. `EventFormFields` type for form state.
-- `toLocalDatetime()` helper converts ISO timestamps to `datetime-local` input format.
-
----
-
-### 3. Event detail UX — view/edit/delete flow
-
-Refined the Events tab interaction model:
-
-- **Edit and Delete buttons removed from table rows** — table rows are now clean; click to open detail only
-- **Row click opens detail popup** — clicking any event row opens `EventFormModal` in view (read-only) mode
-- **Popup has Edit and Remove buttons** — Edit and Remove are in the popup footer only
-- **Read-only until Edit clicked** — all fields are non-editable in view mode; clicking Edit switches to editable form, "Edit" button becomes "Save"
-- **"+ Add event" button moved** to the tab bar row, right-aligned via `margin-left: auto`
-
----
-
-### 4. Inline styles → CSS classes (`Admin.tsx` + `Admin.css`)
-
-Full CSS extraction pass. New file `app/src/pages/Admin.css` with `adm-*` class namespace.
-
-**Hover effects** — `onMouseEnter`/`onMouseLeave` JS handlers on `MemberRow` and `EventRow` replaced with CSS `:hover` selectors.
-
-**Dynamic inline styles retained** (runtime-computed values that cannot be CSS classes): avatar palette colours, engagement band colour/background, health band colour, role breakdown bar colours, gauge arc stroke colour, signal fill width, disabled opacity.
-
----
-
-### 5. Event detail popup — Events page modal style
-
-Redesigned the `EventFormModal` **view mode** to match the Events page `EventModal` look and feel exactly.
-
-View mode now renders:
-- Type badge (violet pill) + status chip (Upcoming/Past) at top
-- Large title (24px, weight 800, display font)
-- Icon rows: 📅 navy block → date + time; 📍 violet block → venue + address; 👥 green block → RSVP count
-- "About this event" uppercase label + body text for description
-- "View on Luma →" full-width navy button (only if URL present)
-- Remove (left) + Edit (right) footer buttons
-
-Edit and create modes keep the clean form layout.
-
----
-
-### 6. Events tab — Upcoming/Past sub-tabs, attendees list, free/paid pricing
-
-**Upcoming / Past sub-tabs**
-- Two pill buttons above the events table: "Upcoming" and "Past", each with a live count
-- `eventSubTab` state filters the table
-
-**Attendee list in event detail popup**
-- Attendees loaded lazily when an event row is clicked (`loadAttendees` callback)
-- Queries `event_rsvps` by `event_id`, then `profiles` for those user IDs
-- Shown in the view mode popup: avatar (coloured circle) + name + role category
-
-**Free / Paid pricing**
-- DB migration `add_event_pricing` — `is_free boolean NOT NULL DEFAULT true` and `ticket_price numeric(10,2)` added to `events` table
-- `Event` type in `supabase.ts` extended with `is_free` and `ticket_price`
-- Table column "Tickets" — Free (green badge) or €N.NN (orange badge) via `PriceTag` component
-- Detail view — 🎟️ icon row shows "Free entry" or "€N.NN per ticket"
-- Add/edit form — Free/Paid toggle + conditional price input
-
----
-
-### 7. Navigation tabs → sidebar
-
-Moved the Members / Events / Analytics navigation from in-page pill buttons to the sidebar.
-
-- **Tab state** switched from `useState<Tab>` to `useSearchParams` — active tab is URL-driven (`/admin?tab=members` etc.). Browser back/forward and direct links work correctly. Defaults to `members`.
-- **Sidebar** — "Organiser" section now contains three `Link` items (Members, Events, Analytics). Active state: `location.pathname === '/admin' && searchParams.get('tab') === tab`. Uses `Link` not `NavLink` to prevent path-based auto-active matching.
-- **In-page tab bar removed** from `Admin.tsx`.
-- **"+ Add event" button** placed in the Upcoming/Past sub-tabs row, right-aligned.
-
-**Bug fix:** All three sidebar Organiser items appeared active simultaneously. Root cause: `NavLink` auto-applies `active` class by path — all three `/admin?tab=…` links share the same `/admin` path. Fixed by replacing `NavLink` with plain `Link`.
-
----
-
-### Files changed this session
-
-| File | Change |
-|---|---|
-| `app/src/pages/Admin.tsx` | Member table columns, engagement score, event CRUD, view/edit/delete UX, inline styles → classes, attendees, pricing, URL-driven tab state |
-| `app/src/pages/Admin.css` | New file — full `adm-*` class set; view-mode, attendees, ticket, sub-tab classes added iteratively |
-| `app/src/components/Sidebar.tsx` | Organiser section → three Link items (Members/Events/Analytics), active state via `useLocation`/`useSearchParams` |
-| `app/src/supabase.ts` | `Event` type extended with `is_free` and `ticket_price` |
-| Supabase migration | `add_event_pricing` — `is_free` + `ticket_price` columns on `events` |
-
----
-
-### Current state after this session
-
-- ✅ Member table — attendance %, connections, engagement score badges, ordinal dates, relative last-event label
-- ✅ Event CRUD — create, view, edit, delete from Events tab
-- ✅ Event detail popup — matches Events page modal style (icon rows, description, Luma button)
-- ✅ Events tab — Upcoming/Past sub-tabs with counts
-- ✅ Attendees list in event detail popup (lazy-loaded)
-- ✅ Free/Paid pricing on events — DB columns, table badge, detail view row, add/edit form
-- ✅ Navigation tabs in sidebar — URL-driven, browser history works
-- ✅ Bug: all sidebar items active simultaneously — fixed (Link vs NavLink)
-- ✅ "+ Add event" and Upcoming/Past tabs on same row
-
-### Next steps
-
-1. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
-2. **Real member onboarding** — first non-test members
-3. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table, replacing RSVPs as attendance signal
 
 ---
 
@@ -1045,3 +899,152 @@ Commit: `fix: aurora glass treatment for PWA login page` (`b4ee329`, `mk-event-a
 1. **Thin Organizer Dashboard** — member directory view for client/licensing demo
 2. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
 3. **Real member onboarding** — first non-test members
+
+
+---
+
+## Session — 22 June 2026 — Organiser Dashboard iteration
+
+### Context
+
+Continued iterating the Organiser Dashboard built in the previous session. All changes are in the web dashboard (`app/src/`). Session covered: member table improvements, event CRUD, event detail UX, CSS refactor, inline styles → CSS classes, events tab enhancements, sidebar navigation refactor, and bug fixes.
+
+---
+
+### 1. Member table revamp (`Admin.tsx`)
+
+Six changes to the Members tab table:
+
+- **"Events" column renamed** to "Events attended"
+- **"Status" column replaced** with attendance % (events attended ÷ past events, shown in parentheses next to count)
+- **"Connections made" column added** — how many accepted connections each member has made inside the community
+- **Dates reformatted** to ordinal long form: `3rd June, 2026` via `formatDate()` helper using `ordinalSuffix()`
+- **"Last seen" renamed** to "Last event attended", value shown as relative time: `Today`, `Yesterday`, `N days ago`, `N months ago` via `lastEventRelative()` helper
+- **Engagement score** introduced per member — weighted formula: 60% attendance rate + 40% connections (normalised to 0–100). Displayed as a labelled pill badge using five bands:
+
+| Score | Label | Colour |
+|---|---|---|
+| 0, no events | New | Grey |
+| 1–30 | Observer | Blue |
+| 31–60 | Regular | Violet |
+| 61–80 | Core | Orange |
+| 81–100 | Champion | Gold |
+
+Helpers added: `ordinalSuffix()`, `formatDate()`, `lastEventRelative()`, `ENGAGEMENT_BANDS[]`, `getEngagementBand()`, `memberEngagementScore()`.
+
+---
+
+### 2. Event CRUD (`Admin.tsx`)
+
+Full create / read / update / delete for events from the Organiser Dashboard Events tab.
+
+- **EventFormModal** component — single modal handles all three modes (view, edit, create)
+- **Create** — "+ Add event" button opens blank form; fields: title, start, end, type, venue, address, description, Luma URL. Saved via `events` insert with `org_id = MK_ORG`. Optimistically prepended to events list.
+- **Update** — existing event fields pre-populated; saved via `events` update by ID. Optimistic list update.
+- **Delete** — "Remove" button in modal footer with a confirm step ("Yes, remove" / Cancel). Row removed from list on success.
+- `AdminEvent` type = `Event & { rsvp_count: number }`. `EventFormFields` type for form state.
+- `toLocalDatetime()` helper converts ISO timestamps to `datetime-local` input format.
+
+---
+
+### 3. Event detail UX — view/edit/delete flow
+
+Refined the Events tab interaction model:
+
+- **Edit and Delete buttons removed from table rows** — table rows are now clean; click to open detail only
+- **Row click opens detail popup** — clicking any event row opens `EventFormModal` in view (read-only) mode
+- **Popup has Edit and Remove buttons** — Edit and Remove are in the popup footer only
+- **Read-only until Edit clicked** — all fields are non-editable in view mode; clicking Edit switches to editable form, "Edit" button becomes "Save"
+- **"+ Add event" button moved** to the tab bar row, right-aligned via `margin-left: auto`
+
+---
+
+### 4. Inline styles → CSS classes (`Admin.tsx` + `Admin.css`)
+
+Full CSS extraction pass. New file `app/src/pages/Admin.css` with `adm-*` class namespace.
+
+**Hover effects** — `onMouseEnter`/`onMouseLeave` JS handlers on `MemberRow` and `EventRow` replaced with CSS `:hover` selectors.
+
+**Dynamic inline styles retained** (runtime-computed values that cannot be CSS classes): avatar palette colours, engagement band colour/background, health band colour, role breakdown bar colours, gauge arc stroke colour, signal fill width, disabled opacity.
+
+---
+
+### 5. Event detail popup — Events page modal style
+
+Redesigned the `EventFormModal` **view mode** to match the Events page `EventModal` look and feel exactly.
+
+View mode now renders:
+- Type badge (violet pill) + status chip (Upcoming/Past) at top
+- Large title (24px, weight 800, display font)
+- Icon rows: 📅 navy block → date + time; 📍 violet block → venue + address; 👥 green block → RSVP count
+- "About this event" uppercase label + body text for description
+- "View on Luma →" full-width navy button (only if URL present)
+- Remove (left) + Edit (right) footer buttons
+
+Edit and create modes keep the clean form layout.
+
+---
+
+### 6. Events tab — Upcoming/Past sub-tabs, attendees list, free/paid pricing
+
+**Upcoming / Past sub-tabs**
+- Two pill buttons above the events table: "Upcoming" and "Past", each with a live count
+- `eventSubTab` state filters the table
+
+**Attendee list in event detail popup**
+- Attendees loaded lazily when an event row is clicked (`loadAttendees` callback)
+- Queries `event_rsvps` by `event_id`, then `profiles` for those user IDs
+- Shown in the view mode popup: avatar (coloured circle) + name + role category
+
+**Free / Paid pricing**
+- DB migration `add_event_pricing` — `is_free boolean NOT NULL DEFAULT true` and `ticket_price numeric(10,2)` added to `events` table
+- `Event` type in `supabase.ts` extended with `is_free` and `ticket_price`
+- Table column "Tickets" — Free (green badge) or €N.NN (orange badge) via `PriceTag` component
+- Detail view — 🎟️ icon row shows "Free entry" or "€N.NN per ticket"
+- Add/edit form — Free/Paid toggle + conditional price input
+
+---
+
+### 7. Navigation tabs → sidebar
+
+Moved the Members / Events / Analytics navigation from in-page pill buttons to the sidebar.
+
+- **Tab state** switched from `useState<Tab>` to `useSearchParams` — active tab is URL-driven (`/admin?tab=members` etc.). Browser back/forward and direct links work correctly. Defaults to `members`.
+- **Sidebar** — "Organiser" section now contains three `Link` items (Members, Events, Analytics). Active state: `location.pathname === '/admin' && searchParams.get('tab') === tab`. Uses `Link` not `NavLink` to prevent path-based auto-active matching.
+- **In-page tab bar removed** from `Admin.tsx`.
+- **"+ Add event" button** placed in the Upcoming/Past sub-tabs row, right-aligned.
+
+**Bug fix:** All three sidebar Organiser items appeared active simultaneously. Root cause: `NavLink` auto-applies `active` class by path — all three `/admin?tab=…` links share the same `/admin` path. Fixed by replacing `NavLink` with plain `Link`.
+
+---
+
+### Files changed this session
+
+| File | Change |
+|---|---|
+| `app/src/pages/Admin.tsx` | Member table columns, engagement score, event CRUD, view/edit/delete UX, inline styles → classes, attendees, pricing, URL-driven tab state |
+| `app/src/pages/Admin.css` | New file — full `adm-*` class set; view-mode, attendees, ticket, sub-tab classes added iteratively |
+| `app/src/components/Sidebar.tsx` | Organiser section → three Link items (Members/Events/Analytics), active state via `useLocation`/`useSearchParams` |
+| `app/src/supabase.ts` | `Event` type extended with `is_free` and `ticket_price` |
+| Supabase migration | `add_event_pricing` — `is_free` + `ticket_price` columns on `events` |
+
+---
+
+### Current state after this session
+
+- ✅ Member table — attendance %, connections, engagement score badges, ordinal dates, relative last-event label
+- ✅ Event CRUD — create, view, edit, delete from Events tab
+- ✅ Event detail popup — matches Events page modal style (icon rows, description, Luma button)
+- ✅ Events tab — Upcoming/Past sub-tabs with counts
+- ✅ Attendees list in event detail popup (lazy-loaded)
+- ✅ Free/Paid pricing on events — DB columns, table badge, detail view row, add/edit form
+- ✅ Navigation tabs in sidebar — URL-driven, browser history works
+- ✅ Bug: all sidebar items active simultaneously — fixed (Link vs NavLink)
+- ✅ "+ Add event" and Upcoming/Past tabs on same row
+
+### Next steps
+
+1. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
+2. **Real member onboarding** — first non-test members
+3. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table, replacing RSVPs as attendance signal
+

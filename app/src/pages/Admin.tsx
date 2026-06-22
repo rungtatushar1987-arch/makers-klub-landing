@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getSupabaseClient, getInitials, type Profile, type Event } from '../supabase'
+import Recommendations from './Recommendations'
 import './Admin.css'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -24,8 +25,8 @@ type AdminEvent = Event & {
 
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
-type Tab = 'members' | 'events' | 'analytics'
-const VALID_TABS: Tab[] = ['members', 'events', 'analytics']
+type Tab = 'members' | 'events' | 'analytics' | 'recommendations'
+const VALID_TABS: Tab[] = ['members', 'events', 'analytics', 'recommendations']
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -470,6 +471,9 @@ export default function Admin() {
             )}
           </>
         )}
+
+        {/* ══ RECOMMENDATIONS ══ */}
+        {tab === 'recommendations' && <Recommendations />}
 
         {/* ══ ANALYTICS ══ */}
         {tab === 'analytics' && (

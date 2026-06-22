@@ -360,3 +360,79 @@ sizing this (web dashboard `app/src/`, PWA `mk-event-app/src/`).
 - Should `profiles.org_id`/`org_role` be dropped immediately as part of the
   correction, or left as unused dead columns until Phase 1.5 lands and the
   migration is verified end-to-end?
+
+---
+
+## Session — 21 June 2026 — Organiser Dashboard Spec
+
+### Status at session start
+
+- Phase 1.5 complete and verified
+- `profiles.org_id` and `profiles.org_role` confirmed dropped (verified via `information_schema.columns`)
+- `org_members` is the canonical membership table; `jwt_is_org_admin()` SECURITY DEFINER helper in place, checks `org_role IN ('owner', 'admin')`
+- Tushar (`user_3E5D484FC0PzCZpEVqBeKCYOnbM`) confirmed as `owner` of the Makers Klub org in `org_members`
+- No `/admin` route, no admin page, no admin component exists — clean slate
+- Aurora Glass design system fully implemented across Dashboard, Events, Network, Profile, Login, Signup
+
+### Core decision
+
+Repurpose the existing web dashboard (`app.makersklub.com`) as the Organiser Dashboard rather than building a separate tool. Route: `/admin`. Same Aurora Glass look and feel as all other pages. Organiser-only — all data and analytics on this page are gated behind `org_role IN ('owner', 'admin')`.
+
+### Architecture decisions
+
+- **Route:** `/admin` with a guard component that redirects non-admins to `/home`
+- **Sidebar:** new “Organiser” section below “Account”, visible only to org admins. Single nav item: “Dashboard” → `/admin`
+- **Page structure:** three tabs — Members · Events · Analytics
+- **Data layer:** new `OrgAdminContext` (or inline queries), separate from `KlubContext` which is member-scoped. Admin queries use `jwt_is_org_admin()` already in place
+- **Gender / age fields:** deferred. Requires GDPR consent page during onboarding before collecting. Added to backlog
+- **Paying member:** `is_paying` boolean on `org_members`, manually managed by admin. Schema hook for future Luma/Stripe integration
+- **Attendance % threshold:** only surface after 5 events hosted. Before that, suppress the column entirely — data is noise
+- **Network graph:** deferred. High demo value but high build cost. Post-launch
+
+### Feature spec — full agreed list
+
+#### Must-have (build first)
+
+1. **Member Directory** — searchable list of all org members via `org_members` joined to `profiles`. Shows name, role/bio, join date, avatar. Core CRM view.
+2. **Stats Bar** — headline numbers at top of the page: total members, total events, total RSVPs. Simple, demo-friendly trust signal.
+3. **Event List with Attendance** — all events scoped to this org. Each row: date, title, RSVP count.
+4. **Per-Member Event History** — click a member → see which events they attended. Expand-in-place or minimal overlay.
+
+#### Good to have (second pass)
+
+5. **Attendance % per member** — (events attended by this member) / (total events hosted by org). Single number replaces the three separate “regulars / no-shows / at-risk” list concepts; one metric covers all three. **Suppressed until 5 events have been hosted** — before that threshold, column does not appear.
+6. **Connection count per member** — how many connections each member has made inside the community. Identifies super-connectors.
+7. **Last seen / active at** — date of most recent RSVP or attendance. Lets organiser spot quiet members without manual tracking.
+8. **Role filter + additional filters** — filter directory by `role_category`. Additional filter options: paying/not, attendance range (active / quiet / new). Age and gender deferred (not in schema yet; GDPR consent page required first).
+9. **Paying member flag** — manual `is_paying` boolean on `org_members`, toggled by admin. Honest and shippable now. Schema hook left for future ticketing integration when Luma/Stripe is wired up.
+10. **CSV export** — export the member list. High perceived value for organiser ops (emails, invoicing, planning).
+
+#### Cherry on top
+
+11. **At-risk flag** — auto-badge members who are “quiet”. Definition agreed: member who attended at least once, then no attendance or RSVP in the last 60 days. Visual badge on their card. No manual work, instant insight. Strongest proof the product does something LinkedIn doesn’t.
+12. **Super-connector highlight** — rank members by connection count, surface top 3–5. Gamification lite. Demo-friendly — makes the product feel alive.
+13. **Network graph teaser** — small force-directed graph, who’s connected to whom across the org. Purely visual, no interactions. Demo showstopper. **Deferred — expensive to build.**
+
+#### Analytics tab (organiser-only)
+
+Goal: help organiser target the right audience for events and newsletters.
+
+Three use-cases identified:
+- **Event targeting** — role breakdown + past attendance by event type → “who should I invite to this kind of event?”
+- **Newsletter targeting** — attendance % + last seen → “who’s engaged vs cold?”
+- **Growth** — member acquisition over time (simple line or bar chart)
+
+### What gets built next session
+
+1. Migration: add `is_paying` boolean (nullable, default `false`) to `org_members`
+2. `/admin` route + guard component (redirect non-admins to `/home`)
+3. `Admin.tsx` + `Admin.css` — three-tab page (Members · Events · Analytics), Aurora Glass
+4. `Sidebar.tsx` update — “Organiser” section + Dashboard link, shown only to `owner`/`admin`
+5. `App.tsx` — add `/admin` route
+
+### Backlog additions from this session
+
+- GDPR consent page during onboarding (required before collecting age/gender)
+- Age + gender fields on `profiles` (post-GDPR consent flow)
+- Luma/Stripe ticketing integration (replaces manual `is_paying` flag)
+- Network graph visualisation (organiser dashboard, cherry, post-launch)
