@@ -165,6 +165,64 @@
   flex-shrink: 0;
 }
 
+/* ── Charts row ─────────────────────────────────────────────────────────────── */
+
+.ins-charts-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ── Doughnut legend ─────────────────────────────────────────────────────────── */
+
+.ins-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ins-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.ins-donut-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ins-donut-legend-label {
+  flex: 1;
+  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ins-donut-legend-val {
+  color: var(--ink-1);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.ins-donut-legend-pct {
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  font-size: 11px;
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
 /* ── People signals ──────────────────────────────────────────────────────────── */
 
 .ins-people-grid {

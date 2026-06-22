@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useSession } from '@clerk/clerk-react'
 import { getInitials } from '../supabase'
 import type { OrgMember, AdminEvent } from './Admin'
@@ -54,21 +54,7 @@ function copyMessage(item: AiItem, event: AdminEvent): void {
   navigator.clipboard.writeText(msg).catch(() => {})
 }
 
-// ── Stat card ─────────────────────────────────────────────────────────────────
-
-function StatCard({ label, value, sub, color }: {
-  label: string; value: string | number; sub?: string; color?: string
-}) {
-  return (
-    <div className="ins-stat-card">
-      <div className="ins-stat-label">{label}</div>
-      <div className="ins-stat-value" style={color ? { color } : {}}>{value}</div>
-      {sub && <div className="ins-stat-sub">{sub}</div>}
-    </div>
-  )
-}
-
-// ── Event performance bar chart (SVG) ─────────────────────────────────────────
+// ── Design tokens ─────────────────────────────────────────────────────────────
 
 const TYPE_COLORS: Record<string, string> = {
   Networking: '#7a4ed8',
@@ -83,120 +69,235 @@ function typeColor(t: string | null): string {
   return TYPE_COLORS[t || 'Other'] || '#8a94a8'
 }
 
-function EventChart({ events }: { events: AdminEvent[] }) {
-  const past = events
-    .filter(e => new Date(e.date) < new Date())
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(-12) // last 12 events
+// ── Stat card ─────────────────────────────────────────────────────────────────
 
-  if (past.length === 0) return (
-    <div className="ins-empty-sub">No past events to chart yet.</div>
-  )
-
-  // Always render at least 6 slots so a single bar doesn't fill the whole chart
-  const MIN_SLOTS = 6
-  const slots = Math.max(past.length, MIN_SLOTS)
-  const max = Math.max(...past.map(e => e.rsvp_count), 1)
-  const BAR_W = 36, GAP = 12, H = 100, PAD = 24
-
-  const totalW = slots * (BAR_W + GAP) - GAP + PAD * 2
-
+function StatCard({ label, value, sub, color }: {
+  label: string; value: string | number; sub?: string; color?: string
+}) {
   return (
-    <div className="ins-chart-wrap">
-      <svg
-        viewBox={`0 0 ${totalW} ${H + 40}`}
-        preserveAspectRatio="xMinYMid meet"
-        className="ins-chart-svg"
-      >
-        {past.map((e, i) => {
-          const barH = Math.max(4, Math.round((e.rsvp_count / max) * H))
-          const x = PAD + i * (BAR_W + GAP)
-          const y = H - barH
-          const color = typeColor(e.type)
-          const label = fmtDate(e.date)
-          return (
-            <g key={e.id}>
-              <rect x={x} y={y} width={BAR_W} height={barH} rx={6} fill={color} opacity={0.85} />
-              <text
-                x={x + BAR_W / 2} y={y - 5}
-                textAnchor="middle"
-                style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, fill: 'var(--ink-1)' }}
-              >
-                {e.rsvp_count}
-              </text>
-              <text
-                x={x + BAR_W / 2} y={H + 14}
-                textAnchor="middle"
-                style={{ fontFamily: 'var(--font-body)', fontSize: 9, fill: 'var(--ink-3)' }}
-              >
-                {label.split(' ')[0]}
-              </text>
-              <text
-                x={x + BAR_W / 2} y={H + 25}
-                textAnchor="middle"
-                style={{ fontFamily: 'var(--font-body)', fontSize: 9, fill: 'var(--ink-3)' }}
-              >
-                {label.split(' ')[1]}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-
-      {/* Legend */}
-      <div className="ins-chart-legend">
-        {Object.entries(TYPE_COLORS)
-          .filter(([t]) => past.some(e => (e.type || 'Other') === t))
-          .map(([t, c]) => (
-            <div key={t} className="ins-legend-item">
-              <span className="ins-legend-dot" style={{ background: c }} />
-              {t}
-            </div>
-          ))}
-      </div>
+    <div className="ins-stat-card">
+      <div className="ins-stat-label">{label}</div>
+      <div className="ins-stat-value" style={color ? { color } : {}}>{value}</div>
+      {sub && <div className="ins-stat-sub">{sub}</div>}
     </div>
   )
 }
 
-// ── What's working ────────────────────────────────────────────────────────────
+// ── Chart.js loader ───────────────────────────────────────────────────────────
+// Loads Chart.js from CDN once and resolves when ready.
 
-function EventTypeBreakdown({ events }: { events: AdminEvent[] }) {
-  const past = events.filter(e => new Date(e.date) < new Date())
-  if (past.length === 0) return null
+let chartJsPromise: Promise<void> | null = null
+function loadChartJs(): Promise<void> {
+  if (chartJsPromise) return chartJsPromise
+  chartJsPromise = new Promise((resolve, reject) => {
+    if ((window as any).Chart) { resolve(); return }
+    const s = document.createElement('script')
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
+    s.onload = () => resolve()
+    s.onerror = () => reject(new Error('Chart.js failed to load'))
+    document.head.appendChild(s)
+  })
+  return chartJsPromise
+}
 
-  const byType = new Map<string, { count: number; totalRsvps: number }>()
-  for (const e of past) {
-    const t = e.type || 'Other'
-    const cur = byType.get(t) || { count: 0, totalRsvps: 0 }
-    cur.count++
-    cur.totalRsvps += e.rsvp_count
-    byType.set(t, cur)
-  }
+// ── Doughnut chart ────────────────────────────────────────────────────────────
 
-  const sorted = Array.from(byType.entries())
-    .map(([type, { count, totalRsvps }]) => ({ type, count, avg: Math.round(totalRsvps / count) }))
-    .sort((a, b) => b.avg - a.avg)
+function DoughnutChart({ title, sub, labels, values, colors, emptyMsg, formatValue }: {
+  title: string
+  sub: string
+  labels: string[]
+  values: number[]
+  colors: string[]
+  emptyMsg: string
+  formatValue: (v: number) => string
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const chartRef  = useRef<any>(null)
+  const [ready, setReady] = useState(false)
 
-  const maxAvg = Math.max(...sorted.map(s => s.avg), 1)
+  useEffect(() => {
+    loadChartJs().then(() => setReady(true)).catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !canvasRef.current || values.length === 0) return
+    const Chart = (window as any).Chart
+
+    if (chartRef.current) {
+      chartRef.current.destroy()
+      chartRef.current = null
+    }
+
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors.map(c => c + 'cc'),
+          borderColor: colors,
+          borderWidth: 1.5,
+          hoverOffset: 6,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx: any) => ` ${ctx.label}: ${formatValue(ctx.raw)}`,
+            },
+          },
+        },
+      },
+    })
+
+    return () => {
+      chartRef.current?.destroy()
+      chartRef.current = null
+    }
+  }, [ready, labels.join(), values.join(), colors.join()])
+
+  const total = values.reduce((a, b) => a + b, 0)
 
   return (
-    <div className="ins-type-breakdown">
-      {sorted.map(({ type, count, avg }) => (
-        <div key={type} className="ins-type-row">
-          <div className="ins-type-meta">
-            <span className="ins-type-dot" style={{ background: typeColor(type) }} />
-            <span className="ins-type-name">{type}</span>
-            <span className="ins-type-count">{count} event{count !== 1 ? 's' : ''}</span>
+    <div className="ins-section-card">
+      <div className="ins-section-title">{title}</div>
+      <div className="ins-section-sub" style={{ marginBottom: 16 }}>{sub}</div>
+
+      {values.length === 0 ? (
+        <div className="ins-empty-sub">{emptyMsg}</div>
+      ) : (
+        <>
+          <div style={{ position: 'relative', height: 180 }}>
+            <canvas ref={canvasRef} />
           </div>
-          <div className="ins-type-track">
-            <div
-              className="ins-type-fill"
-              style={{ width: `${(avg / maxAvg) * 100}%`, background: typeColor(type) }}
-            />
+
+          <div className="ins-donut-legend">
+            {labels.map((lbl, i) => (
+              <div key={lbl} className="ins-donut-legend-row">
+                <span className="ins-donut-legend-dot" style={{ background: colors[i] }} />
+                <span className="ins-donut-legend-label">{lbl}</span>
+                <span className="ins-donut-legend-val">{formatValue(values[i])}</span>
+                <span className="ins-donut-legend-pct">
+                  {total > 0 ? Math.round((values[i] / total) * 100) : 0}%
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="ins-type-avg" style={{ color: typeColor(type) }}>{avg} avg RSVPs</div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Members over time line chart ──────────────────────────────────────────────
+
+function MembersLineChart({ members }: { members: OrgMember[] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const chartRef  = useRef<any>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    loadChartJs().then(() => setReady(true)).catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !canvasRef.current) return
+    const Chart = (window as any).Chart
+
+    const real = members
+      .filter(m => !m.clerk_user_id.startsWith('mock_') && m.joined_at)
+      .sort((a, b) => new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime())
+
+    if (real.length === 0) return
+
+    // Build cumulative series — one point per member join date
+    const points: { x: string; y: number }[] = []
+    real.forEach((m, i) => {
+      points.push({ x: fmtDate(m.joined_at), y: i + 1 })
+    })
+
+    if (chartRef.current) {
+      chartRef.current.destroy()
+      chartRef.current = null
+    }
+
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'line',
+      data: {
+        labels: points.map(p => p.x),
+        datasets: [{
+          label: 'Members',
+          data: points.map(p => p.y),
+          borderColor: '#7a4ed8',
+          backgroundColor: 'rgba(122,78,216,0.08)',
+          borderWidth: 2,
+          pointRadius: real.length <= 20 ? 4 : 2,
+          pointBackgroundColor: '#7a4ed8',
+          fill: true,
+          tension: 0.3,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: (items: any[]) => items[0].label,
+              label: (ctx: any) => ` ${ctx.raw} members`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { size: 11 },
+              color: '#818aa6',
+              maxTicksLimit: 8,
+              maxRotation: 0,
+            },
+          },
+          y: {
+            grid: { color: 'rgba(12,19,48,0.06)' },
+            ticks: {
+              font: { size: 11 },
+              color: '#818aa6',
+              stepSize: 1,
+              precision: 0,
+            },
+            min: 0,
+          },
+        },
+      },
+    })
+
+    return () => {
+      chartRef.current?.destroy()
+      chartRef.current = null
+    }
+  }, [ready, members.length])
+
+  const real = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
+
+  return (
+    <div className="ins-section-card">
+      <div className="ins-section-title">Members over time</div>
+      <div className="ins-section-sub" style={{ marginBottom: 16 }}>Cumulative growth since first member</div>
+
+      {real.length === 0 ? (
+        <div className="ins-empty-sub">No members yet.</div>
+      ) : (
+        <div style={{ position: 'relative', height: 200 }}>
+          <canvas ref={canvasRef} />
         </div>
-      ))}
+      )}
     </div>
   )
 }
@@ -217,17 +318,10 @@ function PeopleSignals({ members, pastEventCount, events }: {
 }) {
   const real = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
 
-  // Regulars — top 5 by engagement score, attended 3+
   const regulars = [...real]
     .filter(m => m.events_attended >= 3)
     .sort((a, b) => memberEngScore(b, pastEventCount) - memberEngScore(a, pastEventCount))
     .slice(0, 5)
-
-  // Fading — attended at least once, last seen 30+ days ago, not attended in last 3 events
-  const pastEventsSorted = events
-    .filter(e => new Date(e.date) < new Date())
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  const recentEventIds = new Set(pastEventsSorted.slice(0, 3).map(e => e.id))
 
   const fading = real
     .filter(m => {
@@ -244,7 +338,6 @@ function PeopleSignals({ members, pastEventCount, events }: {
     })
     .slice(0, 5)
 
-  // Never attended — joined but 0 events
   const neverAttended = real
     .filter(m => m.events_attended === 0)
     .sort((a, b) => new Date(b.joined_at).getTime() - new Date(a.joined_at).getTime())
@@ -529,21 +622,78 @@ export default function Recommendations({
 }) {
   const { session } = useSession()
 
+  const real = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
+  const past = events.filter(e => new Date(e.date) < new Date())
+
+  const avgRsvps = past.length > 0
+    ? Math.round(past.reduce((s, e) => s + e.rsvp_count, 0) / past.length)
+    : 0
+
+  const connectionRate = real.length > 0
+    ? Math.round((real.filter(m => m.connections_made > 0).length / real.length) * 100)
+    : 0
+
+  const repeatRate = real.length > 0
+    ? Math.round((real.filter(m => m.events_attended > 1).length / real.length) * 100)
+    : 0
+
+  // ── RSVP pie data — total RSVPs per event type ────────────────────────────
+  const rsvpByType = new Map<string, number>()
+  for (const e of past) {
+    const t = e.type || 'Other'
+    rsvpByType.set(t, (rsvpByType.get(t) || 0) + e.rsvp_count)
+  }
+  const rsvpSorted = Array.from(rsvpByType.entries()).sort((a, b) => b[1] - a[1])
+  const rsvpLabels = rsvpSorted.map(([t]) => t)
+  const rsvpValues = rsvpSorted.map(([, v]) => v)
+  const rsvpColors = rsvpLabels.map(t => typeColor(t))
+
+  // ── Revenue pie data — estimated revenue per event type ───────────────────
+  const revenueByType = new Map<string, number>()
+  for (const e of past) {
+    if (e.is_free || !e.ticket_price) continue
+    const t = e.type || 'Other'
+    const est = e.rsvp_count * Number(e.ticket_price)
+    revenueByType.set(t, (revenueByType.get(t) || 0) + est)
+  }
+  const revSorted = Array.from(revenueByType.entries()).sort((a, b) => b[1] - a[1])
+  const revLabels = revSorted.map(([t]) => t)
+  const revValues = revSorted.map(([, v]) => v)
+  const revColors = revLabels.map(t => typeColor(t))
+
   return (
     <div className="ins-page">
 
-      {/* ── 2. Event performance ── */}
-      <div className="ins-section-card">
-        <div className="ins-section-head">
-          <div>
-            <div className="ins-section-title">Event performance</div>
-            <div className="ins-section-sub">RSVPs per event — last 12</div>
-          </div>
-        </div>
-        <EventChart events={events} />
-        <div className="ins-section-divider" />
-        <div className="ins-type-head">By event type</div>
-        <EventTypeBreakdown events={events} />
+      {/* ── 1. Stats row ── */}
+      <div className="ins-stats-row">
+        <StatCard label="Members" value={stats.totalMembers} sub="in your community" />
+        <StatCard label="Events hosted" value={stats.pastEvents} sub="total past events" />
+        <StatCard label="Avg RSVPs / event" value={avgRsvps} sub="across past events" color="var(--mk-violet)" />
+        <StatCard label="Connection rate" value={`${connectionRate}%`} sub="members with 1+ connection" color="var(--mk-blue)" />
+        <StatCard label="Repeat attendance" value={`${repeatRate}%`} sub="attended more than once" color="var(--ok)" />
+      </div>
+
+      {/* ── 2. Charts row ── */}
+      <div className="ins-charts-row">
+        <DoughnutChart
+          title="RSVPs by niche"
+          sub="Total RSVPs per event type"
+          labels={rsvpLabels}
+          values={rsvpValues}
+          colors={rsvpColors}
+          emptyMsg="No past events with RSVPs yet."
+          formatValue={v => `${v} RSVPs`}
+        />
+        <DoughnutChart
+          title="Est. revenue by niche"
+          sub="Ticket price × RSVPs per type · estimated"
+          labels={revLabels}
+          values={revValues}
+          colors={revColors}
+          emptyMsg="No paid past events yet."
+          formatValue={v => `€${Math.round(v).toLocaleString()}`}
+        />
+        <MembersLineChart members={members} />
       </div>
 
       {/* ── 3. People signals ── */}
