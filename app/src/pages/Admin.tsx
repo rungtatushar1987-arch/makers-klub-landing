@@ -667,134 +667,80 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
     setSaving(false)
   }
 
-  const readOnly = !isEditing
   const isPast = event ? new Date(event.date) < new Date() : false
 
-  function inputCls(hasError?: boolean) {
-    return ['adm-modal-input', readOnly ? 'readonly' : '', hasError ? 'error' : ''].filter(Boolean).join(' ')
-  }
+  // ── View mode — matches Events page EventModal ──────────────────────────────
+  if (!isNew && !isEditing) {
+    const dateStr = new Date(event!.date).toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    const time    = new Date(event!.date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })
+    const endTime = event!.end_date ? new Date(event!.end_date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false }) : null
 
-  return (
-    <>
-      <div className="adm-modal-backdrop" onClick={onClose} />
-      <div className="adm-modal">
-        <button className="adm-modal-close" onClick={onClose}>×</button>
+    return (
+      <>
+        <div className="adm-modal-backdrop" onClick={onClose} />
+        <div className="adm-modal adm-modal--view">
+          <button className="adm-modal-close" onClick={onClose}>×</button>
 
-        <div className="adm-modal-header">
-          <h2 className="adm-modal-title">
-            {isNew ? 'New event' : isEditing ? 'Edit event' : form.title}
-          </h2>
-          {!isNew && !isEditing && (
-            <span className={`adm-modal-status ${isPast ? 'past' : 'upcoming'}`}>
-              {isPast ? 'Past' : 'Upcoming'}
-            </span>
+          {/* Type badge + status */}
+          {(event!.type || !isPast) && (
+            <div className="adm-view-badges">
+              {event!.type && <span className="adm-view-type-badge">{event!.type}</span>}
+              <span className={`adm-modal-status ${isPast ? 'past' : 'upcoming'}`}>
+                {isPast ? 'Past' : 'Upcoming'}
+              </span>
+            </div>
           )}
-        </div>
 
-        <form className="adm-modal-form" onSubmit={handleSave}>
-          <div>
-            <label className="adm-modal-label">Title {isEditing && '*'}</label>
-            <input
-              className={inputCls(!!errors.title)}
-              value={form.title}
-              onChange={e => setField('title', e.target.value)}
-              placeholder="e.g. Makers Drinks #12"
-              readOnly={readOnly}
-            />
-            {errors.title && <div className="adm-modal-error">{errors.title}</div>}
-          </div>
+          {/* Title */}
+          <h2 className="adm-view-title">{event!.title}</h2>
 
-          <div className="adm-modal-grid-2">
-            <div>
-              <label className="adm-modal-label">Start {isEditing && '*'}</label>
-              <input
-                type="datetime-local"
-                className={inputCls(!!errors.date)}
-                value={form.date}
-                onChange={e => setField('date', e.target.value)}
-                readOnly={readOnly}
-              />
-              {errors.date && <div className="adm-modal-error">{errors.date}</div>}
+          {/* Date / location icon rows */}
+          <div className="adm-view-meta">
+            <div className="adm-view-meta-row">
+              <div className="adm-view-icon adm-view-icon--navy">📅</div>
+              <div>
+                <div className="adm-view-meta-primary">{dateStr}</div>
+                <div className="adm-view-meta-secondary">{time}{endTime ? ` – ${endTime}` : ''}</div>
+              </div>
             </div>
-            <div>
-              <label className="adm-modal-label">End</label>
-              <input
-                type="datetime-local"
-                className={inputCls()}
-                value={form.end_date}
-                onChange={e => setField('end_date', e.target.value)}
-                readOnly={readOnly}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="adm-modal-label">Type</label>
-            {readOnly
-              ? <div className="adm-modal-type-val">{form.type || '—'}</div>
-              : <select className={inputCls()} value={form.type} onChange={e => setField('type', e.target.value)}>
-                  {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-            }
-          </div>
-
-          <div className="adm-modal-grid-2">
-            <div>
-              <label className="adm-modal-label">Venue</label>
-              <input
-                className={inputCls()}
-                value={form.location}
-                onChange={e => setField('location', e.target.value)}
-                placeholder="e.g. Factory Berlin"
-                readOnly={readOnly}
-              />
-            </div>
-            <div>
-              <label className="adm-modal-label">Address</label>
-              <input
-                className={inputCls()}
-                value={form.address}
-                onChange={e => setField('address', e.target.value)}
-                placeholder="e.g. Rheinsberger Str. 76"
-                readOnly={readOnly}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="adm-modal-label">Description</label>
-            <textarea
-              className={`${inputCls()} adm-modal-textarea`}
-              value={form.description}
-              onChange={e => setField('description', e.target.value)}
-              placeholder={isEditing ? "What's this event about?" : ''}
-              readOnly={readOnly}
-              style={{ resize: isEditing ? 'vertical' : 'none' }}
-            />
-          </div>
-
-          <div>
-            <label className="adm-modal-label">Luma URL</label>
-            {readOnly
-              ? <div className="adm-modal-luma-link">
-                  {form.luma_url
-                    ? <a href={form.luma_url} target="_blank" rel="noreferrer">{form.luma_url}</a>
-                    : '—'}
+            {event!.location && (
+              <div className="adm-view-meta-row">
+                <div className="adm-view-icon adm-view-icon--violet">📍</div>
+                <div>
+                  <div className="adm-view-meta-primary">{event!.location}</div>
+                  {event!.address && <div className="adm-view-meta-secondary">{event!.address}</div>}
                 </div>
-              : <input
-                  className={inputCls()}
-                  value={form.luma_url}
-                  onChange={e => setField('luma_url', e.target.value)}
-                  placeholder="https://lu.ma/…"
-                />
-            }
+              </div>
+            )}
+            {event!.rsvp_count > 0 && (
+              <div className="adm-view-meta-row">
+                <div className="adm-view-icon adm-view-icon--green">👥</div>
+                <div>
+                  <div className="adm-view-meta-primary">{event!.rsvp_count} RSVPs</div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Footer */}
-          <div className="adm-modal-footer">
-            {/* Left: Remove */}
+          {/* Description */}
+          {event!.description && (
+            <div className="adm-view-desc-wrap">
+              <div className="adm-view-desc-label">About this event</div>
+              <p className="adm-view-desc">{event!.description}</p>
+            </div>
+          )}
+
+          {/* Luma link */}
+          {event!.luma_url && (
+            <a href={event!.luma_url} target="_blank" rel="noreferrer" className="adm-view-luma-btn">
+              View on Luma →
+            </a>
+          )}
+
+          {/* Footer actions */}
+          <div className="adm-modal-footer adm-modal-footer--view">
             <div>
-              {!isNew && onDelete && !isEditing && (
+              {onDelete && (
                 confirmDelete ? (
                   <div className="adm-modal-confirm">
                     <span className="adm-modal-confirm-text">Delete this event?</span>
@@ -826,28 +772,129 @@ function EventFormModal({ event, deleting, onSave, onDelete, onClose }: {
                 )
               )}
             </div>
-
-            {/* Right: Edit / Cancel + Save */}
             <div className="adm-modal-actions">
-              {isEditing ? (
-                <>
-                  <button type="button" className="adm-btn adm-btn-md adm-btn-ghost" onClick={cancelEdit}>
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="adm-btn adm-btn-lg adm-btn-navy"
-                    disabled={saving}
-                    style={{ opacity: saving ? 0.6 : 1, cursor: saving ? 'default' : 'pointer' }}
-                  >
-                    {saving ? 'Saving…' : isNew ? 'Create event' : 'Save'}
-                  </button>
-                </>
-              ) : (
-                <button type="button" className="adm-btn adm-btn-lg adm-btn-navy" onClick={() => setIsEditing(true)}>
-                  Edit
-                </button>
-              )}
+              <button type="button" className="adm-btn adm-btn-lg adm-btn-navy" onClick={() => setIsEditing(true)}>
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // ── Edit / create form ──────────────────────────────────────────────────────
+
+  function inputCls(hasError?: boolean) {
+    return ['adm-modal-input', hasError ? 'error' : ''].filter(Boolean).join(' ')
+  }
+
+  return (
+    <>
+      <div className="adm-modal-backdrop" onClick={onClose} />
+      <div className="adm-modal">
+        <button className="adm-modal-close" onClick={onClose}>×</button>
+
+        <div className="adm-modal-header">
+          <h2 className="adm-modal-title">{isNew ? 'New event' : 'Edit event'}</h2>
+        </div>
+
+        <form className="adm-modal-form" onSubmit={handleSave}>
+          <div>
+            <label className="adm-modal-label">Title *</label>
+            <input
+              className={inputCls(!!errors.title)}
+              value={form.title}
+              onChange={e => setField('title', e.target.value)}
+              placeholder="e.g. Makers Drinks #12"
+            />
+            {errors.title && <div className="adm-modal-error">{errors.title}</div>}
+          </div>
+
+          <div className="adm-modal-grid-2">
+            <div>
+              <label className="adm-modal-label">Start *</label>
+              <input
+                type="datetime-local"
+                className={inputCls(!!errors.date)}
+                value={form.date}
+                onChange={e => setField('date', e.target.value)}
+              />
+              {errors.date && <div className="adm-modal-error">{errors.date}</div>}
+            </div>
+            <div>
+              <label className="adm-modal-label">End</label>
+              <input
+                type="datetime-local"
+                className={inputCls()}
+                value={form.end_date}
+                onChange={e => setField('end_date', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="adm-modal-label">Type</label>
+            <select className={inputCls()} value={form.type} onChange={e => setField('type', e.target.value)}>
+              {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <div className="adm-modal-grid-2">
+            <div>
+              <label className="adm-modal-label">Venue</label>
+              <input
+                className={inputCls()}
+                value={form.location}
+                onChange={e => setField('location', e.target.value)}
+                placeholder="e.g. Factory Berlin"
+              />
+            </div>
+            <div>
+              <label className="adm-modal-label">Address</label>
+              <input
+                className={inputCls()}
+                value={form.address}
+                onChange={e => setField('address', e.target.value)}
+                placeholder="e.g. Rheinsberger Str. 76"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="adm-modal-label">Description</label>
+            <textarea
+              className={`${inputCls()} adm-modal-textarea`}
+              value={form.description}
+              onChange={e => setField('description', e.target.value)}
+              placeholder="What's this event about?"
+            />
+          </div>
+
+          <div>
+            <label className="adm-modal-label">Luma URL</label>
+            <input
+              className={inputCls()}
+              value={form.luma_url}
+              onChange={e => setField('luma_url', e.target.value)}
+              placeholder="https://lu.ma/…"
+            />
+          </div>
+
+          <div className="adm-modal-footer">
+            <div />
+            <div className="adm-modal-actions">
+              <button type="button" className="adm-btn adm-btn-md adm-btn-ghost" onClick={cancelEdit}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="adm-btn adm-btn-lg adm-btn-navy"
+                disabled={saving}
+                style={{ opacity: saving ? 0.6 : 1, cursor: saving ? 'default' : 'pointer' }}
+              >
+                {saving ? 'Saving…' : isNew ? 'Create event' : 'Save'}
+              </button>
             </div>
           </div>
         </form>

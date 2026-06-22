@@ -327,6 +327,119 @@
 .adm-atrisk-desc     { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; font-family: var(--font-body); }
 .adm-atrisk-lastseen { font-size: 11px; color: var(--danger); flex-shrink: 0; font-family: var(--font-body); }
 
+/* ── Event detail view (matches Events page EventModal) ────────────────────── */
+
+.adm-modal--view { width: min(520px, calc(100vw - 48px)); }
+
+.adm-view-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.adm-view-type-badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(122,78,216,0.12);
+  color: var(--mk-violet);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.adm-view-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  color: var(--ink-1);
+  margin: 0 0 20px;
+}
+
+.adm-view-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.adm-view-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-view-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.adm-view-icon--navy   { background: var(--mk-navy); }
+.adm-view-icon--violet { background: rgba(122,78,216,0.12); }
+.adm-view-icon--green  { background: rgba(52,210,123,0.12); }
+
+.adm-view-meta-primary {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-1);
+}
+
+.adm-view-meta-secondary {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}
+
+.adm-view-desc-wrap { margin-bottom: 28px; }
+
+.adm-view-desc-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+}
+
+.adm-view-desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.7;
+  font-family: var(--font-body);
+  margin: 0;
+}
+
+.adm-view-luma-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: var(--mk-navy);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  transition: opacity 0.15s;
+}
+.adm-view-luma-btn:hover { opacity: 0.85; }
+
+.adm-modal-footer--view { margin-top: 0; }
+
 /* ── Event form modal ───────────────────────────────────────────────────────── */
 
 .adm-modal-backdrop {
