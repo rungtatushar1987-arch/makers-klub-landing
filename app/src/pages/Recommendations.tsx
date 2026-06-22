@@ -529,32 +529,8 @@ export default function Recommendations({
 }) {
   const { session } = useSession()
 
-  const real = members.filter(m => !m.clerk_user_id.startsWith('mock_'))
-  const past = events.filter(e => new Date(e.date) < new Date())
-
-  const avgRsvps = past.length > 0
-    ? Math.round(past.reduce((s, e) => s + e.rsvp_count, 0) / past.length)
-    : 0
-
-  const connectionRate = real.length > 0
-    ? Math.round((real.filter(m => m.connections_made > 0).length / real.length) * 100)
-    : 0
-
-  const repeatRate = real.length > 0
-    ? Math.round((real.filter(m => m.events_attended > 1).length / real.length) * 100)
-    : 0
-
   return (
     <div className="ins-page">
-
-      {/* ── 1. Stats row ── */}
-      <div className="ins-stats-row">
-        <StatCard label="Members" value={stats.totalMembers} sub="in your community" />
-        <StatCard label="Events hosted" value={stats.pastEvents} sub="total past events" />
-        <StatCard label="Avg RSVPs / event" value={avgRsvps} sub="across past events" color="var(--mk-violet)" />
-        <StatCard label="Connection rate" value={`${connectionRate}%`} sub="members with 1+ connection" color="var(--mk-blue)" />
-        <StatCard label="Repeat attendance" value={`${repeatRate}%`} sub="attended more than once" color="var(--ok)" />
-      </div>
 
       {/* ── 2. Event performance ── */}
       <div className="ins-section-card">
