@@ -93,16 +93,19 @@ function EventChart({ events }: { events: AdminEvent[] }) {
     <div className="ins-empty-sub">No past events to chart yet.</div>
   )
 
+  // Always render at least 6 slots so a single bar doesn't fill the whole chart
+  const MIN_SLOTS = 6
+  const slots = Math.max(past.length, MIN_SLOTS)
   const max = Math.max(...past.map(e => e.rsvp_count), 1)
   const BAR_W = 36, GAP = 12, H = 100, PAD = 24
 
-  const totalW = past.length * (BAR_W + GAP) - GAP + PAD * 2
+  const totalW = slots * (BAR_W + GAP) - GAP + PAD * 2
 
   return (
     <div className="ins-chart-wrap">
       <svg
         viewBox={`0 0 ${totalW} ${H + 40}`}
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMinYMid meet"
         className="ins-chart-svg"
       >
         {past.map((e, i) => {

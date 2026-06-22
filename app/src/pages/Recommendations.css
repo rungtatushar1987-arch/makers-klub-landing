@@ -105,6 +105,7 @@
   display: block;
   width: 100%;
   min-width: 320px;
+  max-height: 180px;
   height: auto;
 }
 
