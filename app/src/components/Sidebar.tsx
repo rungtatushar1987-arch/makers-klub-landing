@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useUser, useSession, useClerk } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 import { getInitials, getSupabaseClient } from '../supabase'
@@ -13,6 +13,11 @@ export default function Sidebar() {
   const navigate = useNavigate()
   const { isOnboarding } = useKlub()
   const [isAdmin, setIsAdmin] = useState(false)
+
+  const location = useLocation()
+  const [adminSearchParams] = useSearchParams()
+  const onAdmin = location.pathname === '/admin'
+  const activeTab = onAdmin ? (adminSearchParams.get('tab') || 'members') : null
 
   const initials = getInitials(user?.fullName || user?.firstName || '')
 
@@ -64,8 +69,23 @@ export default function Sidebar() {
         {isAdmin && (
           <>
             <div className="mkw-nav-label" style={{ marginTop: 14 }}>Organiser</div>
-            <NavLink to="/admin" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
-              <span className="nav-ic">⊞</span> Dashboard
+            <NavLink
+              to="/admin?tab=members"
+              className={`mkw-nav-item${onAdmin && activeTab === 'members' ? ' active' : ''}`}
+            >
+              <span className="nav-ic">👥</span> Members
+            </NavLink>
+            <NavLink
+              to="/admin?tab=events"
+              className={`mkw-nav-item${onAdmin && activeTab === 'events' ? ' active' : ''}`}
+            >
+              <span className="nav-ic">▦</span> Events
+            </NavLink>
+            <NavLink
+              to="/admin?tab=analytics"
+              className={`mkw-nav-item${onAdmin && activeTab === 'analytics' ? ' active' : ''}`}
+            >
+              <span className="nav-ic">◈</span> Analytics
             </NavLink>
           </>
         )}

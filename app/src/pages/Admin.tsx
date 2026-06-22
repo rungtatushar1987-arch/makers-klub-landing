@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getSupabaseClient, getInitials, type Profile, type Event } from '../supabase'
 import './Admin.css'
 
@@ -25,6 +25,7 @@ type AdminEvent = Event & {
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
 type Tab = 'members' | 'events' | 'analytics'
+const VALID_TABS: Tab[] = ['members', 'events', 'analytics']
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -91,8 +92,11 @@ export default function Admin() {
   const { session } = useSession()
   const navigate = useNavigate()
 
+  const [searchParams, setSearchParams] = useSearchParams()
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
-  const [tab, setTab] = useState<Tab>('members')
+  const rawTab = searchParams.get('tab') as Tab | null
+  const tab: Tab = rawTab && VALID_TABS.includes(rawTab) ? rawTab : 'members'
+  const setTab = (t: Tab) => setSearchParams({ tab: t }, { replace: true })
   const [search, setSearch] = useState('')
 
   // Members tab
@@ -376,24 +380,6 @@ export default function Admin() {
           ))}
         </div>
 
-        {/* Tab bar */}
-        <div className="adm-tabs">
-          {(['members', 'events', 'analytics'] as Tab[]).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`adm-tab${tab === t ? ' active' : ''}`}
-            >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
-            </button>
-          ))}
-          {tab === 'events' && (
-            <button className="adm-add-btn" onClick={() => setEventFormOpen(true)}>
-              + Add event
-            </button>
-          )}
-        </div>
-
         {/* ══ MEMBERS ══ */}
         {tab === 'members' && (
           <>
@@ -427,6 +413,11 @@ export default function Admin() {
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
           <>
+            <div className="adm-events-header">
+              <button className="adm-add-btn" onClick={() => setEventFormOpen(true)}>
+                + Add event
+              </button>
+            </div>
             {/* Sub-tabs */}
             <div className="adm-sub-tabs">
               {(['upcoming', 'past'] as const).map(t => {
