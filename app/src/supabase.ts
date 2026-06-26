@@ -15,6 +15,11 @@ export function getSupabaseClient(token: string | null | undefined) {
     global: {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
+    auth: {
+      persistSession: false,
+      detectSessionInUrl: false,
+      autoRefreshToken: false,
+    },
   })
 }
 
