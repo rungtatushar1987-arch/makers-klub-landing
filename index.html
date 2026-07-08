@@ -567,12 +567,16 @@
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  function setAud(aud, scrollToTop) {
+  function setAud(aud, scrollToTop, syncUrl) {
     if (!['professionals','mk-community'].includes(aud)) aud = 'professionals';
     document.body.dataset.aud = aud;
     try { localStorage.setItem(AUD_KEY, aud); } catch (_) {}
     document.querySelectorAll('.nav-link[data-aud]').forEach(b =>
       b.classList.toggle('active', b.dataset.aud === aud));
+    if (syncUrl) {
+      const path = aud === 'mk-community' ? '/community' : '/';
+      if (location.pathname !== path) history.pushState({ aud }, '', path);
+    }
     requestAnimationFrame(() => {
       document.querySelectorAll('.aud[data-aud="' + aud + '"] .reveal').forEach(el => {
         const r = el.getBoundingClientRect();
@@ -583,21 +587,30 @@
   }
 
   document.querySelectorAll('.nav-link[data-aud]').forEach(btn => {
-    btn.addEventListener('click', () => setAud(btn.dataset.aud));
+    btn.addEventListener('click', () => setAud(btn.dataset.aud, false, true));
   });
 
   document.querySelectorAll('[data-go]').forEach(el => {
     el.addEventListener('click', e => {
       e.preventDefault();
-      setAud(el.dataset.go, true);
+      setAud(el.dataset.go, true, true);
     });
   });
 
+  window.addEventListener('popstate', () => {
+    const onCommunity = location.pathname.replace(/\/+$/, '') === '/community';
+    setAud(onCommunity ? 'mk-community' : 'professionals');
+  });
+
   let savedAud = 'professionals';
-  try {
-    const s = localStorage.getItem(AUD_KEY);
-    if (s === 'mk-community') savedAud = 'mk-community';
-  } catch (_) {}
+  if (location.pathname.replace(/\/+$/, '') === '/community') {
+    savedAud = 'mk-community';
+  } else {
+    try {
+      const s = localStorage.getItem(AUD_KEY);
+      if (s === 'mk-community') savedAud = 'mk-community';
+    } catch (_) {}
+  }
   setAud(savedAud);
 
   // Carousel
