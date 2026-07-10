@@ -30,7 +30,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
-        app: './app/index.html'
+        app: './app/index.html',
+        impressum: './impressum.html',
+        datenschutz: './datenschutz.html'
       }
     }
   },
