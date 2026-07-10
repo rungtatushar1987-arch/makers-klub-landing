@@ -19,3 +19,10 @@ BUILD_LOG.md
 *.jpg
 .DS_Store
 design_handoff_aurora_glass_app/package-lock.json
+
+# Claude Code local config
+.claude/settings.local.json
+
+# Installed skills (reproducible via skills-lock.json)
+.agents/
+.claude/

@@ -1632,6 +1632,21 @@ footer {
   color: var(--fg-muted);
 }
 
+.foot-bottom-links {
+  display: flex;
+  gap: 20px;
+}
+
+.foot-bottom-links a {
+  color: var(--fg-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.foot-bottom-links a:hover {
+  color: var(--navy);
+}
+
 /* ── RESPONSIVE (index) ── */
 @media (max-width: 960px) {
   nav { padding: 0 24px; }

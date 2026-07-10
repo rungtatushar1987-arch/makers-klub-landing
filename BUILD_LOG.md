@@ -1089,3 +1089,189 @@ Moved the Members / Events / Analytics navigation from in-page pill buttons to t
 4. **Real member onboarding** — first non-test members
 5. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table
 
+---
+
+## Marketing site (makersklub.com) — footer legal links restored
+
+*10 July 2026*
+
+- ✅ `impressum.html` and `datenschutz.html` were already present on disk (built earlier, per § 5 TMG / DSGVO) but their footer links were dropped during the July 8 site redesign (communities/professionals/community-tab rework of `index.html`) — an oversight, not intentional.
+- ✅ Re-added `Impressum` and `Datenschutz` links to `.foot-bottom` in `index.html`, styled via new `.foot-bottom-links` rules in `styles.css`.
+- ⚠️ Not yet pushed — Tushar to `git add`, `commit`, `push` to deploy.
+- ⚠️ `community.html` (standalone file from 14 June) appears superseded by the in-page `mk-community` tab added in the July 8 redesign — not touched, flagged for cleanup/removal decision.
+- ✅ Updated Impressum heading from "§ 5 TMG" to "§ 5 DDG" (TMG's Impressum provision was repealed May 2024, folded into the Digitale-Dienste-Gesetz).
+- ✅ Added Umsatzsteuer-ID (DE360635616) to `impressum.html`, per § 27a UStG, under Kontakt.
+
+---
+
+## Session — 23 June 2026
+
+### Engagement scoring refactor — event-count based recency decay
+
+**Problem identified:** a member whose last RSVP was a year ago was scoring 68/100. Root cause: the engagement score formula used raw attendance rate (events attended ÷ total past events) with no time component. Someone historically active but long gone looked identical to someone active last month.
+
+**First attempt (day-based decay) — discarded:** replaced the flat attendance rate with a day-based recency multiplier: full weight within 90 days, linear decay to 0 at 365 days. Tushar rejected this because the metric is more meaningful as events-missed, not days-since — at 4 events/month, a day-count window is a poor proxy.
+
+**Final approach (event-count based decay):**
+- Base: attendance rate calculated only over events the member was eligible for (events on or after their `joined_at` date) — prevents penalising members for events before they joined
+- Recency multiplier: derived from `eventsMissed = (total past events − 1) − lastAttendedIndex`. Grace of 3 missed events (≈ 1 week at current cadence), zero at 12 missed (≈ 3 months). Linear between.
+- Connection score unchanged — connections are a permanent structural signal, not recency-dependent
+- Formula: `score = round(attPct × recencyMultiplier × 0.6 + connScore × 0.4)`
+
+**Schema change:** `created_at` added to the `org_members` select query in the Edge Function to supply join date per member. `events_eligible` added to member snapshot payload so the AI has the correct denominator context.
+
+**Files changed:** `supabase/functions/generate-recommendations/index.ts`
+
+---
+
+### Type cleanup — remove duplicate InsightsMember / InsightsEvent
+
+**Problem:** `Recommendations.tsx` defined its own `InsightsMember` and `InsightsEvent` types that duplicated the shapes of `OrgMember` and `AdminEvent` in `Admin.tsx`. The component was called with `members={members as any}` to paper over the mismatch — an `as any` cast, explicitly unacceptable.
+
+**Fix:**
+- Exported `OrgMember` and `AdminEvent` from `Admin.tsx` (changed `type` → `export type`)
+- `Recommendations.tsx` imports both via `import type { OrgMember, AdminEvent } from './Admin'`
+- All `InsightsMember` and `InsightsEvent` references replaced throughout — component props, function signatures, helper functions, `copyMessage`, `AiRec.event`
+- `as any` cast in `Admin.tsx` render call removed
+- Verified with grep: zero remaining `InsightsMember`, `InsightsEvent`, or `as any` in either file
+
+**Files changed:** `app/src/pages/Admin.tsx`, `app/src/pages/Recommendations.tsx`
+
+---
+
+### Insights tab — full redesign
+
+**Problem:** the previous Insights tab was structured as one card per upcoming event (AI-first). No aggregate stats, no visualisations, no people signals. Didn't make sense as a dashboard section.
+
+**New layout — four sections in order:**
+
+**1. Stats row** — five metric cards: Members, Events hosted, Avg RSVPs/event (violet), Connection rate (blue), Repeat attendance (green). All computed client-side from data already loaded in Admin.tsx. No extra fetch.
+
+**2. Charts row (three side-by-side cards):**
+- **RSVPs by niche** — doughnut chart, total RSVPs per event type. Shows popularity of each event niche.
+- **Estimated revenue by niche** — doughnut chart, `rsvp_count × ticket_price` per paid event type. Free events excluded. Labelled "estimated" in the subtitle; will be replaced with real Luma payment data when imported.
+- **Members over time** — line chart, one point per member join date, y-axis is cumulative count, `tension: 0.3` smooth curve.
+
+**3. People signals** — three-column grid: Regulars (3+ events, sorted by engagement score), Going quiet (attended before, 30+ days since last seen), Never attended (joined, zero events). All derived client-side.
+
+**4. AI recommendations** — moved to the bottom. Now starts idle with a Generate button rather than auto-firing on page load. Same per-event invite leads / ticket converts / no-show risks structure, with copy-message buttons.
+
+**Chart library — Chart.js** loaded lazily from CDN (`cdnjs.cloudflare.com/libs/Chart.js/4.4.1/chart.umd.js`) via a module-level `loadChartJs()` promise. Charts rendered into `useRef` canvases; destroyed and recreated on data change. No bundler dependency.
+
+**Removed:** the hand-rolled SVG bar chart, the event type breakdown horizontal bars, `EventChart` and `EventTypeBreakdown` components, old chart/type-breakdown CSS classes.
+
+**Files changed:** `app/src/pages/Recommendations.tsx` (full rewrite), `app/src/pages/Recommendations.css` (charts row + doughnut legend + cleanup of old SVG chart CSS)
+
+**Admin.tsx change:** props passed to `<Recommendations>` updated — `members`, `events`, `stats` now passed directly with correct types; `as any` removed.
+
+---
+
+### SVG chart rendering bug — fixed
+
+**Bug:** with one past event, the SVG bar chart rendered a single bar that filled the entire viewport height.
+
+**Root cause (two issues):**
+1. Single bar scaled to `max = 1 RSVP` = 100% of bar height. With a very wide container, the SVG expanded proportionally and the single bar looked like a full-page grey block.
+2. No minimum slot count — a one-event chart had only one bar-width of viewBox.
+
+**Fix (applied before the full chart rewrite):**
+- Minimum 6 slots in the viewBox regardless of event count
+- `max-height: 180px` on `.ins-chart-svg` to cap vertical expansion
+
+Note: this bug no longer exists after the Chart.js rewrite (doughnut + line charts replaced the SVG bar chart), but the fix was applied first and is recorded here for completeness.
+
+---
+
+### Housekeeping
+
+- **`CREATE_DIRS.sh` removed** — one-time scaffolding script, job done. Deleted from repo root. Commit message: `chore: remove CREATE_DIRS.sh scaffolding script`
+
+---
+
+### Current state after this session
+
+- ✅ Engagement scoring — event-count recency decay, eligible events scoped to join date
+- ✅ Type cleanup — `OrgMember`/`AdminEvent` exported from Admin, no duplicate types, no `as any`
+- ✅ Insights tab redesigned — stats → charts (Chart.js) → people signals → AI recommendations
+- ✅ Three charts: RSVPs by niche (doughnut), estimated revenue by niche (doughnut), members over time (line)
+- ✅ SVG bar chart removed
+- ✅ `CREATE_DIRS.sh` removed
+- ⏳ RSVP deduplication fix — still not applied to Edge Function
+- ⏳ Deploy Edge Function — `supabase secrets set ANTHROPIC_API_KEY=...` + `supabase functions deploy generate-recommendations`
+
+---
+
+## Session: June 27 2026 — Notes Feature, Strategy Realignment & Competitor Review
+
+### Context brought into session
+A potential community organiser client pulled back, saying the platform "only builds a connection list and has no USP." This triggered a strategy conversation and a summary was shared at the start of the session.
+
+**Key conclusions from that summary:**
+- The client feedback was right for the wrong reasons. The real problem was premature B2B sales — pitching a white-label solution before the member experience is proven.
+- The original vision is correct: Makers Klub as a testing ground → prove member experience → approach communities → scale white-label.
+- **North star metric for the testing phase confirmed: return visits the day after an event.** Not scans, not signups.
+- The thing to build before July: the notes feature. Action item tags in the existing flow were decorative — nothing acted on them. Free-text notes are strictly more powerful.
+
+### Strategy discussion
+
+**On event aggregation (Luma/Eventbrite API):** Rejected definitively. The only reason someone opens the app the day after an event is to look at the people they met — not to discover events. Building a worse version of Luma to solve a problem Luma already solves is a distraction. The actual differentiator is the connection layer. Event aggregation dropped entirely.
+
+**On Captūr (cptur.ai):** Reviewed their website. Surface-level overlap — both capture post-event conversation context. But Captūr is a personal CRM tool for salespeople at conferences: you record voice memos after each conversation, AI structures them, you export to CRM. Their unit is strangers you'll probably never see again. Makers Klub's unit is community members who will keep seeing each other — the value compounds across repeated encounters. Fundamental different product. Voice memo feature also considered and rejected: legal/consent complexity in public spaces, no appetite for that.
+
+### Notes feature — what shipped
+
+**Problem:** The existing flow had "Action items" — a set of decorative tag chips (`Send email`, `Intro call`, `Collab discussion`, etc.) that got saved to `connection.tags` but nothing in the app ever acted on them. They were UI theatre.
+
+**Solution:** Remove tags entirely across the whole flow. Replace with a single free-text textarea for notes. Notes save to the existing `connection.notes` column in Supabase (already existed in schema, already had `updateConnectionNotes` helper).
+
+**Files changed:**
+
+`src/lib/supabase.ts`
+- `addConnection` signature changed: third argument was `tags: string[]`, now `notes: string | null`
+- Function body: writes `notes` field, always writes `tags: []` (clearing old tag data going forward)
+
+`src/pages/MemberProfile/MemberProfile.tsx`
+- Removed all tag state (`selectedTags`, `addingTag`, `customTag`), `DEFAULT_TAGS` constant, tag toggle/add handlers
+- Added `notes` state (string)
+- Notes textarea shown in the overlay when `connectionState === 'none'` — placeholder reads "What did you talk about with [first name]?"
+- Notes pre-populate from `existing.notes` if a connection already exists
+- Notes passed to `addConnection` on submit
+
+`src/pages/MemberProfile/MemberProfile.module.css`
+- Removed all `.tag*` classes
+- Added `.notesInput` — glass background, violet focus border, `resize: none`, `min-height: 80px`
+
+`src/pages/Memory/ConnectionOverlay.tsx`
+- Removed `DEFAULT_TAGS`, all tag state and handlers, `addingTag` / `customTag` flow
+- Added `notes` state pre-populated from `connection.notes`
+- Notes textarea replaces the entire tags section
+- `handleDone` now calls `updateConnectionMeta` with `{ notes: notes.trim() || null, follow_up: followUp }` instead of `{ tags, follow_up }`
+- Renamed "Event last attended" label to "Met at" — more accurate (this is connection context, not event history)
+
+`src/pages/Memory/ConnectionOverlay.module.css`
+- Removed all `.tag*` classes
+- Added `.notesInput` matching MemberProfile styles
+
+`src/pages/Events/Events.tsx`
+- `handleConnect` inside inline `AttendeesSheet` was passing `[]` (old tags array) as third arg to `addConnection` — updated to pass `null` for notes
+- This also fixed a TypeScript type error introduced by the signature change
+
+### Key decisions
+| Decision | Reason |
+|---|---|
+| Tags removed entirely | Decorative — nothing acted on them. Notes are strictly more powerful. |
+| Notes on the connection, not the event | When you see someone again months later, you open their profile, not an event page. |
+| No voice memos | Legal/consent complexity in public spaces. Not worth it. |
+| Event aggregation dropped | Users open the app to see people they met, not to discover events. Luma already does discovery. |
+| B2B white-label deferred | Needs proven member experience first. No organiser will bet their community on an unvalidated product. |
+
+*Last updated: June 27 2026*
+
+### Next steps
+
+1. **Apply RSVP deduplication fix** in `supabase/functions/generate-recommendations/index.ts`
+2. **Deploy Edge Function** — set secret, deploy, smoke-test against production
+3. **Real member onboarding** — first non-test members
+4. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
+5. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table
+
