@@ -673,6 +673,14 @@ body[data-aud="mk-community"]  .aud[data-aud="professionals"]  { display: none; 
 .comm-cta-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
 .comm-cta-note { font-size: 13px; color: var(--fg-muted); margin-top: 14px; }
 
+/* ── NAVY BACKGROUND SECTIONS ── */
+.navy-bg { background: var(--navy); }
+.navy-bg .label { color: rgba(205,188,245,0.7); }
+.navy-bg h2.title { color: white; }
+.navy-bg .body-l { color: rgba(255,255,255,0.7); }
+.navy-bg .comm-cta-note { color: rgba(255,255,255,0.5); }
+.evt-section .evt-card h3 { color: white; }
+
 /* ── NAV ── */
 nav {
   position: fixed;
@@ -1277,7 +1285,7 @@ p.body-l {
   border: 1.5px solid var(--cream-3);
 }
 
-.aud-card > a { margin-top: auto; }
+.aud-card > a { margin-top: auto; align-self: flex-start; }
 
 .aud-card.founders { background: var(--navy); border-color: var(--navy); }
 .aud-card.creatives { background: white; }
