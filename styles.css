@@ -474,59 +474,6 @@ p.body-l {
   display: block;
 }
 
-/* ── PLATFORM STRIP ───────────────────────────── */
-.platform-strip {
-  background: var(--cream-2);
-  border-top: 1px solid var(--cream-3);
-  border-bottom: 1px solid var(--cream-3);
-  padding: 56px 48px;
-}
-
-.platform-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: center;
-}
-
-.platform-text .label { margin-bottom: 10px; }
-
-.platform-text h3 {
-  font-family: 'Fraunces', serif;
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--navy);
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-  margin-bottom: 10px;
-}
-
-.platform-text h3 em { font-style: italic; color: var(--lavender); }
-
-.platform-text p {
-  font-size: 15px;
-  color: var(--fg-2);
-  line-height: 1.7;
-  max-width: 520px;
-}
-
-.platform-screenshot {
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(15,30,61,0.15);
-  border: 1px solid var(--cream-3);
-  max-height: 280px;
-}
-
-.platform-screenshot img {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  display: block;
-}
-
 /* ── CTA ──────────────────────────────────────── */
 .cta-section {
   padding: 120px 48px;
@@ -629,9 +576,6 @@ footer {
   .event-type-inner { grid-template-columns: 1fr; gap: 36px; }
   .event-type-section--reversed .event-type-photo { order: -1; }
 
-  .platform-strip { padding: 40px 24px; }
-  .platform-inner { grid-template-columns: 1fr; gap: 24px; }
-
   .cta-section { padding: 80px 24px; }
 
   footer {
@@ -723,14 +667,6 @@ body[data-aud="mk-community"]  .aud[data-aud="professionals"]  { display: none; 
 .evt-card h3 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.3px; line-height: 1.2; margin-top: 20px; }
 .evt-photo { border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(15,30,61,0.12); border: 1px solid var(--cream-3); aspect-ratio: 4/3; }
 .evt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.platform-strip { background: var(--cream-2); border-top: 1px solid var(--cream-3); border-bottom: 1px solid var(--cream-3); padding: 56px 48px; }
-.platform-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
-.platform-text h3 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 10px; }
-.platform-text h3 em { font-style: italic; color: var(--lavender); }
-.platform-text p { font-size: 15px; color: var(--fg-2); line-height: 1.7; }
-.platform-screenshot { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(15,30,61,0.15); border: 1px solid var(--cream-3); max-height: 280px; }
-.platform-screenshot img { width: 100%; height: 280px; object-fit: cover; display: block; }
 
 .comm-cta { padding: 120px 48px; text-align: center; position: relative; overflow: hidden; }
 .comm-cta-glow { position: absolute; inset: 0; background: radial-gradient(ellipse 65% 70% at 50% 50%, rgba(91,91,214,0.15) 0%, transparent 70%); pointer-events: none; }
@@ -1334,10 +1270,14 @@ p.body-l {
 }
 
 .aud-card {
+  display: flex;
+  flex-direction: column;
   border-radius: 20px;
   padding: 40px 36px;
   border: 1.5px solid var(--cream-3);
 }
+
+.aud-card > a { margin-top: auto; }
 
 .aud-card.founders { background: var(--navy); border-color: var(--navy); }
 .aud-card.creatives { background: white; }
