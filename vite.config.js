@@ -32,7 +32,8 @@ export default defineConfig({
         main: './index.html',
         app: './app/index.html',
         impressum: './impressum.html',
-        datenschutz: './datenschutz.html'
+        datenschutz: './datenschutz.html',
+        apply: './apply.html'
       }
     }
   },
