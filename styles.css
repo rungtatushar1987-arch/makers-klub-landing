@@ -1278,16 +1278,14 @@ p.body-l {
 }
 
 .aud-card {
-  display: flex;
-  flex-direction: column;
   border-radius: 20px;
   padding: 40px 36px;
   border: 1.5px solid var(--cream-3);
 }
 
-.aud-card > a { margin-top: auto; align-self: flex-start; }
-
 .aud-card.founders { background: var(--navy); border-color: var(--navy); }
+
+.membership-cta { text-align: center; margin-top: 40px; }
 .aud-card.creatives { background: white; }
 
 .aud-tag {
