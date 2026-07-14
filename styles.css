@@ -677,8 +677,9 @@ body[data-aud="mk-community"]  .aud[data-aud="professionals"]  { display: none; 
 .navy-bg { background: var(--navy); }
 .navy-bg .label { color: rgba(205,188,245,0.7); }
 .navy-bg h2.title { color: white; }
-.navy-bg .body-l { color: rgba(255,255,255,0.7); }
-.navy-bg .comm-cta-note { color: rgba(255,255,255,0.5); }
+.navy-bg .body-l,
+.navy-bg .sec-head p { color: rgba(255,255,255,0.7); }
+.navy-bg .aud-card.founders { background: var(--navy-2); border-color: rgba(255,255,255,0.12); }
 .evt-section .evt-card h3 { color: white; }
 
 /* ── NAV ── */
