@@ -11,6 +11,8 @@ function appFallback() {
                           '/app/home', '/app/events', '/app/network', '/app/profile', '/app/login', '/app/signup']
         if (appRoutes.some(r => req.url?.startsWith(r))) {
           req.url = '/app/index.html'
+        } else if (req.url?.startsWith('/community/join')) {
+          req.url = '/apply.html'
         } else if (req.url?.startsWith('/community')) {
           req.url = '/index.html'
         }
