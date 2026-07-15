@@ -6,7 +6,12 @@ function appFallback() {
   return {
     name: 'app-fallback',
     configureServer(server) {
-      server.middlewares.use((req, _res, next) => {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.startsWith('/apply.html')) {
+          res.writeHead(308, { Location: '/community/join' })
+          res.end()
+          return
+        }
         const appRoutes = ['/home', '/events', '/network', '/profile', '/login', '/signup',
                           '/app/home', '/app/events', '/app/network', '/app/profile', '/app/login', '/app/signup']
         if (appRoutes.some(r => req.url?.startsWith(r))) {
