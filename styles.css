@@ -567,7 +567,6 @@ footer {
   .who-grid { grid-template-columns: 1fr; gap: 40px; }
 
   .values-section { padding: 64px 24px; }
-  .values-grid { grid-template-columns: 1fr; }
 
   .events-section { padding: 64px 24px 32px; }
   .events-header { flex-direction: column; align-items: flex-start; }
@@ -1621,6 +1620,9 @@ footer {
 
   .hero-inner { grid-template-columns: 1fr; gap: 48px; padding-bottom: 56px; }
   .hero-visual { max-width: 480px; }
+
+  .comm-hero-top { grid-template-columns: 1fr; gap: 40px; align-items: start; padding-bottom: 40px; }
+  .values-grid { grid-template-columns: 1fr; }
 
   .trust { padding: 32px 24px; }
   .trust-inner { grid-template-columns: repeat(2,1fr); }
