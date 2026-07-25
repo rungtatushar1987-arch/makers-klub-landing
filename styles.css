@@ -663,6 +663,27 @@ body[data-aud="mk-community"]  .aud[data-aud="professionals"]  { display: none; 
 .who-box p:last-child { margin-bottom: 0; }
 .who-box strong { color: var(--navy); font-weight: 600; }
 
+.members-carousel-wrap { overflow: hidden; cursor: grab; user-select: none; margin-top: 56px; }
+.members-carousel-wrap:active { cursor: grabbing; }
+.members-track { display: flex; gap: 16px; will-change: transform; }
+.member-card {
+  flex: 0 0 300px; height: 400px;
+  display: flex; flex-direction: column;
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--cream-3); background: white;
+}
+.member-card-img {
+  height: 70%; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-weight: 800; font-size: 56px;
+  object-fit: cover; object-position: center top;
+}
+.member-card-img.tint-lavender { background: rgba(91,91,214,0.12); color: var(--lavender); }
+.member-card-img.tint-ochre { background: rgba(244,168,51,0.18); color: var(--ochre-text); }
+.member-card-info { height: 30%; display: flex; flex-direction: column; justify-content: center; padding: 14px 22px; }
+.member-name { font-family: 'Fraunces', serif; font-weight: 800; font-size: 18px; color: var(--navy); letter-spacing: -0.2px; margin-bottom: 4px; line-height: 1.2; }
+.member-role { font-size: 13px; color: var(--fg-muted); line-height: 1.3; }
+
 .evt-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; }
 .evt-card h3 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.3px; line-height: 1.2; margin-top: 20px; }
 .evt-photo { border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(15,30,61,0.12); border: 1px solid var(--cream-3); aspect-ratio: 4/3; }
@@ -680,7 +701,9 @@ body[data-aud="mk-community"]  .aud[data-aud="professionals"]  { display: none; 
 .navy-bg .body-l,
 .navy-bg .sec-head p { color: rgba(255,255,255,0.7); }
 .navy-bg .aud-card.founders { background: var(--navy-2); border-color: rgba(255,255,255,0.12); }
-.evt-section .evt-card h3 { color: white; }
+.navy-bg .evt-card h3 { color: white; }
+.navy-bg .comm-cta-note { color: rgba(255,255,255,0.4); }
+.navy-bg .comm-cta-glow { background: radial-gradient(ellipse 65% 70% at 50% 50%, rgba(91,91,214,0.3) 0%, transparent 70%); }
 
 /* ── NAV ── */
 nav {
@@ -1614,6 +1637,7 @@ footer {
   .fgrid { grid-template-columns: 1fr 1fr; }
 
   .evt-grid { grid-template-columns: 1fr 1fr; }
+  .member-card { flex-basis: 240px; height: 320px; }
 
   .cta-card { padding: 48px 32px; }
 
@@ -1626,6 +1650,7 @@ footer {
 @media (max-width: 600px) {
   .fgrid { grid-template-columns: 1fr; }
   .evt-grid { grid-template-columns: 1fr; }
+  .member-card { flex-basis: 200px; height: 270px; }
   .trust-inner { grid-template-columns: repeat(2,1fr); }
   .wl-row { flex-direction: column; }
   .wl-input { min-width: unset; width: 100%; }
