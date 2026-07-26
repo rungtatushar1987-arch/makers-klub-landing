@@ -1633,6 +1633,7 @@ footer {
   .steps { grid-template-columns: 1fr; }
 
   .showcase { grid-template-columns: 1fr; gap: 40px; direction: ltr !important; }
+  .showcase-wide-art .showcase-art { margin-right: 0; }
 
   .audience { grid-template-columns: 1fr; }
 
