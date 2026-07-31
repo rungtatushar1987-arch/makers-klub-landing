@@ -1,7 +1,7 @@
 import { useState, useCallback, type KeyboardEvent } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
-import { upsertProfile, setProfileGoals } from '../supabase'
+import { upsertProfile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import './OnboardingWizard.css'
 
@@ -22,54 +22,6 @@ const INDUSTRIES = [
   'E-commerce & Retail',
   'Other',
 ]
-
-// ── Skill definitions ──
-const TECH_SKILLS = [
-  'Design tools (Figma / Adobe)',
-  'Web or app development',
-  'No-code & automation',
-  'Video & photo editing',
-  'Data & analytics',
-  'AI tools & prompting',
-]
-
-const BUSINESS_SKILLS = [
-  'Client acquisition & sales',
-  'Project management',
-  'Copywriting & content',
-  'Public speaking & pitching',
-  'Finance & budgeting',
-  'Social media & marketing',
-]
-
-// ── All possible goals ──
-const ALL_GOALS = [
-  'Land new clients',
-  'Find freelance projects',
-  'Get hired full-time',
-  'Find a co-founder',
-  'Find collaborators for a project',
-  'Give or receive mentorship',
-  'Learn from peers in my field',
-  'Get feedback on my work',
-  'Build my reputation in Berlin',
-  'Meet like-minded people',
-  'Expand my professional network',
-  'Find my next event or community',
-  'Other',
-]
-
-// Goals to exclude based on whether the person is looking to hire or offer services.
-const GOAL_EXCLUSIONS: Record<'hire' | 'freelancer', string[]> = {
-  hire: ['Get hired full-time', 'Find freelance projects'],
-  freelancer: ['Get hired full-time', 'Find a co-founder'],
-}
-
-function getFilteredGoals(lookingTo: 'hire' | 'freelancer' | ''): string[] {
-  if (!lookingTo) return ALL_GOALS
-  const excluded = new Set(GOAL_EXCLUSIONS[lookingTo])
-  return ALL_GOALS.filter(g => !excluded.has(g))
-}
 
 // ── AI polish helper ──
 async function polishWithAI(
@@ -93,9 +45,40 @@ async function polishWithAI(
   return data.result
 }
 
-const MAX_GOALS = 3
 const MAX_INDUSTRIES = 3
 const MAX_SERVICES = 5
+
+const EXPERIENCE_LEVELS = ['Beginner', 'Intermediate', 'Expert']
+
+const SOCIAL_PLATFORMS = [
+  'LinkedIn',
+  'Instagram',
+  'Twitter / X',
+  'Behance',
+  'Dribbble',
+  'TikTok',
+  'YouTube',
+  'Facebook',
+  'Threads',
+]
+
+const INCOME_GOAL_OPTIONS = [
+  { value: 'starting_out', label: 'Just starting out ($2k - $4k / mo)' },
+  { value: 'replacing_job', label: 'Replacing my full-time job ($4k - $7k / mo)' },
+  { value: 'scaling_business', label: 'Scaling my established business ($7k+ / mo)' },
+]
+
+const CLIENT_CAPACITY_OPTIONS = [
+  { value: '1_2', label: '1 - 2 clients (Focused)' },
+  { value: '3_4', label: '3 - 4 clients (Optimal capacity)' },
+  { value: '5_plus', label: '5+ clients (Agency style / High volume)' },
+]
+
+const LEAD_AVAILABILITY_OPTIONS = [
+  { value: 'fully_booked', label: 'Fully Booked (No calls needed right now)' },
+  { value: 'steady_growth', label: 'Steady Growth (1-2 calls a week to fill a few gaps)' },
+  { value: 'high_priority', label: 'High Priority (3+ calls a week, I need work immediately)' },
+]
 
 export default function OnboardingWizard() {
   const { user } = useUser()
@@ -119,33 +102,30 @@ export default function OnboardingWizard() {
   const [serviceInput, setServiceInput] = useState('')
 
   // Step 2
-  const [selectedGoals, setSelectedGoals] = useState<string[]>([])
-  const [customGoal, setCustomGoal] = useState('')
+  const initialSocialUrls: Record<string, string> = {
+    ...(profile?.social_links || {}),
+    ...(profile?.linkedin_url ? { LinkedIn: profile.linkedin_url } : {}),
+    ...(profile?.instagram_url ? { Instagram: profile.instagram_url } : {}),
+  }
+  const [servicePricing, setServicePricing] = useState<Record<string, { experience: string; hourlyRate: string }>>(profile?.service_pricing || {})
+  const [website, setWebsite] = useState(profile?.website_url || '')
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(Object.keys(initialSocialUrls))
+  const [socialUrls, setSocialUrls] = useState<Record<string, string>>(initialSocialUrls)
 
   // Step 3
+  const [incomeGoal, setIncomeGoal] = useState(profile?.income_goal || '')
+  const [clientCapacity, setClientCapacity] = useState(profile?.client_capacity || '')
+  const [leadAvailability, setLeadAvailability] = useState(profile?.lead_availability || '')
   const [priority, setPriority] = useState(profile?.current_focus || '')
   const [polishingPriority, setPolishingPriority] = useState(false)
   const [priorityOriginal, setPriorityOriginal] = useState<string | null>(null)
-  const [skills, setSkills] = useState<Record<string, number>>({})
 
   const step1Valid = fullName.trim().length > 0 && lookingTo !== '' && industries.length > 0 && locations.length > 0 && services.length > 0
-  const step2Valid = selectedGoals.length > 0 && (selectedGoals.includes('Other') ? customGoal.trim().length > 0 : true)
-  const step3Valid = priority.trim().length > 0
-
-  const filteredGoals = getFilteredGoals(lookingTo)
-
-  function toggleGoal(goal: string) {
-    setSelectedGoals(prev => {
-      if (prev.includes(goal)) return prev.filter(g => g !== goal)
-      if (prev.length >= MAX_GOALS) return prev
-      return [...prev, goal]
-    })
-  }
+  const step2Valid = website.trim().length > 0 && services.every(s => !!servicePricing[s]?.experience && !!servicePricing[s]?.hourlyRate?.trim())
+  const step3Valid = incomeGoal !== '' && clientCapacity !== '' && leadAvailability !== '' && priority.trim().length > 0
 
   function handleLookingToChange(val: 'hire' | 'freelancer') {
     setLookingTo(val)
-    const nowFiltered = getFilteredGoals(val)
-    setSelectedGoals(prev => prev.filter(g => nowFiltered.includes(g)))
   }
 
   function toggleIndustry(ind: string) {
@@ -154,6 +134,42 @@ export default function OnboardingWizard() {
       if (prev.length >= MAX_INDUSTRIES) return prev
       return [...prev, ind]
     })
+  }
+
+  function setServiceExperience(service: string, level: string) {
+    setServicePricing(prev => ({ ...prev, [service]: { experience: level, hourlyRate: prev[service]?.hourlyRate ?? '' } }))
+  }
+  function setServiceRate(service: string, rate: string) {
+    setServicePricing(prev => ({ ...prev, [service]: { experience: prev[service]?.experience ?? '', hourlyRate: rate } }))
+  }
+
+  function togglePlatform(platform: string) {
+    setSelectedPlatforms(prev => {
+      if (prev.includes(platform)) {
+        setSocialUrls(urls => {
+          const next = { ...urls }
+          delete next[platform]
+          return next
+        })
+        return prev.filter(p => p !== platform)
+      }
+      return [...prev, platform]
+    })
+  }
+  function setSocialUrl(platform: string, url: string) {
+    setSocialUrls(prev => ({ ...prev, [platform]: url }))
+  }
+
+  // LinkedIn/Instagram map to their own dedicated profile columns; everything
+  // else selected here goes into the generic social_links blob.
+  function buildOtherSocialLinks(): Record<string, string> | null {
+    const extras: Record<string, string> = {}
+    selectedPlatforms.forEach(p => {
+      if (p === 'LinkedIn' || p === 'Instagram') return
+      const url = socialUrls[p]?.trim()
+      if (url) extras[p] = url
+    })
+    return Object.keys(extras).length > 0 ? extras : null
   }
 
   function addLocation() {
@@ -203,10 +219,6 @@ export default function OnboardingWizard() {
     }
   }, [priority, services, industries, polishingPriority, session])
 
-  function setSkillRating(skill: string, rating: number) {
-    setSkills(prev => ({ ...prev, [skill]: rating }))
-  }
-
   async function handleFinish() {
     if (!user || !step3Valid) return
     setSaving(true)
@@ -220,8 +232,15 @@ export default function OnboardingWizard() {
       industries: industries.length > 0 ? industries : null,
       locations: locations.length > 0 ? locations : null,
       services: services.length > 0 ? services : null,
+      service_pricing: Object.keys(servicePricing).length > 0 ? servicePricing : null,
+      website_url: website.trim() || null,
+      linkedin_url: socialUrls['LinkedIn']?.trim() || null,
+      instagram_url: socialUrls['Instagram']?.trim() || null,
+      social_links: buildOtherSocialLinks(),
+      income_goal: incomeGoal || null,
+      client_capacity: clientCapacity || null,
+      lead_availability: leadAvailability || null,
       current_focus: priority.trim(),
-      skills: Object.keys(skills).length > 0 ? skills : null,
       onboarding_complete: true,
       email: user.primaryEmailAddress?.emailAddress || null,
     }, token)
@@ -231,10 +250,6 @@ export default function OnboardingWizard() {
       setSaving(false)
       return
     }
-
-    const resolvedGoals = selectedGoals.map(g => g === 'Other' ? customGoal.trim() : g)
-    const isCustom = selectedGoals.map(g => g === 'Other')
-    await setProfileGoals(savedProfile.id, resolvedGoals, isCustom, token)
 
     await refresh()
     navigate('/home', { replace: true })
@@ -371,39 +386,83 @@ export default function OnboardingWizard() {
         {/* ════════════ STEP 2 ════════════ */}
         {step === 2 && (
           <div className="ow-card">
-            <h1 className="ow-heading">What are your goals for the next 3 months?</h1>
-            <p className="ow-sub">Pick up to {MAX_GOALS}. We use this to surface the right connections.</p>
+            <h1 className="ow-heading">Price your services</h1>
+            <p className="ow-sub">
+              Set an approximate rate for each service so we can match you with the right budget.
+            </p>
 
-            <div className="ow-goal-grid">
-              {filteredGoals.map(goal => {
-                const selected = selectedGoals.includes(goal)
-                const disabled = !selected && selectedGoals.length >= MAX_GOALS
-                return (
-                  <button
-                    key={goal}
-                    type="button"
-                    className={`ow-goal-chip ${selected ? 'ow-goal-chip-selected' : ''} ${disabled ? 'ow-goal-chip-disabled' : ''}`}
-                    onClick={() => toggleGoal(goal)}
-                    disabled={disabled}
+            <div className="ow-pricing-rows">
+              {services.map(service => (
+                <div key={service} className="ow-pricing-row">
+                  <span className="ow-pricing-service">{service}</span>
+                  <select
+                    className="mkw-form-select ow-pricing-select"
+                    value={servicePricing[service]?.experience || ''}
+                    onChange={e => setServiceExperience(service, e.target.value)}
                   >
-                    {goal}
-                  </button>
-                )
-              })}
+                    <option value="">Experience</option>
+                    {EXPERIENCE_LEVELS.map(level => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                  <div className="ow-pricing-rate-wrap">
+                    <input
+                      className="ow-pricing-rate-input"
+                      type="number"
+                      min={0}
+                      value={servicePricing[service]?.hourlyRate || ''}
+                      onChange={e => setServiceRate(service, e.target.value)}
+                      placeholder="45"
+                    />
+                    <span className="ow-pricing-rate-suffix">€/hr</span>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {selectedGoals.includes('Other') && (
-              <div className="mkw-form-group" style={{ marginTop: 12 }}>
+            <div className="ow-fields" style={{ marginTop: 24 }}>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Portfolio link <span className="ow-req">*</span></label>
                 <input
                   className="mkw-form-input"
                   type="text"
-                  value={customGoal}
-                  onChange={e => setCustomGoal(e.target.value)}
-                  placeholder="Describe what you're looking for…"
-                  maxLength={80}
+                  value={website}
+                  onChange={e => setWebsite(e.target.value)}
+                  placeholder="https://yourportfolio.com"
                 />
               </div>
-            )}
+
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Social links <span className="ow-skills-optional">(optional)</span></label>
+                <div className="ow-goal-grid">
+                  {SOCIAL_PLATFORMS.map(platform => (
+                    <button
+                      key={platform}
+                      type="button"
+                      className={`ow-goal-chip ${selectedPlatforms.includes(platform) ? 'ow-goal-chip-selected' : ''}`}
+                      onClick={() => togglePlatform(platform)}
+                    >
+                      {platform}
+                    </button>
+                  ))}
+                </div>
+
+                {selectedPlatforms.length > 0 && (
+                  <div className="ow-social-url-list">
+                    {selectedPlatforms.map(platform => (
+                      <input
+                        key={platform}
+                        className="mkw-form-input"
+                        type="text"
+                        value={socialUrls[platform] || ''}
+                        onChange={e => setSocialUrl(platform, e.target.value)}
+                        placeholder={`${platform} URL`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div className="ow-nav-row">
               <button className="mk-btn mk-btn-ghost" onClick={() => setStep(1)}>← Back</button>
@@ -417,10 +476,58 @@ export default function OnboardingWizard() {
         {/* ════════════ STEP 3 ════════════ */}
         {step === 3 && (
           <div className="ow-card">
-            <h1 className="ow-heading">Almost there</h1>
-            <p className="ow-sub">Two quick things to help us match you with the right people and events.</p>
+            <h1 className="ow-heading">Your business goals</h1>
+            <p className="ow-sub">This helps us match you with the right opportunities.</p>
 
             <div className="ow-fields">
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Where are you currently focusing your income goals? <span className="ow-req">*</span></label>
+                <div className="ow-option-list">
+                  {INCOME_GOAL_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`ow-option-card ${incomeGoal === opt.value ? 'ow-option-card-selected' : ''}`}
+                      onClick={() => setIncomeGoal(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">How many long-term retainer clients can you realistically balance? <span className="ow-req">*</span></label>
+                <div className="ow-option-list">
+                  {CLIENT_CAPACITY_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`ow-option-card ${clientCapacity === opt.value ? 'ow-option-card-selected' : ''}`}
+                      onClick={() => setClientCapacity(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">What is your current availability for new project leads? <span className="ow-req">*</span></label>
+                <div className="ow-option-list">
+                  {LEAD_AVAILABILITY_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`ow-option-card ${leadAvailability === opt.value ? 'ow-option-card-selected' : ''}`}
+                      onClick={() => setLeadAvailability(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="mkw-form-group">
                 <label className="mkw-form-label">What is your biggest challenge right now? <span className="ow-req">*</span></label>
                 <textarea
@@ -430,7 +537,6 @@ export default function OnboardingWizard() {
                   placeholder="e.g. Land 2 new retainer clients by Q3, or ship my first SaaS product"
                   rows={3}
                   maxLength={200}
-                  autoFocus
                 />
                 <div className="ow-field-footer">
                   <span className="ow-char-count">{priority.length} / 200</span>
@@ -452,51 +558,6 @@ export default function OnboardingWizard() {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-
-            <div className="ow-skills-block">
-              <div className="ow-skills-block-label">Rate your skills <span className="ow-skills-optional">(optional)</span></div>
-              <p className="ow-skills-hint">Tap a dot to rate yourself. We use this to surface the right collaborators.</p>
-
-              <div className="ow-skill-section">
-                <div className="ow-skill-section-label">Tech skills</div>
-                {TECH_SKILLS.map(skill => (
-                  <div key={skill} className="ow-skill-row">
-                    <span className="ow-skill-name">{skill}</span>
-                    <div className="ow-skill-dots">
-                      {[1, 2, 3, 4, 5].map(n => (
-                        <button
-                          key={n}
-                          type="button"
-                          className={`ow-dot ${(skills[skill] ?? 0) >= n ? 'ow-dot-filled' : ''}`}
-                          onClick={() => setSkillRating(skill, skills[skill] === n ? 0 : n)}
-                          aria-label={`Rate ${skill} ${n} out of 5`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="ow-skill-section">
-                <div className="ow-skill-section-label">Business skills</div>
-                {BUSINESS_SKILLS.map(skill => (
-                  <div key={skill} className="ow-skill-row">
-                    <span className="ow-skill-name">{skill}</span>
-                    <div className="ow-skill-dots">
-                      {[1, 2, 3, 4, 5].map(n => (
-                        <button
-                          key={n}
-                          type="button"
-                          className={`ow-dot ${(skills[skill] ?? 0) >= n ? 'ow-dot-filled' : ''}`}
-                          onClick={() => setSkillRating(skill, skills[skill] === n ? 0 : n)}
-                          aria-label={`Rate ${skill} ${n} out of 5`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
 

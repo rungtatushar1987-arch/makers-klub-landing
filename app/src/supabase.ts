@@ -31,9 +31,9 @@ export type Profile = {
   role_category: string
   avatar_color: string
   slug: string
-  linkedin_url: string
-  instagram_url: string
-  website_url: string
+  linkedin_url: string | null
+  instagram_url: string | null
+  website_url: string | null
   notify_email: boolean
   email: string | null
   city: string | null
@@ -43,20 +43,16 @@ export type Profile = {
   industries: string[] | null
   locations: string[] | null
   services: string[] | null
+  service_pricing: Record<string, { experience: string; hourlyRate: string }> | null
+  social_links: Record<string, string> | null
+  income_goal: string | null
+  client_capacity: string | null
+  lead_availability: string | null
   current_focus: string | null
   skills: Record<string, number> | null
   onboarding_complete: boolean
   created_at: string
   updated_at: string
-}
-
-export type ProfileGoal = {
-  id: string
-  profile_id: string
-  goal: string
-  is_custom: boolean
-  done: boolean
-  created_at: string
 }
 
 export type Event = {
@@ -127,33 +123,6 @@ export async function upsertProfile(
     .select().single()
   if (error || !data) { console.error('upsertProfile error:', error); return null }
   return data as Profile
-}
-
-export async function getProfileGoals(profileId: string, token?: string | null): Promise<ProfileGoal[]> {
-  const db = getSupabaseClient(token)
-  const { data, error } = await db
-    .from('profile_goals')
-    .select('*')
-    .eq('profile_id', profileId)
-    .order('created_at', { ascending: true })
-  if (error || !data) { console.error('getProfileGoals error:', error); return [] }
-  return data as ProfileGoal[]
-}
-
-export async function setProfileGoals(
-  profileId: string,
-  goals: string[],
-  isCustom: boolean[],
-  token?: string | null
-): Promise<boolean> {
-  const db = getSupabaseClient(token)
-  const { error: deleteError } = await db.from('profile_goals').delete().eq('profile_id', profileId)
-  if (deleteError) { console.error('setProfileGoals delete error:', deleteError); return false }
-  if (goals.length === 0) return true
-  const rows = goals.map((goal, i) => ({ profile_id: profileId, goal, is_custom: isCustom[i] ?? false }))
-  const { error: insertError } = await db.from('profile_goals').insert(rows)
-  if (insertError) { console.error('setProfileGoals insert error:', insertError); return false }
-  return true
 }
 
 /**

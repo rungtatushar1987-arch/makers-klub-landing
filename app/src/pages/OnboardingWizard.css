@@ -249,6 +249,85 @@
   padding: 5px 2px;
 }
 
+/* ── Service pricing rows ── */
+.ow-pricing-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ow-pricing-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-xs);
+}
+
+.ow-pricing-row .ow-pricing-select {
+  flex-shrink: 0;
+  width: 150px;
+}
+
+.ow-pricing-service {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ow-pricing-rate-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ow-pricing-rate-input {
+  width: 68px;
+  padding: 9px 8px;
+  border: 1.5px solid var(--hairline-strong);
+  border-radius: var(--r-xs);
+  background: rgba(255,255,255,0.7);
+  color: var(--ink-1);
+  font-size: 13px;
+  font-family: var(--font-body);
+  text-align: right;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s;
+}
+
+.ow-pricing-rate-input:focus { border-color: var(--mk-yellow); background: #fff; }
+
+.ow-pricing-rate-suffix {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  flex-shrink: 0;
+}
+
+/* ── Social links list ── */
+.ow-social-url-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .ow-pricing-row { flex-wrap: wrap; }
+  .ow-pricing-row .ow-pricing-select { width: auto; flex: 1; }
+}
+
 /* ── Goal chips ── */
 .ow-goal-grid {
   display: flex;
@@ -363,21 +442,6 @@
   font-weight: 600;
 }
 
-/* ── Skill ratings ── */
-.ow-skills-block {
-  margin-top: 4px;
-  padding-top: 20px;
-  border-top: 1px solid var(--hairline);
-}
-
-.ow-skills-block-label {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink-1);
-  margin-bottom: 4px;
-}
-
 .ow-skills-optional {
   font-weight: 400;
   font-size: 12px;
@@ -385,72 +449,40 @@
   font-family: var(--font-body);
 }
 
-.ow-skills-hint {
-  font-size: 12px;
-  color: var(--ink-3);
-  font-family: var(--font-body);
-  margin-bottom: 14px;
-}
-
-.ow-skill-section {
-  margin-bottom: 16px;
-}
-
-.ow-skill-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-bottom: 6px;
-}
-
-.ow-skill-row {
+/* ── Option cards (single-choice, long-label questions) ── */
+.ow-option-list {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--hairline);
+  flex-direction: column;
   gap: 8px;
 }
 
-.ow-skill-row:last-child {
-  border-bottom: none;
-}
-
-.ow-skill-name {
-  font-size: 13px;
+.ow-option-card {
+  width: 100%;
+  text-align: left;
+  padding: 13px 18px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--hairline-strong);
+  background: rgba(255,255,255,0.6);
   color: var(--ink-1);
   font-family: var(--font-body);
-  flex: 1;
-  min-width: 0;
-}
-
-.ow-skill-dots {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.ow-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--hairline-strong);
-  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  padding: 0;
-  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  transition: border-color 0.14s, background 0.14s;
+  outline: none;
 }
 
-.ow-dot:hover {
+.ow-option-card:hover:not(.ow-option-card-selected) {
   border-color: var(--mk-yellow);
-  transform: scale(1.15);
+  background: rgba(252,184,19,0.08);
 }
 
-.ow-dot-filled {
-  background: var(--mk-yellow);
-  border-color: var(--mk-yellow);
+.ow-option-card-selected {
+  background: var(--mk-yellow) !important;
+  border-color: var(--mk-yellow) !important;
+  color: var(--accent-ink) !important;
+  font-weight: 600;
+  box-shadow: var(--shadow-cta);
 }
 
 /* ── Error ── */
