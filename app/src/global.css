@@ -70,15 +70,6 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 .mkw-brand-logo { width: 36px; height: 36px; flex-shrink: 0; }
 .mkw-brand-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-.mkw-brand-mark {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--mk-yellow);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-weight: 800; font-size: 13px;
-  color: var(--mk-navy); letter-spacing: -0.5px; flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(252,184,19,0.35);
-}
-
 .mkw-brand-name {
   font-family: var(--font-display); font-weight: 700;
   font-size: 15px; letter-spacing: -0.3px; color: var(--ink-1);
@@ -87,6 +78,12 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 .mkw-brand-sub {
   font-size: 10px; font-weight: 600; letter-spacing: 1.6px;
   text-transform: uppercase; color: var(--ink-3);
+}
+
+.mkw-brand-greeting-name {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 13px; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
 .mkw-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; padding: 0 12px; }

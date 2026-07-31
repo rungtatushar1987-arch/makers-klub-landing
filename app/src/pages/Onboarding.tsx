@@ -23,7 +23,6 @@ export default function Onboarding() {
   const { user } = useUser()
   const { events, rsvpd, toggleRsvp, allRsvps, allProfiles } = useKlub()
 
-  const firstName = user?.firstName || 'there'
   const now = new Date()
   const upcoming = events.filter(e => new Date(e.date) >= now).slice(0, 4)
   const profilePct = user?.firstName && user?.lastName ? 25 : 10
@@ -81,17 +80,6 @@ export default function Onboarding() {
 
   return (
     <div className="onb-wrap">
-
-      {/* Hero */}
-      <div className="onb-hero">
-        <div className="onb-hero-eyebrow">Welcome to Makers Klub</div>
-        <h1 className="onb-hero-title">
-          Good to have you,<br /><em>{firstName}.</em>
-        </h1>
-        <p className="onb-hero-sub">
-          You're now part of Berlin's creative community. Start by showing up to an event — that's where everything begins.
-        </p>
-      </div>
 
       <div className="onb-grid">
         <div className="onb-main">

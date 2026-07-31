@@ -21,6 +21,10 @@ export default function Sidebar() {
 
   const initials = getInitials(user?.fullName || user?.firstName || '')
 
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+  const firstName = user?.firstName || 'there'
+
   useEffect(() => {
     if (!session) return
     session.getToken().then(async token => {
@@ -32,12 +36,14 @@ export default function Sidebar() {
 
   return (
     <aside className="mkw-side">
-      {/* Brand */}
+      {/* Brand + greeting */}
       <div className="mkw-brand">
-        <div className="mkw-brand-mark">MK</div>
-        <div>
-          <div className="mkw-brand-name">Makers Klub</div>
-          <div className="mkw-brand-sub">Berlin</div>
+        <div className="mkw-brand-logo">
+          <img src="logo.svg" alt="Makers Klub" />
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <div className="mkw-brand-name">Good {greeting},</div>
+          <div className="mkw-brand-greeting-name">{firstName}.</div>
         </div>
       </div>
 
