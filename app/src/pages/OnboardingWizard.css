@@ -1,0 +1,419 @@
+/* OnboardingWizard — Aurora Glass, desktop stepped flow */
+
+.ow-page {
+  min-height: 100vh;
+  background: var(--surface);
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 56px 24px 80px;
+}
+
+.ow-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--blob-opacity);
+  background:
+    radial-gradient(42% 50% at 12% 0%,    rgba(252,184,19,0.50)  0%, transparent 70%),
+    radial-gradient(48% 40% at 100% 28%,  rgba(122,78,216,0.38)  0%, transparent 72%),
+    radial-gradient(55% 40% at 55% 110%,  rgba(59,109,217,0.35)  0%, transparent 70%),
+    radial-gradient(38% 30% at 78% 85%,   rgba(165,135,240,0.28) 0%, transparent 72%);
+}
+
+.ow-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ow-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.3px;
+  color: var(--ink-1);
+}
+
+.ow-step-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: 0.2px;
+}
+
+.ow-progress-bg {
+  height: 3px;
+  background: var(--hairline);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.ow-progress-fill {
+  height: 100%;
+  background: var(--mk-yellow);
+  border-radius: var(--r-pill);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ow-card {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-hi), var(--glass-shadow);
+  border-radius: var(--r-lg);
+  padding: 32px 36px 28px;
+  display: flex;
+  flex-direction: column;
+  animation: ow-slide-up 0.22s ease;
+}
+
+@keyframes ow-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ow-heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.6px;
+  color: var(--ink-1);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.ow-sub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.ow-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ow-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ow-req {
+  color: var(--mk-yellow-deep);
+}
+
+/* ── Field footer: hint + AI button side by side ── */
+.ow-field-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+}
+
+.ow-hint {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  margin-top: 4px;
+}
+
+.ow-char-count {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}
+
+/* ── AI polish row ── */
+.ow-ai-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ow-polish-btn {
+  padding: 4px 10px;
+  background: rgba(122,78,216,0.10);
+  color: var(--mk-violet);
+  border: 1px solid rgba(122,78,216,0.25);
+  border-radius: var(--r-pill);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, opacity 0.14s;
+}
+
+.ow-polish-btn:hover:not(:disabled) {
+  background: rgba(122,78,216,0.18);
+}
+
+.ow-polish-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ow-revert-btn {
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--ink-3);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-pill);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.14s;
+}
+
+.ow-revert-btn:hover {
+  color: var(--ink-1);
+}
+
+/* ── Goal chips ── */
+.ow-goal-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ow-goal-chip {
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--hairline-strong);
+  background: rgba(255,255,255,0.6);
+  color: var(--ink-1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.14s, background 0.14s;
+  line-height: 1;
+  white-space: nowrap;
+  outline: none;
+}
+
+[data-theme="dark"] .ow-goal-chip,
+[data-theme="dark"] .ow-tech-chip {
+  background: rgba(255,255,255,0.06);
+}
+
+.ow-goal-chip:focus-visible {
+  box-shadow: 0 0 0 2px var(--mk-yellow);
+}
+
+.ow-goal-chip:hover:not(:disabled):not(.ow-goal-chip-selected) {
+  border-color: var(--mk-yellow);
+  background: rgba(252,184,19,0.08);
+}
+
+.ow-goal-chip-selected {
+  background: var(--mk-yellow) !important;
+  border-color: var(--mk-yellow) !important;
+  color: var(--accent-ink) !important;
+  font-weight: 600;
+  box-shadow: var(--shadow-cta);
+}
+
+.ow-goal-chip-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── CTA / nav ── */
+.ow-cta {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.mk-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.ow-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.ow-nav-row .ow-cta {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* ── Tech background chips ── */
+.ow-tech-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ow-tech-chip {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--hairline-strong);
+  background: rgba(255,255,255,0.6);
+  color: var(--ink-1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.14s, background 0.14s;
+  outline: none;
+  white-space: nowrap;
+}
+
+.ow-tech-chip:hover:not(.ow-tech-chip-selected) {
+  border-color: var(--mk-yellow);
+  background: rgba(252,184,19,0.08);
+}
+
+.ow-tech-chip-selected {
+  background: var(--mk-yellow) !important;
+  border-color: var(--mk-yellow) !important;
+  color: var(--accent-ink) !important;
+  font-weight: 600;
+}
+
+/* ── Skill ratings ── */
+.ow-skills-block {
+  margin-top: 4px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+}
+
+.ow-skills-block-label {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-1);
+  margin-bottom: 4px;
+}
+
+.ow-skills-optional {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}
+
+.ow-skills-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  margin-bottom: 14px;
+}
+
+.ow-skill-section {
+  margin-bottom: 16px;
+}
+
+.ow-skill-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.ow-skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+  gap: 8px;
+}
+
+.ow-skill-row:last-child {
+  border-bottom: none;
+}
+
+.ow-skill-name {
+  font-size: 13px;
+  color: var(--ink-1);
+  font-family: var(--font-body);
+  flex: 1;
+  min-width: 0;
+}
+
+.ow-skill-dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ow-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--hairline-strong);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+}
+
+.ow-dot:hover {
+  border-color: var(--mk-yellow);
+  transform: scale(1.15);
+}
+
+.ow-dot-filled {
+  background: var(--mk-yellow);
+  border-color: var(--mk-yellow);
+}
+
+/* ── Error ── */
+.ow-error {
+  background: rgba(224,82,79,0.1);
+  border: 1px solid rgba(224,82,79,0.3);
+  color: var(--danger);
+  border-radius: var(--r-xs);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  margin-top: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .ow-page { padding: 32px 16px 56px; }
+  .ow-card { padding: 24px 20px 20px; }
+  .ow-row-2 { grid-template-columns: 1fr; }
+}

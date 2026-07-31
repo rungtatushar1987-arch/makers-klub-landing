@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
-import { KlubProvider } from './KlubContext'
+import { KlubProvider, useKlub } from './KlubContext'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import Events from './pages/Events'
@@ -9,17 +10,33 @@ import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Admin from './pages/Admin'
+import OnboardingWizard from './pages/OnboardingWizard'
+
+/**
+ * New signups get a bare profile stub with onboarding_complete = false
+ * (inserted by KlubContext's load()) and are redirected here until they
+ * finish the wizard. While data is still loading, renders nothing to
+ * avoid a flash redirect.
+ */
+function OnboardingGate({ children }: { children: ReactNode }) {
+  const { profile, loading } = useKlub()
+  if (loading) return null
+  if (!profile || !profile.onboarding_complete) {
+    return <Navigate to="/onboarding" replace />
+  }
+  return <>{children}</>
+}
 
 function AppShell() {
   return (
-    <KlubProvider>
-      <div className="mkw">
-        <Sidebar />
-        <main className="mkw-main">
+    <div className="mkw">
+      <Sidebar />
+      <main className="mkw-main">
+        <OnboardingGate>
           <Outlet />
-        </main>
-      </div>
-    </KlubProvider>
+        </OnboardingGate>
+      </main>
+    </div>
   )
 }
 
@@ -35,7 +52,11 @@ function ProtectedLayout() {
     return null
   }
 
-  return <AppShell />
+  return (
+    <KlubProvider>
+      <Outlet />
+    </KlubProvider>
+  )
 }
 
 export default function App() {
@@ -45,11 +66,16 @@ export default function App() {
         <Route path="/login"    element={<Login />} />
         <Route path="/signup/*" element={<Signup />} />
         <Route element={<ProtectedLayout />}>
-          <Route path="/home"    element={<Dashboard />} />
-          <Route path="/events"  element={<Events />} />
-          <Route path="/network" element={<Members />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/admin"   element={<Admin />} />
+          {/* Onboarding — protected, no gate (it IS the gate destination) */}
+          <Route path="/onboarding" element={<OnboardingWizard />} />
+
+          <Route element={<AppShell />}>
+            <Route path="/home"    element={<Dashboard />} />
+            <Route path="/events"  element={<Events />} />
+            <Route path="/network" element={<Members />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/admin"   element={<Admin />} />
+          </Route>
         </Route>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />

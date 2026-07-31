@@ -9,6 +9,7 @@ type KlubContextType = {
   rsvpd: Set<string>
   allRsvps: { clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]
   allProfiles: Profile[]
+  profile: Profile | null
   loading: boolean
   isOnboarding: boolean
   toggleRsvp: (event: Event) => Promise<void>
@@ -32,6 +33,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
   const [allRsvps, setAllRsvps] = useState<{ clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]>([])
   const [allProfiles, setAllProfiles] = useState<Profile[]>([])
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
@@ -43,14 +45,16 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     // Ensure a profile row exists for this user
     const { data: existingProfile } = await db
       .from('profiles')
-      .select('clerk_user_id')
+      .select('*')
       .eq('clerk_user_id', user.id)
       .maybeSingle()
 
-    if (!existingProfile) {
+    let ownProfile = existingProfile as Profile | null
+
+    if (!ownProfile) {
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.emailAddresses[0]?.emailAddress || ''
       const slug = fullName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user.id.slice(-6)
-      await db.from('profiles').insert({
+      const { data: inserted } = await db.from('profiles').insert({
         clerk_user_id: user.id,
         full_name: fullName,
         bio: '',
@@ -61,8 +65,11 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
         instagram_url: '',
         website_url: '',
         notify_email: true,
-      })
+      }).select().single()
+      ownProfile = inserted as Profile | null
     }
+
+    setProfile(ownProfile)
 
     const [
       { data: outgoingData },
@@ -249,7 +256,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <KlubContext.Provider value={{
-      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, loading,
+      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, profile, loading,
       isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
       acceptRequest, declineRequest,
