@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, type KeyboardEvent } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import { upsertProfile, setProfileGoals } from '../supabase'
@@ -59,40 +59,21 @@ const ALL_GOALS = [
   'Other',
 ]
 
-// Goals to exclude based on keywords found in the discipline field.
-const GOAL_EXCLUSIONS: { keywords: string[]; exclude: string[] }[] = [
-  {
-    keywords: ['founder', 'ceo', 'startup', 'entrepreneur', 'building', 'operator'],
-    exclude: ['Get hired full-time', 'Find freelance projects'],
-  },
-  {
-    keywords: ['freelance', 'freelancer', 'independent', 'consultant', 'self-employed'],
-    exclude: ['Get hired full-time', 'Find a co-founder'],
-  },
-  {
-    keywords: ['designer', 'developer', 'engineer', 'photographer', 'videographer', 'editor', 'writer', 'copywriter', 'motion', 'animator', 'illustrator', 'creative'],
-    exclude: ['Find a co-founder'],
-  },
-  {
-    keywords: ['director', 'manager', 'head of', 'lead', 'vp', 'chief'],
-    exclude: ['Get hired full-time', 'Find freelance projects'],
-  },
-]
+// Goals to exclude based on whether the person is looking to hire or offer services.
+const GOAL_EXCLUSIONS: Record<'hire' | 'freelancer', string[]> = {
+  hire: ['Get hired full-time', 'Find freelance projects'],
+  freelancer: ['Get hired full-time', 'Find a co-founder'],
+}
 
-function getFilteredGoals(discipline: string): string[] {
-  const lower = discipline.toLowerCase()
-  const excluded = new Set<string>()
-  for (const rule of GOAL_EXCLUSIONS) {
-    if (rule.keywords.some(kw => lower.includes(kw))) {
-      rule.exclude.forEach(g => excluded.add(g))
-    }
-  }
+function getFilteredGoals(lookingTo: 'hire' | 'freelancer' | ''): string[] {
+  if (!lookingTo) return ALL_GOALS
+  const excluded = new Set(GOAL_EXCLUSIONS[lookingTo])
   return ALL_GOALS.filter(g => !excluded.has(g))
 }
 
 // ── AI polish helper ──
 async function polishWithAI(
-  field: 'working' | 'priority',
+  field: 'priority',
   text: string,
   discipline: string,
   token: string | null | undefined
@@ -113,6 +94,8 @@ async function polishWithAI(
 }
 
 const MAX_GOALS = 3
+const MAX_INDUSTRIES = 3
+const MAX_SERVICES = 5
 
 export default function OnboardingWizard() {
   const { user } = useUser()
@@ -126,13 +109,14 @@ export default function OnboardingWizard() {
 
   // Step 1
   const [fullName, setFullName] = useState(profile?.full_name || user?.fullName || '')
-  const [discipline, setDiscipline] = useState(profile?.role_category || '')
-  const [city, setCity] = useState(profile?.city && profile.city !== 'all' ? profile.city : 'Berlin')
-  const [industry, setIndustry] = useState(profile?.industry || '')
-  const [techBackground, setTechBackground] = useState(profile?.tech_background || '')
-  const [currentWork, setCurrentWork] = useState(profile?.bio || '')
-  const [polishingWork, setPolishingWork] = useState(false)
-  const [workOriginal, setWorkOriginal] = useState<string | null>(null)
+  const [lookingTo, setLookingTo] = useState<'hire' | 'freelancer' | ''>(
+    profile?.looking_to === 'hire' || profile?.looking_to === 'freelancer' ? profile.looking_to : ''
+  )
+  const [industries, setIndustries] = useState<string[]>(profile?.industries || [])
+  const [locations, setLocations] = useState<string[]>(profile?.locations || [])
+  const [locationInput, setLocationInput] = useState('')
+  const [services, setServices] = useState<string[]>(profile?.services || [])
+  const [serviceInput, setServiceInput] = useState('')
 
   // Step 2
   const [selectedGoals, setSelectedGoals] = useState<string[]>([])
@@ -144,11 +128,11 @@ export default function OnboardingWizard() {
   const [priorityOriginal, setPriorityOriginal] = useState<string | null>(null)
   const [skills, setSkills] = useState<Record<string, number>>({})
 
-  const step1Valid = fullName.trim().length > 0 && discipline.trim().length > 0 && currentWork.trim().length > 0 && industry.length > 0 && techBackground.length > 0
+  const step1Valid = fullName.trim().length > 0 && lookingTo !== '' && industries.length > 0 && locations.length > 0 && services.length > 0
   const step2Valid = selectedGoals.length > 0 && (selectedGoals.includes('Other') ? customGoal.trim().length > 0 : true)
   const step3Valid = priority.trim().length > 0
 
-  const filteredGoals = getFilteredGoals(discipline)
+  const filteredGoals = getFilteredGoals(lookingTo)
 
   function toggleGoal(goal: string) {
     setSelectedGoals(prev => {
@@ -158,26 +142,51 @@ export default function OnboardingWizard() {
     })
   }
 
-  function handleDisciplineChange(val: string) {
-    setDiscipline(val)
+  function handleLookingToChange(val: 'hire' | 'freelancer') {
+    setLookingTo(val)
     const nowFiltered = getFilteredGoals(val)
     setSelectedGoals(prev => prev.filter(g => nowFiltered.includes(g)))
   }
 
-  const handlePolishWork = useCallback(async () => {
-    if (!currentWork.trim() || polishingWork) return
-    setPolishingWork(true)
-    try {
-      setWorkOriginal(currentWork)
-      const token = await session?.getToken()
-      const polished = await polishWithAI('working', currentWork, discipline, token)
-      setCurrentWork(polished)
-    } catch {
-      // silently fail — user keeps their original text
-    } finally {
-      setPolishingWork(false)
+  function toggleIndustry(ind: string) {
+    setIndustries(prev => {
+      if (prev.includes(ind)) return prev.filter(i => i !== ind)
+      if (prev.length >= MAX_INDUSTRIES) return prev
+      return [...prev, ind]
+    })
+  }
+
+  function addLocation() {
+    const val = locationInput.trim()
+    if (!val || locations.includes(val)) { setLocationInput(''); return }
+    setLocations(prev => [...prev, val])
+    setLocationInput('')
+  }
+  function removeLocation(loc: string) {
+    setLocations(prev => prev.filter(l => l !== loc))
+  }
+  function handleLocationKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addLocation() }
+    else if (e.key === 'Backspace' && locationInput === '' && locations.length > 0) {
+      setLocations(prev => prev.slice(0, -1))
     }
-  }, [currentWork, discipline, polishingWork, session])
+  }
+
+  function addService() {
+    const val = serviceInput.trim()
+    if (!val || services.includes(val) || services.length >= MAX_SERVICES) { setServiceInput(''); return }
+    setServices(prev => [...prev, val])
+    setServiceInput('')
+  }
+  function removeService(s: string) {
+    setServices(prev => prev.filter(x => x !== s))
+  }
+  function handleServiceKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addService() }
+    else if (e.key === 'Backspace' && serviceInput === '' && services.length > 0) {
+      setServices(prev => prev.slice(0, -1))
+    }
+  }
 
   const handlePolishPriority = useCallback(async () => {
     if (!priority.trim() || polishingPriority) return
@@ -185,14 +194,14 @@ export default function OnboardingWizard() {
     try {
       setPriorityOriginal(priority)
       const token = await session?.getToken()
-      const polished = await polishWithAI('priority', priority, discipline, token)
+      const polished = await polishWithAI('priority', priority, services.join(', ') || industries.join(', '), token)
       setPriority(polished)
     } catch {
       // silently fail
     } finally {
       setPolishingPriority(false)
     }
-  }, [priority, discipline, polishingPriority, session])
+  }, [priority, services, industries, polishingPriority, session])
 
   function setSkillRating(skill: string, rating: number) {
     setSkills(prev => ({ ...prev, [skill]: rating }))
@@ -207,12 +216,11 @@ export default function OnboardingWizard() {
 
     const savedProfile = await upsertProfile(user.id, {
       full_name: fullName.trim(),
-      role_category: discipline.trim(),
-      city: city.trim() || null,
-      bio: currentWork.trim(),
+      looking_to: lookingTo || null,
+      industries: industries.length > 0 ? industries : null,
+      locations: locations.length > 0 ? locations : null,
+      services: services.length > 0 ? services : null,
       current_focus: priority.trim(),
-      industry: industry || null,
-      tech_background: techBackground || null,
       skills: Object.keys(skills).length > 0 ? skills : null,
       onboarding_complete: true,
       email: user.primaryEmailAddress?.emailAddress || null,
@@ -266,94 +274,90 @@ export default function OnboardingWizard() {
               </div>
 
               <div className="mkw-form-group">
-                <label className="mkw-form-label">What you do <span className="ow-req">*</span></label>
-                <input
-                  className="mkw-form-input"
-                  type="text"
-                  value={discipline}
-                  onChange={e => handleDisciplineChange(e.target.value)}
-                  placeholder="e.g. Brand strategist, UX designer, Motion designer…"
-                  maxLength={60}
-                />
+                <label className="mkw-form-label">Are you looking to <span className="ow-req">*</span></label>
+                <div className="ow-tech-chips">
+                  {([
+                    { value: 'hire' as const, label: 'Hire' },
+                    { value: 'freelancer' as const, label: 'Provide service (freelancer)' },
+                  ]).map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`ow-tech-chip ${lookingTo === opt.value ? 'ow-tech-chip-selected' : ''}`}
+                      onClick={() => handleLookingToChange(opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="ow-row-2">
-                <div className="mkw-form-group">
-                  <label className="mkw-form-label">Industry <span className="ow-req">*</span></label>
-                  <select
-                    className="mkw-form-select"
-                    value={industry}
-                    onChange={e => setIndustry(e.target.value)}
-                  >
-                    <option value="">Select your industry</option>
-                    {INDUSTRIES.map(ind => (
-                      <option key={ind} value={ind}>{ind}</option>
-                    ))}
-                  </select>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Choose 3 industries you have experience working in <span className="ow-req">*</span></label>
+                <div className="ow-goal-grid">
+                  {INDUSTRIES.map(ind => {
+                    const selected = industries.includes(ind)
+                    const disabled = !selected && industries.length >= MAX_INDUSTRIES
+                    return (
+                      <button
+                        key={ind}
+                        type="button"
+                        className={`ow-goal-chip ${selected ? 'ow-goal-chip-selected' : ''} ${disabled ? 'ow-goal-chip-disabled' : ''}`}
+                        onClick={() => toggleIndustry(ind)}
+                        disabled={disabled}
+                      >
+                        {ind}
+                      </button>
+                    )
+                  })}
                 </div>
+              </div>
 
-                <div className="mkw-form-group">
-                  <label className="mkw-form-label">City</label>
+              <div className="mkw-form-group">
+                <label className="mkw-form-label">Choose the locations you are available to work in <span className="ow-req">*</span></label>
+                <div className="ow-hint" style={{ marginBottom: 6 }}>P.S We only recommend you to businesses in your area</div>
+                <div className="ow-tag-input-box">
+                  {locations.map(loc => (
+                    <span key={loc} className="ow-tag-chip">
+                      {loc}
+                      <button type="button" className="ow-tag-remove" onClick={() => removeLocation(loc)}>×</button>
+                    </span>
+                  ))}
                   <input
-                    className="mkw-form-input"
+                    className="ow-tag-input"
                     type="text"
-                    value={city}
-                    onChange={e => setCity(e.target.value)}
-                    placeholder="Berlin"
+                    value={locationInput}
+                    onChange={e => setLocationInput(e.target.value)}
+                    onKeyDown={handleLocationKeyDown}
+                    onBlur={addLocation}
+                    placeholder={locations.length === 0 ? 'e.g. Berlin, Remote…' : ''}
                   />
                 </div>
               </div>
 
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Tech background <span className="ow-req">*</span></label>
-                <div className="ow-tech-chips">
-                  {(['Non-technical', 'Some tech skills', 'Technical'] as const).map(opt => (
-                    <button
-                      key={opt}
-                      type="button"
-                      className={`ow-tech-chip ${techBackground === opt ? 'ow-tech-chip-selected' : ''}`}
-                      onClick={() => setTechBackground(opt)}
-                    >
-                      {opt}
-                    </button>
+                <label className="mkw-form-label">List 5 primary services you offer <span className="ow-req">*</span></label>
+                <div className="ow-tag-input-box">
+                  {services.map(s => (
+                    <span key={s} className="ow-tag-chip">
+                      {s}
+                      <button type="button" className="ow-tag-remove" onClick={() => removeService(s)}>×</button>
+                    </span>
                   ))}
-                </div>
-                <div className="ow-hint">
-                  {techBackground === 'Non-technical' && 'No coding or dev tools — you work with people, strategy, or craft'}
-                  {techBackground === 'Some tech skills' && 'Comfortable with no-code tools, basic automation, or digital production'}
-                  {techBackground === 'Technical' && 'Can code, build, or have a dev / engineering background'}
-                </div>
-              </div>
-
-              <div className="mkw-form-group">
-                <label className="mkw-form-label">What do you do? <span className="ow-req">*</span></label>
-                <textarea
-                  className="mkw-form-textarea"
-                  value={currentWork}
-                  onChange={e => { setCurrentWork(e.target.value); setWorkOriginal(null) }}
-                  placeholder="e.g. Freelance brand designer helping fintech startups find their visual voice"
-                  rows={3}
-                  maxLength={200}
-                />
-                <div className="ow-field-footer">
-                  <span className="ow-char-count">{currentWork.length} / 200</span>
-                  {currentWork.trim().length > 10 && (
-                    <div className="ow-ai-row">
-                      {workOriginal !== null && (
-                        <button type="button" className="ow-revert-btn" onClick={() => { setCurrentWork(workOriginal); setWorkOriginal(null) }}>
-                          ↩ Revert
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        className="ow-polish-btn"
-                        onClick={handlePolishWork}
-                        disabled={polishingWork}
-                      >
-                        {polishingWork ? '✦ Writing…' : '✦ Write with AI'}
-                      </button>
-                    </div>
+                  {services.length < MAX_SERVICES && (
+                    <input
+                      className="ow-tag-input"
+                      type="text"
+                      value={serviceInput}
+                      onChange={e => setServiceInput(e.target.value)}
+                      onKeyDown={handleServiceKeyDown}
+                      onBlur={addService}
+                      placeholder={services.length === 0 ? 'e.g. Logo design, Brand strategy…' : ''}
+                    />
                   )}
+                </div>
+                <div className="ow-field-footer">
+                  <span className="ow-char-count">{services.length} / {MAX_SERVICES}</span>
                 </div>
               </div>
             </div>

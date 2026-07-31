@@ -39,6 +39,10 @@ export type Profile = {
   city: string | null
   industry: string | null
   tech_background: string | null
+  looking_to: string | null
+  industries: string[] | null
+  locations: string[] | null
+  services: string[] | null
   current_focus: string | null
   skills: Record<string, number> | null
   onboarding_complete: boolean
