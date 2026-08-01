@@ -1,5 +1,13 @@
 /* Profile.css — Aurora Glass */
 
+.prof-wizard-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow-y: auto;
+  background: var(--surface);
+}
+
 .prof-saved-toast {
   background: rgba(52,210,123,0.15);
   color: #1e7a3f;

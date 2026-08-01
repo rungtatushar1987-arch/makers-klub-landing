@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import type { Event, Profile } from '../supabase'
+import { calcProfileProgress, type Event, type Profile } from '../supabase'
 import './Onboarding.css'
 
 function timeAgo(dateStr: string): string {
@@ -21,11 +21,11 @@ function getInitials(name?: string | null): string {
 
 export default function Onboarding() {
   const { user } = useUser()
-  const { events, rsvpd, toggleRsvp, allRsvps, allProfiles } = useKlub()
+  const { events, rsvpd, toggleRsvp, allRsvps, allProfiles, profile } = useKlub()
 
   const now = new Date()
   const upcoming = events.filter(e => new Date(e.date) >= now).slice(0, 4)
-  const profilePct = user?.firstName && user?.lastName ? 25 : 10
+  const { pct: profilePct } = calcProfileProgress(profile)
 
   // Community members — up to 8, exclude self
   const communityMembers = useMemo(() => {
@@ -97,7 +97,7 @@ export default function Onboarding() {
               <div className="onb-progress-fill" style={{ width: `${profilePct}%` }} />
             </div>
             <p className="onb-card-body">
-              Add your role, bio, and links so other members know who you are before they meet you.
+              Add your services, rates, and business goals so we can match you with the right people and events.
             </p>
             <a href="/profile" className="mk-btn mk-btn-navy mk-btn-sm">Complete your profile →</a>
           </div>

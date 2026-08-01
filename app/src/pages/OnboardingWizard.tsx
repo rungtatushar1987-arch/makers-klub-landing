@@ -1,9 +1,16 @@
 import { useState, useCallback, type KeyboardEvent } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
-import { upsertProfile } from '../supabase'
+import { upsertProfile, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import './OnboardingWizard.css'
+
+type OnboardingWizardProps = {
+  // When provided (rendered as a modal from the Profile page), the wizard
+  // calls this instead of navigating — passes the saved profile on finish,
+  // or nothing when just backing out.
+  onClose?: (savedProfile?: Profile) => void
+}
 
 // ── Industry options ──
 const INDUSTRIES = [
@@ -80,7 +87,7 @@ const LEAD_AVAILABILITY_OPTIONS = [
   { value: 'high_priority', label: 'High Priority (3+ calls a week, I need work immediately)' },
 ]
 
-export default function OnboardingWizard() {
+export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}) {
   const { user } = useUser()
   const { session } = useSession()
   const navigate = useNavigate()
@@ -252,7 +259,16 @@ export default function OnboardingWizard() {
     }
 
     await refresh()
-    navigate('/home', { replace: true })
+    if (onClose) {
+      onClose(savedProfile)
+    } else {
+      navigate('/profile', { replace: true })
+    }
+  }
+
+  function handleExit() {
+    if (onClose) onClose()
+    else navigate('/profile')
   }
 
   const progress = (step / 3) * 100
@@ -260,6 +276,8 @@ export default function OnboardingWizard() {
   return (
     <div className="ow-page">
       <div className="ow-inner">
+        <button type="button" className="ow-exit-link" onClick={handleExit}>← Back to profile</button>
+
         <div className="ow-header">
           <div className="ow-logo">makers klub</div>
           <div className="ow-step-label">Step {step} of 3</div>
@@ -566,7 +584,7 @@ export default function OnboardingWizard() {
             <div className="ow-nav-row">
               <button className="mk-btn mk-btn-ghost" onClick={() => setStep(2)}>← Back</button>
               <button className="mk-btn mk-btn-primary ow-cta" onClick={handleFinish} disabled={!step3Valid || saving}>
-                {saving ? 'Setting up…' : 'Enter Makers Klub →'}
+                {saving ? 'Saving…' : 'Save profile →'}
               </button>
             </div>
           </div>

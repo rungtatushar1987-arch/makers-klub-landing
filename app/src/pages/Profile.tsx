@@ -1,32 +1,9 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { getSupabaseClient, type Profile } from '../supabase'
+import { getSupabaseClient, calcProfileProgress, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
+import OnboardingWizard from './OnboardingWizard'
 import './Profile.css'
-
-const ROLE_OPTIONS = ['founder', 'designer', 'photographer', 'videographer', 'creator', 'developer', 'other']
-const ROLE_LABELS: Record<string, string> = {
-  founder: 'Founder / Business Owner',
-  designer: 'Brand / UI Designer',
-  photographer: 'Photographer',
-  videographer: 'Videographer',
-  creator: 'Content Creator',
-  developer: 'Developer',
-  other: 'Other',
-}
-
-function calcProgress(p: Partial<Profile>): { pct: number; fieldsLeft: number; isComplete: boolean } {
-  const has = [
-    !!p.full_name?.trim(),
-    !!p.bio?.trim(),
-    !!p.role_category,
-    !!p.linkedin_url?.trim(),
-    !!p.instagram_url?.trim(),
-    !!p.website_url?.trim(),
-  ]
-  const filled = has.filter(Boolean).length
-  return { pct: Math.round((filled / 6) * 100), fieldsLeft: 6 - filled, isComplete: filled === 6 }
-}
 
 export default function Profile() {
   const { user } = useUser()
@@ -38,6 +15,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [socialError, setSocialError] = useState(false)
+  const [showWizard, setShowWizard] = useState(false)
 
   const upcomingCount = useMemo(() => {
     const now = new Date()
@@ -60,7 +38,7 @@ export default function Profile() {
     if (['linkedin_url', 'instagram_url', 'website_url'].includes(field)) setSocialError(false)
   }
 
-  const { pct, fieldsLeft, isComplete } = calcProgress(savedProfile)
+  const { pct, fieldsLeft, isComplete } = calcProfileProgress(savedProfile)
 
   const savedHasSocial =
     !!savedProfile.linkedin_url?.trim() ||
@@ -69,7 +47,6 @@ export default function Profile() {
   const isProfileUnlocked =
     !!savedProfile.full_name?.trim() &&
     !!savedProfile.bio?.trim() &&
-    !!savedProfile.role_category &&
     savedHasSocial
 
   const hasSocial =
@@ -77,7 +54,7 @@ export default function Profile() {
     !!profile.instagram_url?.trim() ||
     !!profile.website_url?.trim()
 
-  const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && !!profile.role_category && hasSocial
+  const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && hasSocial
 
   async function save() {
     if (!isProfileUnlocked && !canSave) { if (!hasSocial) setSocialError(true); return }
@@ -134,14 +111,16 @@ export default function Profile() {
                 <label className="mkw-form-label">One-line bio *</label>
                 <textarea className="mkw-form-textarea" value={profile.bio || ''} onChange={e => update('bio', e.target.value)} placeholder="What you do + what you're working on right now" />
               </div>
-              <div className="mkw-form-group">
-                <label className="mkw-form-label">I am a… *</label>
-                <select className="mkw-form-select" value={profile.role_category || ''} onChange={e => update('role_category', e.target.value)}>
-                  <option value="">Select your role</option>
-                  {ROLE_OPTIONS.map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
-                </select>
-                <p className="prof-field-hint">We'll use this to recommend events and matches for you</p>
-              </div>
+            </div>
+
+            <div className="prof-section">
+              <div className="prof-section-label">Services & business profile</div>
+              <p className="prof-field-hint" style={{ marginTop: 0, marginBottom: 14 }}>
+                Tell us what you offer, your rates, and your business goals so we can match you with the right people and events.
+              </p>
+              <button type="button" className="mk-btn mk-btn-navy" onClick={() => setShowWizard(true)}>
+                {pct > 0 ? 'Continue completing your profile →' : 'Complete your profile →'}
+              </button>
             </div>
 
             <div className="prof-section">
@@ -195,18 +174,13 @@ export default function Profile() {
             </div>
 
             {(() => {
-              const ROLE_PLURAL: Record<string, string> = {
-                founder: 'Founders', designer: 'Designers', photographer: 'Photographers',
-                videographer: 'Videographers', creator: 'Creators', developer: 'Developers', other: 'Members',
-              }
               const FIELD_LABEL: Record<string, string> = {
                 linkedin_url: 'a LinkedIn', instagram_url: 'an Instagram', website_url: 'a website',
               }
-              const rolePlural = ROLE_PLURAL[savedProfile.role_category || ''] || 'Members'
               const socialFields = ['linkedin_url', 'instagram_url', 'website_url'] as const
               const nudges = socialFields
                 .filter(f => !savedProfile[f]?.trim())
-                .map(f => `${rolePlural} with ${FIELD_LABEL[f]} get more collabs at our events`)
+                .map(f => `Members with ${FIELD_LABEL[f]} get more collabs at our events`)
               if (nudges.length === 0) return null
               return (
                 <div className="prof-tip-card">
@@ -227,6 +201,17 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {showWizard && (
+        <div className="prof-wizard-overlay">
+          <OnboardingWizard
+            onClose={(updated) => {
+              setShowWizard(false)
+              if (updated) { setProfile(updated); setSavedProfile(updated) }
+            }}
+          />
+        </div>
+      )}
     </>
   )
 }

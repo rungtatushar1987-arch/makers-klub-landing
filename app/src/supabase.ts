@@ -55,6 +55,27 @@ export type Profile = {
   updated_at: string
 }
 
+/**
+ * Single source of truth for "profile completeness" — used by both the
+ * Profile page and the home welcome card, so they never disagree.
+ */
+export function calcProfileProgress(p: Partial<Profile> | null | undefined): { pct: number; fieldsLeft: number; isComplete: boolean } {
+  const has = [
+    !!p?.full_name?.trim(),
+    !!p?.looking_to,
+    !!(p?.industries && p.industries.length > 0),
+    !!(p?.locations && p.locations.length > 0),
+    !!(p?.services && p.services.length > 0),
+    !!p?.website_url?.trim(),
+    !!p?.income_goal,
+    !!p?.client_capacity,
+    !!p?.lead_availability,
+    !!p?.current_focus?.trim(),
+  ]
+  const filled = has.filter(Boolean).length
+  return { pct: Math.round((filled / has.length) * 100), fieldsLeft: has.length - filled, isComplete: filled === has.length }
+}
+
 export type Event = {
   id: string
   title: string
