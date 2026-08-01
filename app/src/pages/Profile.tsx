@@ -1,9 +1,14 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, type KeyboardEvent } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { getSupabaseClient, calcProfileProgress, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import OnboardingWizard from './OnboardingWizard'
+import {
+  INDUSTRIES, MAX_INDUSTRIES, MAX_SERVICES, EXPERIENCE_LEVELS,
+  INCOME_GOAL_OPTIONS, CLIENT_CAPACITY_OPTIONS, LEAD_AVAILABILITY_OPTIONS,
+} from '../profileOptions'
 import './Profile.css'
+import './OnboardingWizard.css'
 
 export default function Profile() {
   const { user } = useUser()
@@ -16,6 +21,8 @@ export default function Profile() {
   const [saved, setSaved] = useState(false)
   const [socialError, setSocialError] = useState(false)
   const [showWizard, setShowWizard] = useState(false)
+  const [locationInput, setLocationInput] = useState('')
+  const [serviceInput, setServiceInput] = useState('')
 
   const upcomingCount = useMemo(() => {
     const now = new Date()
@@ -38,7 +45,74 @@ export default function Profile() {
     if (['linkedin_url', 'instagram_url', 'website_url'].includes(field)) setSocialError(false)
   }
 
+  function toggleIndustry(ind: string) {
+    setProfile(prev => {
+      const cur = prev.industries || []
+      if (cur.includes(ind)) return { ...prev, industries: cur.filter(i => i !== ind) }
+      if (cur.length >= MAX_INDUSTRIES) return prev
+      return { ...prev, industries: [...cur, ind] }
+    })
+  }
+
+  function addLocation() {
+    const val = locationInput.trim()
+    if (!val) { setLocationInput(''); return }
+    setProfile(prev => {
+      const cur = prev.locations || []
+      if (cur.includes(val)) return prev
+      return { ...prev, locations: [...cur, val] }
+    })
+    setLocationInput('')
+  }
+  function removeLocation(loc: string) {
+    setProfile(prev => ({ ...prev, locations: (prev.locations || []).filter(l => l !== loc) }))
+  }
+  function handleLocationKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addLocation() }
+    else if (e.key === 'Backspace' && locationInput === '' && (profile.locations || []).length > 0) {
+      setProfile(prev => ({ ...prev, locations: (prev.locations || []).slice(0, -1) }))
+    }
+  }
+
+  function addService() {
+    const val = serviceInput.trim()
+    if (!val) { setServiceInput(''); return }
+    setProfile(prev => {
+      const cur = prev.services || []
+      if (cur.includes(val) || cur.length >= MAX_SERVICES) return prev
+      return { ...prev, services: [...cur, val] }
+    })
+    setServiceInput('')
+  }
+  function removeService(s: string) {
+    setProfile(prev => {
+      const nextPricing = { ...(prev.service_pricing || {}) }
+      delete nextPricing[s]
+      return { ...prev, services: (prev.services || []).filter(x => x !== s), service_pricing: nextPricing }
+    })
+  }
+  function handleServiceKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addService() }
+    else if (e.key === 'Backspace' && serviceInput === '' && (profile.services || []).length > 0) {
+      setProfile(prev => ({ ...prev, services: (prev.services || []).slice(0, -1) }))
+    }
+  }
+
+  function setServiceExperience(service: string, level: string) {
+    setProfile(prev => ({
+      ...prev,
+      service_pricing: { ...(prev.service_pricing || {}), [service]: { experience: level, hourlyRate: prev.service_pricing?.[service]?.hourlyRate ?? '' } },
+    }))
+  }
+  function setServiceRate(service: string, rate: string) {
+    setProfile(prev => ({
+      ...prev,
+      service_pricing: { ...(prev.service_pricing || {}), [service]: { experience: prev.service_pricing?.[service]?.experience ?? '', hourlyRate: rate } },
+    }))
+  }
+
   const { pct, fieldsLeft, isComplete } = calcProfileProgress(savedProfile)
+  const isDirty = JSON.stringify(profile) !== JSON.stringify(savedProfile)
 
   const savedHasSocial =
     !!savedProfile.linkedin_url?.trim() ||
@@ -115,12 +189,205 @@ export default function Profile() {
 
             <div className="prof-section">
               <div className="prof-section-label">Services & business profile</div>
-              <p className="prof-field-hint" style={{ marginTop: 0, marginBottom: 14 }}>
-                Tell us what you offer, your rates, and your business goals so we can match you with the right people and events.
-              </p>
-              <button type="button" className="mk-btn mk-btn-navy" onClick={() => setShowWizard(true)}>
-                {pct > 0 ? 'Continue completing your profile →' : 'Complete your profile →'}
-              </button>
+
+              {!isComplete && (
+                <>
+                  <p className="prof-field-hint" style={{ marginTop: 0, marginBottom: 14 }}>
+                    Tell us what you offer, your rates, and your business goals so we can match you with the right people and events.
+                  </p>
+                  <button type="button" className="mk-btn mk-btn-navy" onClick={() => setShowWizard(true)}>
+                    {pct > 0 ? 'Continue completing your profile →' : 'Complete your profile →'}
+                  </button>
+                </>
+              )}
+
+              {isComplete && (
+                <>
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Looking to</label>
+                    <div className="ow-tech-chips">
+                      {([
+                        { value: 'hire' as const, label: 'Hire' },
+                        { value: 'freelancer' as const, label: 'Provide service (freelancer)' },
+                      ]).map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`ow-tech-chip ${profile.looking_to === opt.value ? 'ow-tech-chip-selected' : ''}`}
+                          onClick={() => update('looking_to', opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Industries you have experience working in</label>
+                    <div className="ow-goal-grid">
+                      {INDUSTRIES.map(ind => {
+                        const selected = (profile.industries || []).includes(ind)
+                        const disabled = !selected && (profile.industries || []).length >= MAX_INDUSTRIES
+                        return (
+                          <button
+                            key={ind}
+                            type="button"
+                            className={`ow-goal-chip ${selected ? 'ow-goal-chip-selected' : ''} ${disabled ? 'ow-goal-chip-disabled' : ''}`}
+                            onClick={() => toggleIndustry(ind)}
+                            disabled={disabled}
+                          >
+                            {ind}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Locations you are available to work in</label>
+                    <div className="ow-tag-input-box">
+                      {(profile.locations || []).map(loc => (
+                        <span key={loc} className="ow-tag-chip">
+                          {loc}
+                          <button type="button" className="ow-tag-remove" onClick={() => removeLocation(loc)}>×</button>
+                        </span>
+                      ))}
+                      <input
+                        className="ow-tag-input"
+                        type="text"
+                        value={locationInput}
+                        onChange={e => setLocationInput(e.target.value)}
+                        onKeyDown={handleLocationKeyDown}
+                        onBlur={addLocation}
+                        placeholder={(profile.locations || []).length === 0 ? 'e.g. Berlin, Remote…' : ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Primary services you offer</label>
+                    <div className="ow-tag-input-box">
+                      {(profile.services || []).map(s => (
+                        <span key={s} className="ow-tag-chip">
+                          {s}
+                          <button type="button" className="ow-tag-remove" onClick={() => removeService(s)}>×</button>
+                        </span>
+                      ))}
+                      {(profile.services || []).length < MAX_SERVICES && (
+                        <input
+                          className="ow-tag-input"
+                          type="text"
+                          value={serviceInput}
+                          onChange={e => setServiceInput(e.target.value)}
+                          onKeyDown={handleServiceKeyDown}
+                          onBlur={addService}
+                          placeholder={(profile.services || []).length === 0 ? 'e.g. Logo design, Brand strategy…' : ''}
+                        />
+                      )}
+                    </div>
+                    <div className="ow-field-footer">
+                      <span className="ow-char-count">{(profile.services || []).length} / {MAX_SERVICES}</span>
+                    </div>
+                  </div>
+
+                  {(profile.services || []).length > 0 && (
+                    <div className="mkw-form-group">
+                      <label className="mkw-form-label">Service pricing</label>
+                      <div className="ow-pricing-rows">
+                        {(profile.services || []).map(service => (
+                          <div key={service} className="ow-pricing-row">
+                            <span className="ow-pricing-service">{service}</span>
+                            <select
+                              className="mkw-form-select ow-pricing-select"
+                              value={profile.service_pricing?.[service]?.experience || ''}
+                              onChange={e => setServiceExperience(service, e.target.value)}
+                            >
+                              <option value="">Experience</option>
+                              {EXPERIENCE_LEVELS.map(level => (
+                                <option key={level} value={level}>{level}</option>
+                              ))}
+                            </select>
+                            <div className="ow-pricing-rate-wrap">
+                              <input
+                                className="ow-pricing-rate-input"
+                                type="number"
+                                min={0}
+                                value={profile.service_pricing?.[service]?.hourlyRate || ''}
+                                onChange={e => setServiceRate(service, e.target.value)}
+                                placeholder="45"
+                              />
+                              <span className="ow-pricing-rate-suffix">€/hr</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Income goal</label>
+                    <div className="ow-option-list">
+                      {INCOME_GOAL_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`ow-option-card ${profile.income_goal === opt.value ? 'ow-option-card-selected' : ''}`}
+                          onClick={() => update('income_goal', opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Long-term retainer clients you can realistically balance</label>
+                    <div className="ow-option-list">
+                      {CLIENT_CAPACITY_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`ow-option-card ${profile.client_capacity === opt.value ? 'ow-option-card-selected' : ''}`}
+                          onClick={() => update('client_capacity', opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Availability for new project leads</label>
+                    <div className="ow-option-list">
+                      {LEAD_AVAILABILITY_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`ow-option-card ${profile.lead_availability === opt.value ? 'ow-option-card-selected' : ''}`}
+                          onClick={() => update('lead_availability', opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mkw-form-group">
+                    <label className="mkw-form-label">Biggest challenge right now</label>
+                    <textarea
+                      className="mkw-form-textarea"
+                      value={profile.current_focus || ''}
+                      onChange={e => update('current_focus', e.target.value)}
+                      placeholder="e.g. Land 2 new retainer clients by Q3, or ship my first SaaS product"
+                      rows={3}
+                      maxLength={200}
+                    />
+                    <div className="ow-field-footer">
+                      <span className="ow-char-count">{(profile.current_focus || '').length} / 200</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="prof-section">
@@ -147,7 +414,7 @@ export default function Profile() {
             <button
               className={`mk-btn ${isProfileUnlocked || canSave ? 'mk-btn-primary' : 'mk-btn-ghost'} prof-save-btn`}
               onClick={save}
-              disabled={saving || (!isProfileUnlocked && !canSave)}
+              disabled={saving || (isComplete ? !isDirty : (!isProfileUnlocked && !canSave))}
             >
               {saving ? 'Saving…' : isProfileUnlocked ? 'Save profile' : 'Save & unlock →'}
             </button>
@@ -173,7 +440,12 @@ export default function Profile() {
               <a href="https://app.makersklub.com" target="_blank" rel="noopener noreferrer" className="prof-qr-app-link">Open app →</a>
             </div>
 
-            {(() => {
+            {isComplete ? (
+              <div className="prof-complete-banner">
+                <div className="prof-complete-banner-pct">{pct}%</div>
+                <div className="prof-complete-banner-text">Profile complete</div>
+              </div>
+            ) : (() => {
               const FIELD_LABEL: Record<string, string> = {
                 linkedin_url: 'a LinkedIn', instagram_url: 'an Instagram', website_url: 'a website',
               }

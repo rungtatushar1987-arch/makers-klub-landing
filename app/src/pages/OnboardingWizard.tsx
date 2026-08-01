@@ -3,6 +3,10 @@ import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import { upsertProfile, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
+import {
+  INDUSTRIES, MAX_INDUSTRIES, MAX_SERVICES, EXPERIENCE_LEVELS, SOCIAL_PLATFORMS,
+  INCOME_GOAL_OPTIONS, CLIENT_CAPACITY_OPTIONS, LEAD_AVAILABILITY_OPTIONS,
+} from '../profileOptions'
 import './OnboardingWizard.css'
 
 type OnboardingWizardProps = {
@@ -11,24 +15,6 @@ type OnboardingWizardProps = {
   // or nothing when just backing out.
   onClose?: (savedProfile?: Profile) => void
 }
-
-// ── Industry options ──
-const INDUSTRIES = [
-  'Advertising & Marketing',
-  'Architecture & Interior Design',
-  'Consulting & Strategy',
-  'Design & Creative',
-  'Education & Training',
-  'Fashion & Lifestyle',
-  'Finance & Fintech',
-  'Health & Wellness',
-  'Media & Publishing',
-  'Music & Audio',
-  'Photography & Film',
-  'Technology & Engineering',
-  'E-commerce & Retail',
-  'Other',
-]
 
 // ── AI polish helper ──
 async function polishWithAI(
@@ -51,41 +37,6 @@ async function polishWithAI(
   if (!data.result) throw new Error('No response from AI')
   return data.result
 }
-
-const MAX_INDUSTRIES = 3
-const MAX_SERVICES = 5
-
-const EXPERIENCE_LEVELS = ['Beginner', 'Intermediate', 'Expert']
-
-const SOCIAL_PLATFORMS = [
-  'LinkedIn',
-  'Instagram',
-  'Twitter / X',
-  'Behance',
-  'Dribbble',
-  'TikTok',
-  'YouTube',
-  'Facebook',
-  'Threads',
-]
-
-const INCOME_GOAL_OPTIONS = [
-  { value: 'starting_out', label: 'Just starting out ($2k - $4k / mo)' },
-  { value: 'replacing_job', label: 'Replacing my full-time job ($4k - $7k / mo)' },
-  { value: 'scaling_business', label: 'Scaling my established business ($7k+ / mo)' },
-]
-
-const CLIENT_CAPACITY_OPTIONS = [
-  { value: '1_2', label: '1 - 2 clients (Focused)' },
-  { value: '3_4', label: '3 - 4 clients (Optimal capacity)' },
-  { value: '5_plus', label: '5+ clients (Agency style / High volume)' },
-]
-
-const LEAD_AVAILABILITY_OPTIONS = [
-  { value: 'fully_booked', label: 'Fully Booked (No calls needed right now)' },
-  { value: 'steady_growth', label: 'Steady Growth (1-2 calls a week to fill a few gaps)' },
-  { value: 'high_priority', label: 'High Priority (3+ calls a week, I need work immediately)' },
-]
 
 export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}) {
   const { user } = useUser()

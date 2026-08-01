@@ -339,6 +339,34 @@
 
 .prof-events-link:hover { text-decoration: underline; }
 
+/* Completion banner — replaces the tip card once the profile is done */
+.prof-complete-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(52,210,123,0.10);
+  border: 1px solid rgba(52,210,123,0.25);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+}
+
+.prof-complete-banner-pct {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: #1e7a3f;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.prof-complete-banner-text {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #1e7a3f;
+}
+
 /* Tip card */
 .prof-tip-card {
   background: rgba(122,78,216,0.08);
