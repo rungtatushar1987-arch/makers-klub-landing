@@ -70,7 +70,6 @@ export function calcProfileProgress(p: Partial<Profile> | null | undefined): { p
     !!p?.income_goal,
     !!p?.client_capacity,
     !!p?.lead_availability,
-    !!p?.current_focus?.trim(),
   ]
   const filled = has.filter(Boolean).length
   return { pct: Math.round((filled / has.length) * 100), fieldsLeft: has.length - filled, isComplete: filled === has.length }

@@ -21,20 +21,6 @@ export const INDUSTRIES = [
 export const MAX_INDUSTRIES = 3
 export const MAX_SERVICES = 5
 
-export const EXPERIENCE_LEVELS = ['Beginner', 'Intermediate', 'Expert']
-
-export const SOCIAL_PLATFORMS = [
-  'LinkedIn',
-  'Instagram',
-  'Twitter / X',
-  'Behance',
-  'Dribbble',
-  'TikTok',
-  'YouTube',
-  'Facebook',
-  'Threads',
-]
-
 export const INCOME_GOAL_OPTIONS = [
   { value: 'starting_out', label: 'Just starting out ($2k - $4k / mo)' },
   { value: 'replacing_job', label: 'Replacing my full-time job ($4k - $7k / mo)' },
