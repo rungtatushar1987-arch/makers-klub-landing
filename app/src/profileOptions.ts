@@ -18,9 +18,6 @@ export const INDUSTRIES = [
   'Other',
 ]
 
-export const MAX_INDUSTRIES = 3
-export const MAX_SERVICES = 5
-
 export const INCOME_GOAL_OPTIONS = [
   { value: 'starting_out', label: 'Just starting out ($2k - $4k / mo)' },
   { value: 'replacing_job', label: 'Replacing my full-time job ($4k - $7k / mo)' },

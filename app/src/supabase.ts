@@ -64,8 +64,6 @@ export function calcProfileProgress(p: Partial<Profile> | null | undefined): { p
     !!p?.full_name?.trim(),
     !!p?.looking_to,
     !!(p?.industries && p.industries.length > 0),
-    !!(p?.locations && p.locations.length > 0),
-    !!(p?.services && p.services.length > 0),
     !!p?.website_url?.trim(),
     !!p?.income_goal,
     !!p?.client_capacity,

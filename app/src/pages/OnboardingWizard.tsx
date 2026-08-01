@@ -1,10 +1,10 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useState } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import { upsertProfile, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import {
-  INDUSTRIES, MAX_INDUSTRIES, MAX_SERVICES,
+  INDUSTRIES,
   INCOME_GOAL_OPTIONS, CLIENT_CAPACITY_OPTIONS, LEAD_AVAILABILITY_OPTIONS,
 } from '../profileOptions'
 import './OnboardingWizard.css'
@@ -32,17 +32,13 @@ export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}
     profile?.looking_to === 'hire' || profile?.looking_to === 'freelancer' ? profile.looking_to : ''
   )
   const [industries, setIndustries] = useState<string[]>(profile?.industries || [])
-  const [locations, setLocations] = useState<string[]>(profile?.locations || [])
-  const [locationInput, setLocationInput] = useState('')
-  const [services, setServices] = useState<string[]>(profile?.services || [])
-  const [serviceInput, setServiceInput] = useState('')
 
   // Step 2
   const [incomeGoal, setIncomeGoal] = useState(profile?.income_goal || '')
   const [clientCapacity, setClientCapacity] = useState(profile?.client_capacity || '')
   const [leadAvailability, setLeadAvailability] = useState(profile?.lead_availability || '')
 
-  const step1Valid = fullName.trim().length > 0 && lookingTo !== '' && industries.length > 0 && locations.length > 0 && services.length > 0
+  const step1Valid = fullName.trim().length > 0 && lookingTo !== '' && industries.length > 0
   const step2Valid = incomeGoal !== '' && clientCapacity !== '' && leadAvailability !== ''
 
   function handleLookingToChange(val: 'hire' | 'freelancer') {
@@ -50,43 +46,7 @@ export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}
   }
 
   function toggleIndustry(ind: string) {
-    setIndustries(prev => {
-      if (prev.includes(ind)) return prev.filter(i => i !== ind)
-      if (prev.length >= MAX_INDUSTRIES) return prev
-      return [...prev, ind]
-    })
-  }
-
-  function addLocation() {
-    const val = locationInput.trim()
-    if (!val || locations.includes(val)) { setLocationInput(''); return }
-    setLocations(prev => [...prev, val])
-    setLocationInput('')
-  }
-  function removeLocation(loc: string) {
-    setLocations(prev => prev.filter(l => l !== loc))
-  }
-  function handleLocationKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addLocation() }
-    else if (e.key === 'Backspace' && locationInput === '' && locations.length > 0) {
-      setLocations(prev => prev.slice(0, -1))
-    }
-  }
-
-  function addService() {
-    const val = serviceInput.trim()
-    if (!val || services.includes(val) || services.length >= MAX_SERVICES) { setServiceInput(''); return }
-    setServices(prev => [...prev, val])
-    setServiceInput('')
-  }
-  function removeService(s: string) {
-    setServices(prev => prev.filter(x => x !== s))
-  }
-  function handleServiceKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addService() }
-    else if (e.key === 'Backspace' && serviceInput === '' && services.length > 0) {
-      setServices(prev => prev.slice(0, -1))
-    }
+    setIndustries(prev => prev.includes(ind) ? prev.filter(i => i !== ind) : [...prev, ind])
   }
 
   async function handleFinish() {
@@ -100,8 +60,6 @@ export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}
       full_name: fullName.trim(),
       looking_to: lookingTo || null,
       industries: industries.length > 0 ? industries : null,
-      locations: locations.length > 0 ? locations : null,
-      services: services.length > 0 ? services : null,
       income_goal: incomeGoal || null,
       client_capacity: clientCapacity || null,
       lead_availability: leadAvailability || null,
@@ -183,71 +141,21 @@ export default function OnboardingWizard({ onClose }: OnboardingWizardProps = {}
               </div>
 
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Choose 3 industries you have experience working in <span className="ow-req">*</span></label>
+                <label className="mkw-form-label">Choose the industries you have experience working in <span className="ow-req">*</span></label>
                 <div className="ow-goal-grid">
                   {INDUSTRIES.map(ind => {
                     const selected = industries.includes(ind)
-                    const disabled = !selected && industries.length >= MAX_INDUSTRIES
                     return (
                       <button
                         key={ind}
                         type="button"
-                        className={`ow-goal-chip ${selected ? 'ow-goal-chip-selected' : ''} ${disabled ? 'ow-goal-chip-disabled' : ''}`}
+                        className={`ow-goal-chip ${selected ? 'ow-goal-chip-selected' : ''}`}
                         onClick={() => toggleIndustry(ind)}
-                        disabled={disabled}
                       >
                         {ind}
                       </button>
                     )
                   })}
-                </div>
-              </div>
-
-              <div className="mkw-form-group">
-                <label className="mkw-form-label">Choose the locations you are available to work in <span className="ow-req">*</span></label>
-                <div className="ow-hint" style={{ marginBottom: 6 }}>P.S We only recommend you to businesses in your area</div>
-                <div className="ow-tag-input-box">
-                  {locations.map(loc => (
-                    <span key={loc} className="ow-tag-chip">
-                      {loc}
-                      <button type="button" className="ow-tag-remove" onClick={() => removeLocation(loc)}>×</button>
-                    </span>
-                  ))}
-                  <input
-                    className="ow-tag-input"
-                    type="text"
-                    value={locationInput}
-                    onChange={e => setLocationInput(e.target.value)}
-                    onKeyDown={handleLocationKeyDown}
-                    onBlur={addLocation}
-                    placeholder={locations.length === 0 ? 'e.g. Berlin, Remote…' : ''}
-                  />
-                </div>
-              </div>
-
-              <div className="mkw-form-group">
-                <label className="mkw-form-label">List 5 primary services you offer <span className="ow-req">*</span></label>
-                <div className="ow-tag-input-box">
-                  {services.map(s => (
-                    <span key={s} className="ow-tag-chip">
-                      {s}
-                      <button type="button" className="ow-tag-remove" onClick={() => removeService(s)}>×</button>
-                    </span>
-                  ))}
-                  {services.length < MAX_SERVICES && (
-                    <input
-                      className="ow-tag-input"
-                      type="text"
-                      value={serviceInput}
-                      onChange={e => setServiceInput(e.target.value)}
-                      onKeyDown={handleServiceKeyDown}
-                      onBlur={addService}
-                      placeholder={services.length === 0 ? 'e.g. Logo design, Brand strategy…' : ''}
-                    />
-                  )}
-                </div>
-                <div className="ow-field-footer">
-                  <span className="ow-char-count">{services.length} / {MAX_SERVICES}</span>
                 </div>
               </div>
             </div>
