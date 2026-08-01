@@ -346,6 +346,123 @@
   .ow-pricing-row .ow-pricing-select { width: auto; flex: 1; }
 }
 
+/* ── Multiselect dropdown ── */
+.ow-multiselect {
+  position: relative;
+}
+
+.ow-multiselect-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+[data-theme="dark"] .ow-multiselect-trigger {
+  background: rgba(255,255,255,0.06);
+}
+
+.ow-multiselect-trigger:hover,
+.ow-multiselect-trigger:focus-visible {
+  border-color: var(--mk-yellow);
+}
+
+.ow-multiselect-placeholder {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+.ow-multiselect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.ow-multiselect-caret {
+  font-size: 11px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.ow-multiselect-caret-open {
+  transform: rotate(180deg);
+}
+
+.ow-multiselect-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--glass-shadow), 0 10px 28px rgba(38,40,90,0.16);
+  padding: 6px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ow-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-xs);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-1);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.ow-multiselect-option:hover {
+  background: rgba(252,184,19,0.10);
+}
+
+.ow-multiselect-option-selected {
+  background: rgba(122,78,216,0.08);
+  font-weight: 600;
+}
+
+.ow-multiselect-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--hairline-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.ow-multiselect-option-selected .ow-multiselect-checkbox {
+  background: var(--mk-violet);
+  border-color: var(--mk-violet);
+}
+
 /* ── Goal chips ── */
 .ow-goal-grid {
   display: flex;
