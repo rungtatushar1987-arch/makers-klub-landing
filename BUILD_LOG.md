@@ -1275,3 +1275,85 @@ A potential community organiser client pulled back, saying the platform "only bu
 4. **Roadmap write-up** — licensing model, org vs. personal data isolation framing
 5. **Check-in flow** — `attended` status on `event_rsvps` or new `event_checkins` table
 
+---
+
+## Session — 1 August 2026 — Onboarding wizard: built, debugged, restructured, then made optional
+
+### Context
+Replicated the PWA's onboarding wizard into the web dashboard (previously had no onboarding step at all — new signups landed straight on `/home` with a bare profile stub). Iterated heavily on the wizard's content and structure across the session based on live feedback, then reversed course on the core UX decision (mandatory gate) after real freelancer feedback came in mid-session. All work in this session was mirrored in parallel to `mk-event-app` (PWA) — see that repo's `makers-klub-build-summary.md` for the PWA-side file changes; schema changes below are shared (one Supabase project).
+
+### 1. Initial port — dashboard gains a 3-step onboarding wizard + gate
+- New `OnboardingWizard.tsx` (+ `.css`), ported from the PWA's `Onboarding.tsx` steps/copy/logic, restyled for desktop Aurora Glass using existing `mkw-form-*`/`mk-btn-*` classes instead of the PWA's CSS module.
+- Extended `Profile` type + added `upsertProfile`/`getProfileGoals`/`setProfileGoals` helpers to `app/src/supabase.ts`, matching the PWA's `lib/supabase.ts`.
+- `KlubContext.tsx` — profile fetch changed from `select('clerk_user_id')` to `select('*')`; exposes the full `profile` object through context.
+- `App.tsx` — added an `OnboardingGate` (mirroring the PWA's) wrapping `/home`, `/events`, `/network`, `/profile`, `/admin`; new `/onboarding` route.
+- UI polish pass: removed the purple "Welcome" banner from the new-user home view, swapped the sidebar's placeholder "MK" text mark for the real `logo.svg`, moved a time-of-day greeting into the sidebar in place of the static "Makers Klub / Berlin" text.
+
+### 2. Debugged "No suitable key" onboarding submit error
+Traced via Supabase API logs (not guessed) — the failing session's requests never reached Supabase's REST API at all (no `POST /profiles` in the log, only GETs), meaning the failure was client-side in `session.getToken()` before any app/Supabase code ran. Ruled out an app-code bug and a Clerk-key mismatch (dev/prod use identical `.env.local` values in both repos). Concluded it was a dev-environment-specific stale Clerk session/cache issue, not something fixable from code.
+
+Confirmed along the way: dev and prod (both apps) share the single Supabase project — no separate dev database. Cleaned up one orphaned test profile row (`Test User1`, no matching Clerk account, incomplete onboarding); declined paid Supabase branch isolation after quoting the cost ($0.01344/hr + required plan tier) — left as-is per explicit instruction.
+
+### 3. Onboarding Step 1 overhaul
+Replaced free-text discipline / single-industry-select / city-text / tech-background-chips with:
+- **Are you looking to** — Hire vs. Provide service (freelancer), single choice
+- **Industries** — up to 3, multi-select chips (reused existing `INDUSTRIES` list)
+- **Locations** — tag input, unlimited
+- **Services** — tag input, capped at 5
+
+Goal-exclusion logic in the (then-still-present) goals step rewritten to key off the new `looking_to` value instead of keyword-matching free-text discipline.
+
+Schema: migration added `looking_to text`, `industries text[]`, `locations text[]`, `services text[]` to `profiles`.
+
+### 4. CSS specificity bug — Step 2 pricing row
+Per-service experience `<select>` was losing its `150px` width override to `global.css`'s `.mkw-form-select { width: 100% }` — both single-class selectors tied on specificity, and the global rule won on source order, which also squeezed the service name to invisible and pushed the rate input outside the card border. Fixed with a compound selector (`.ow-pricing-row .ow-pricing-select`), which reliably wins regardless of bundle order.
+
+### 5. Step 2 "Price your services" added
+Per-service rows (experience level + approximate hourly rate €/hr), portfolio link (renamed from "Website" per follow-up), and a social-platform picker (LinkedIn/Instagram write to the existing dedicated columns for compatibility with the Profile page's own editor; everything else — Twitter/X, Behance, Dribbble, TikTok, YouTube, Facebook, Threads — into a new `social_links` jsonb). Follow-up requests made all pricing rows and the portfolio link mandatory to proceed.
+
+Schema: migration added `service_pricing jsonb`, `social_links jsonb`.
+
+### 6. Step 3 replaced goals with business-fit questions
+Removed the free-text goal picker and the skill-rating step entirely. New Step 3 asks three required single-choice questions (income goal, retainer client capacity, lead availability — rendered as full-width option cards since the labels are long sentences, not single words) plus the "biggest challenge" field moved in from the old Step 4. Wizard is 3 steps total.
+
+Schema: migration added `income_goal text`, `client_capacity text`, `lead_availability text`. Dropped the now-fully-dead `ProfileGoal` type and `getProfileGoals`/`setProfileGoals` from the dashboard's `supabase.ts` (confirmed via grep nothing else in this codebase used them, unlike the PWA where `Klub.tsx` still reads goals).
+
+### 7. Mandatory gate removed entirely
+Per direct freelancer feedback ("hated filling it out early on"): new signups now land straight on `/home`, no forced redirect. The wizard becomes an on-demand "profile completion form."
+- `App.tsx` — `OnboardingGate` deleted.
+- `Profile.tsx` — legacy "I am a…" role select removed, replaced with a "Services & business profile" card linking into the wizard. Recomputed profile-completion % against the wizard's actual fields instead of the retired role/bio/social-link set.
+- `OnboardingWizard.tsx` — added a "← Back to profile" exit link (wizard is no longer a forced sequence); finishing now returns to `/profile` with "Save profile →" copy instead of "Enter Makers Klub →".
+
+### 8. Follow-up fixes (same day)
+- **Modal instead of navigation** — "Complete your profile" on the Profile page now opens the wizard as a full-screen in-page overlay (`OnboardingWizard` takes an optional `onClose(savedProfile?)` prop) instead of a route change; closing pushes the saved profile straight into Profile's local state.
+- **Progress percentage mismatch bug** — home page showed a hardcoded "25%" (`user?.firstName && user?.lastName ? 25 : 10`, unrelated to real data) while Profile showed the real "0%". Extracted one `calcProfileProgress()` into `supabase.ts`, used by both `Profile.tsx` and the home welcome card (`pages/Onboarding.tsx`) so they can't disagree again. Updated that card's stale "Add your role, bio, and links..." copy to match the new fields.
+- **Diagnosed a false-alarm blank-screen report** — direct navigation to `/profile` 404'd on `main.tsx` in the user's own separate dev server (port 5174). Reproduced the identical route cleanly on a freshly-started instance of the same config, proving it wasn't a code bug; root-caused to a stale Vite dev server process that hadn't picked up the session's structural edits (removed consts/routes) — confirmed fixed by the user restarting their server.
+
+### Files changed
+| File | Change |
+|---|---|
+| `app/src/pages/OnboardingWizard.tsx` (new) | 3-step wizard: identity/services/locations → pricing/portfolio/social → business goals + biggest challenge. Optional `onClose` prop for modal use. |
+| `app/src/pages/OnboardingWizard.css` (new) | Full styling incl. tag inputs, option cards, pricing rows |
+| `app/src/supabase.ts` | Extended `Profile` type (10+ new fields); `upsertProfile` helper; `calcProfileProgress()` shared helper; dropped dead `ProfileGoal`/goal helpers |
+| `app/src/App.tsx` | `OnboardingGate` added, then removed entirely |
+| `app/src/KlubContext.tsx` | Profile fetch → `select('*')`, exposes `profile` via context |
+| `app/src/pages/Profile.tsx` | Legacy role field → "Complete your profile" launcher (now opens wizard as modal); progress calc unified with home card |
+| `app/src/pages/Onboarding.tsx` (new-user welcome card) | Removed purple welcome banner; real progress % instead of hardcoded; updated copy |
+| `app/src/components/Sidebar.tsx` | Real logo image + time-of-day greeting replacing static brand text |
+| `app/src/global.css` | Removed now-dead `.mkw-brand-mark` styles |
+| Supabase migrations | `looking_to`/`industries`/`locations`/`services`, `service_pricing`/`social_links`, `income_goal`/`client_capacity`/`lead_availability` — all on `profiles` |
+
+### Key decisions
+| Decision | Reason |
+|---|---|
+| Keep the wizard's stepped structure even after dropping the gate | Explicit instruction — reachable on demand from Profile rather than flattened into a single long form |
+| Modal overlay instead of route navigation for "Complete your profile" | Explicit follow-up request; avoids a jarring full-page nav for what's now a revisitable action |
+| LinkedIn/Instagram write to existing dedicated columns, other platforms to a new `social_links` jsonb | Keeps the wizard's social picker in sync with Profile's own pre-existing LinkedIn/Instagram/Website editor instead of forking the data |
+| New array/jsonb columns rather than packing multiple values into existing scalar columns | Correct types, doesn't corrupt columns other pages (Members, admin analytics) still read as plain strings |
+| One shared `calcProfileProgress()` instead of two local calcs | Root cause of the 25%-vs-0% bug was exactly two independent implementations drifting apart |
+
+### Open items (carried forward)
+- Other pages (Members, MemberProfile, admin analytics) still read the retired `role_category`/`industry`/`city` fields as display strings — untouched this session, will just stop getting fresh values from new signups going forward
+- Dev/prod share one Supabase project — no isolation; flagged, not solved (declined per cost)
+- Live click-through of the modal wizard flow and the "revisit and edit" prefill path not verified from this environment (no login credentials available) — verified via clean builds/type-checks + code review only
+
