@@ -63,104 +63,6 @@
   border-radius: 999px; transition: width 0.4s ease;
 }
 
-/* ── Event cards ── */
-.onb-events { display: flex; flex-direction: column; gap: 10px; }
-
-.onb-event-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 13px 15px;
-  background: rgba(255,255,255,0.35);
-  border: 1px solid var(--hairline-strong);
-  border-radius: var(--r-xs);
-}
-
-.onb-event-date {
-  width: 40px; height: 44px; border-radius: 8px;
-  background: var(--mk-navy);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.onb-event-day {
-  font-family: var(--font-display); font-weight: 800;
-  font-size: 16px; line-height: 1; color: #fff;
-}
-
-.onb-event-mon {
-  font-size: 7px; letter-spacing: 1.2px; font-weight: 700;
-  color: var(--mk-yellow); margin-top: 2px;
-}
-
-.onb-event-info { flex: 1; min-width: 0; }
-
-.onb-event-title {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: 13px; color: var(--ink-1); margin-bottom: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.onb-event-meta { font-family: var(--font-body); font-size: 11px; color: var(--ink-3); }
-
-/* ── Locked card ── */
-.onb-card-locked {
-  position: relative; border-style: dashed;
-  background: rgba(12,19,48,0.03);
-}
-
-.onb-lock-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-  background: var(--hairline); color: var(--ink-3);
-  padding: 4px 10px; border-radius: 999px; margin-bottom: 10px;
-}
-
-.onb-blur-preview {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin: 16px 0; filter: blur(4px); pointer-events: none; user-select: none;
-}
-
-.onb-blur-pill {
-  padding: 8px 16px; border-radius: 999px;
-  background: rgba(122,78,216,0.18); color: var(--mk-violet);
-  font-family: var(--font-display); font-size: 13px; font-weight: 600;
-}
-
-.onb-lock-hint {
-  font-family: var(--font-body);
-  font-size: 12px; color: var(--ink-3); font-style: italic; margin-top: 8px;
-}
-
-/* ── Steps checklist ── */
-.onb-card-steps { margin-bottom: 16px; }
-.onb-steps { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
-
-.onb-step {
-  display: flex; align-items: flex-start; gap: 12px;
-  opacity: 0.45; transition: opacity 0.2s;
-}
-
-.onb-step.done { opacity: 1; }
-
-.onb-step-ic {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--hairline); border: 1.5px solid var(--hairline-strong);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-size: 11px; font-weight: 700; color: var(--ink-3);
-  flex-shrink: 0;
-}
-
-.onb-step.done .onb-step-ic {
-  background: var(--mk-yellow); border-color: var(--mk-yellow);
-  color: var(--mk-navy); box-shadow: 0 3px 8px rgba(252,184,19,0.35);
-}
-
-.onb-step-title {
-  font-family: var(--font-display);
-  font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 2px;
-}
-
-.onb-step-sub { font-family: var(--font-body); font-size: 11px; color: var(--ink-3); }
-
 /* ── Community card ── */
 .onb-card-community {
   background: var(--mk-navy);
@@ -198,15 +100,11 @@
   color: rgba(255,255,255,0.45); line-height: 1.6; margin: 0;
 }
 
-/* ── Going pill ── */
-.onb-going-pill {
-  display: inline-flex; padding: 1px 7px; border-radius: 999px;
-  background: rgba(122,78,216,0.14); color: var(--mk-violet);
-  font-family: var(--font-display); font-size: 10px; font-weight: 700; margin-left: 6px;
-}
-
 /* ── Member strip ── */
 .onb-member-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.onb-member-strip--col { flex-direction: column; flex-wrap: nowrap; }
+.onb-member-strip--col .onb-member-chip { width: 100%; }
 
 .onb-member-chip {
   display: flex; align-items: center; gap: 8px;
