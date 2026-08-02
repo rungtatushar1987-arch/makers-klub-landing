@@ -9,6 +9,7 @@ type KlubContextType = {
   rsvpd: Set<string>
   allRsvps: { clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]
   allProfiles: Profile[]
+  totalMembers: number
   profile: Profile | null
   loading: boolean
   isOnboarding: boolean
@@ -33,6 +34,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
   const [allRsvps, setAllRsvps] = useState<{ clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]>([])
   const [allProfiles, setAllProfiles] = useState<Profile[]>([])
+  const [totalMembers, setTotalMembers] = useState(0)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -78,6 +80,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       { data: rsvpData },
       { data: allRsvpData },
       { data: profilesAllData },
+      { count: profilesCount },
     ] = await Promise.all([
       // Outgoing: rows where this user is the scanner, not declined
       db.from('connections').select('*').eq('clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
@@ -87,9 +90,12 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       db.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
       db.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
       db.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20),
+      // Exact total row count, uncapped — the real "how many members" number
+      db.from('profiles').select('*', { count: 'exact', head: true }),
     ])
 
     if (eventsData) setEvents(eventsData)
+    setTotalMembers(profilesCount ?? 0)
     if (rsvpData) setRsvpd(new Set(rsvpData.map((r: { event_id: string }) => r.event_id)))
     if (profilesAllData) setAllProfiles(profilesAllData as Profile[])
     if (allRsvpData && profilesAllData) {
@@ -256,7 +262,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <KlubContext.Provider value={{
-      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, profile, loading,
+      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, totalMembers, profile, loading,
       isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
       acceptRequest, declineRequest,

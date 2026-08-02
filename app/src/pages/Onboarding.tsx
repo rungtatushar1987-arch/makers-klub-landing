@@ -21,10 +21,11 @@ function getInitials(name?: string | null): string {
 
 export default function Onboarding() {
   const { user } = useUser()
-  const { events, rsvpd, toggleRsvp, allRsvps, allProfiles, profile } = useKlub()
+  const { events, rsvpd, toggleRsvp, allRsvps, allProfiles, totalMembers, profile } = useKlub()
 
   const now = new Date()
   const upcoming = events.filter(e => new Date(e.date) >= now).slice(0, 4)
+  const eventsRun = events.filter(e => new Date(e.date) < now).length
   const { pct: profilePct } = calcProfileProgress(profile)
 
   // Community members — up to 8, exclude self
@@ -232,11 +233,11 @@ export default function Onboarding() {
             <div className="onb-card-label">The community</div>
             <div className="onb-community-stats">
               <div className="onb-comm-stat">
-                <div className="onb-comm-num">{allProfiles.length > 0 ? `${allProfiles.length}+` : '47+'}</div>
+                <div className="onb-comm-num">{totalMembers}</div>
                 <div className="onb-comm-lbl">Members</div>
               </div>
               <div className="onb-comm-stat">
-                <div className="onb-comm-num">12</div>
+                <div className="onb-comm-num">{eventsRun}</div>
                 <div className="onb-comm-lbl">Events run</div>
               </div>
               <div className="onb-comm-stat">

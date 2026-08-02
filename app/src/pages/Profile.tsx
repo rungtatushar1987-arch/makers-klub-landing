@@ -3,12 +3,22 @@ import { useUser, useSession } from '@clerk/clerk-react'
 import { getSupabaseClient, calcProfileProgress, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import OnboardingWizard from './OnboardingWizard'
+import { INCOME_GOAL_OPTIONS, CLIENT_CAPACITY_OPTIONS, LEAD_AVAILABILITY_OPTIONS } from '../profileOptions'
 import './Profile.css'
+
+const LOOKING_TO_LABELS: Record<string, string> = {
+  hire: 'Hiring',
+  freelancer: 'Providing services (freelancer)',
+}
+
+function optionLabel(options: { value: string; label: string }[], value?: string | null) {
+  return options.find(o => o.value === value)?.label || value || ''
+}
 
 export default function Profile() {
   const { user } = useUser()
   const { session } = useSession()
-  const { events } = useKlub()
+  const { events, refresh } = useKlub()
   const [profile, setProfile] = useState<Partial<Profile>>({})
   const [savedProfile, setSavedProfile] = useState<Partial<Profile>>({})
   const [loading, setLoading] = useState(true)
@@ -41,6 +51,13 @@ export default function Profile() {
   const { pct, fieldsLeft, isComplete } = calcProfileProgress(savedProfile)
   const isDirty = JSON.stringify(profile) !== JSON.stringify(savedProfile)
 
+  const isBusinessComplete =
+    !!savedProfile.looking_to &&
+    !!(savedProfile.industries && savedProfile.industries.length > 0) &&
+    !!savedProfile.income_goal &&
+    !!savedProfile.client_capacity &&
+    !!savedProfile.lead_availability
+
   const savedHasSocial =
     !!savedProfile.linkedin_url?.trim() ||
     !!savedProfile.instagram_url?.trim() ||
@@ -68,6 +85,7 @@ export default function Profile() {
     await db.from('profiles').upsert({ ...profile, clerk_user_id: user?.id, slug })
     const updated = { ...profile, slug }
     setSavedProfile(updated)
+    await refresh()
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
@@ -115,15 +133,60 @@ export default function Profile() {
             </div>
 
             <div className="prof-section">
-              <div className="prof-section-label">Services & business profile</div>
-              <p className="prof-field-hint" style={{ marginTop: 0, marginBottom: 14 }}>
-                {isComplete
-                  ? 'Update what you offer, your rates, and your business goals.'
-                  : 'Tell us what you offer, your rates, and your business goals so we can match you with the right people and events.'}
-              </p>
-              <button type="button" className="mk-btn mk-btn-navy" onClick={() => setShowWizard(true)}>
-                {isComplete ? 'Edit profile →' : pct > 0 ? 'Continue completing your profile →' : 'Complete your profile →'}
-              </button>
+              <div className="prof-section-head">
+                <div className="prof-section-label">Services & business profile</div>
+                {isBusinessComplete && (
+                  <button
+                    type="button"
+                    className="prof-edit-icon-btn"
+                    onClick={() => setShowWizard(true)}
+                    aria-label="Edit services & business profile"
+                    title="Edit"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.3 2.3a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1 0 1.4l-7.6 7.6-3 .7.7-3 7.5-7.7Z" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {isBusinessComplete ? (
+                <div className="prof-readonly-list">
+                  <div className="prof-readonly-row">
+                    <span className="prof-readonly-label">Looking to</span>
+                    <span className="prof-readonly-value">{LOOKING_TO_LABELS[savedProfile.looking_to || ''] || savedProfile.looking_to}</span>
+                  </div>
+                  <div className="prof-readonly-row">
+                    <span className="prof-readonly-label">Industries</span>
+                    <div className="prof-readonly-chips">
+                      {(savedProfile.industries || []).map(ind => (
+                        <span key={ind} className="prof-readonly-chip">{ind}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="prof-readonly-row">
+                    <span className="prof-readonly-label">Income goal</span>
+                    <span className="prof-readonly-value">{optionLabel(INCOME_GOAL_OPTIONS, savedProfile.income_goal)}</span>
+                  </div>
+                  <div className="prof-readonly-row">
+                    <span className="prof-readonly-label">Client capacity</span>
+                    <span className="prof-readonly-value">{optionLabel(CLIENT_CAPACITY_OPTIONS, savedProfile.client_capacity)}</span>
+                  </div>
+                  <div className="prof-readonly-row">
+                    <span className="prof-readonly-label">Lead availability</span>
+                    <span className="prof-readonly-value">{optionLabel(LEAD_AVAILABILITY_OPTIONS, savedProfile.lead_availability)}</span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="prof-field-hint" style={{ marginTop: 0, marginBottom: 14 }}>
+                    Tell us what you offer, your rates, and your business goals so we can match you with the right people and events.
+                  </p>
+                  <button type="button" className="mk-btn mk-btn-navy" onClick={() => setShowWizard(true)}>
+                    {pct > 0 ? 'Continue completing your profile →' : 'Complete your profile →'}
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="prof-section">

@@ -328,13 +328,13 @@ function HeroMatchCard({
     { bg: '#a587f0', fg: '#0a1340' },
   ]
 
-  // Use real connection initials if available
+  // Real connection initials only — no group yet means no avatars, not fake ones
   const stackPeople = hasGroup
     ? connections.slice(0, 4).map((c, i) => ({
         initial: getInitials(c.profile?.full_name),
         ...stackColors[i % stackColors.length],
       }))
-    : stackColors.map((c, i) => ({ initial: ['T', 'S', 'J', 'M'][i], ...c }))
+    : []
 
   return (
     <div style={{
@@ -358,7 +358,7 @@ function HeroMatchCard({
         letterSpacing: '1.8px', textTransform: 'uppercase',
         color: 'var(--mk-yellow)', marginBottom: 10, position: 'relative',
       }}>
-        {month} MATCH · GROUP OF {Math.min(stackPeople.length + 1, 4)}
+        {month} MATCH{hasGroup ? ` · GROUP OF ${Math.min(stackPeople.length + 1, 4)}` : ''}
       </div>
 
       {/* Headline */}
@@ -386,7 +386,7 @@ function HeroMatchCard({
       {/* Avatar stack + CTA */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'relative' }}>
         <div style={{ display: 'flex' }}>
-          {stackPeople.map((p, i) => (
+          {hasGroup ? stackPeople.map((p, i) => (
             <div key={i} style={{
               width: 32, height: 32, borderRadius: '50%',
               background: p.bg, color: p.fg,
@@ -397,7 +397,16 @@ function HeroMatchCard({
             }}>
               {p.initial}
             </div>
-          ))}
+          )) : (
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14, color: 'rgba(255,255,255,0.55)',
+              border: '2px dashed rgba(255,255,255,0.45)',
+            }}>
+              ?
+            </div>
+          )}
         </div>
         <a
           href={hasGroup ? '/network' : '/events'}
