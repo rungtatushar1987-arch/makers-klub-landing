@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { getSupabaseClient, acceptConnection, declineConnection, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
+import { getSupabaseClient, acceptConnection, declineConnection, calcProfileProgress, type Event, type Profile, type Connection, AVATAR_COLORS } from './supabase'
 
 type KlubContextType = {
   connections: Connection[]           // accepted only (both directions)
@@ -263,7 +263,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   return (
     <KlubContext.Provider value={{
       connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, totalMembers, profile, loading,
-      isOnboarding: connections.length === 0 && events.filter(e => new Date(e.date) < new Date()).length === 0,
+      isOnboarding: !calcProfileProgress(profile).isComplete,
       toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
       acceptRequest, declineRequest,
       refresh: load,
