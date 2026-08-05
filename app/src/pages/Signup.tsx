@@ -195,6 +195,11 @@ export default function Signup() {
                 )}
               </div>
 
+              {/* Required mount point for Clerk's bot-protection CAPTCHA (Cloudflare
+                  Turnstile) — without it, signUp.create() fails to load the challenge
+                  in custom (non-Clerk-Elements) sign-up flows like this one. */}
+              <div id="clerk-captcha" />
+
               {error && <p className="mkw-signup-error">{error}</p>}
 
               <button
