@@ -75,7 +75,7 @@ export default function Profile() {
   const canSave = !!profile.full_name?.trim() && !!profile.bio?.trim() && hasSocial
 
   async function save() {
-    if (!isProfileUnlocked && !canSave) { if (!hasSocial) setSocialError(true); return }
+    if (!canSave) { if (!hasSocial) setSocialError(true); return }
     setSaving(true)
     const slug = profile.slug || (profile.full_name
       ? profile.full_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + user?.id.slice(-6)
@@ -213,7 +213,7 @@ export default function Profile() {
             <button
               className={`mk-btn ${isProfileUnlocked || canSave ? 'mk-btn-primary' : 'mk-btn-ghost'} prof-save-btn`}
               onClick={save}
-              disabled={saving || (isComplete ? !isDirty : (!isProfileUnlocked && !canSave))}
+              disabled={saving || !canSave || (isComplete && !isDirty)}
             >
               {saving ? 'Saving…' : isProfileUnlocked ? 'Save profile' : 'Save & unlock →'}
             </button>

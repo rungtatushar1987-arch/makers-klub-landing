@@ -32,8 +32,14 @@ export default function Login() {
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
         navigate('/home')
+      } else if (result.status === 'needs_second_factor') {
+        setError('This account has two-factor authentication enabled, which this sign-in form doesn\'t support yet. Please contact support.')
+      } else if (result.status === 'needs_new_password') {
+        setError('Your password needs to be reset before you can sign in. Please contact support.')
       } else {
-        setError('Sign in incomplete. Please try again.')
+        // Surface the raw status so an unexpected case is diagnosable instead
+        // of a dead-end generic message.
+        setError(`Sign in incomplete (${result.status}). Please try again or contact support.`)
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.longMessage ?? err.message ?? 'Invalid email or password.')
