@@ -40,7 +40,8 @@ export default defineConfig({
         app: './app/index.html',
         impressum: './impressum.html',
         datenschutz: './datenschutz.html',
-        apply: './apply.html'
+        apply: './apply.html',
+        blog: './blog.html'
       }
     }
   },

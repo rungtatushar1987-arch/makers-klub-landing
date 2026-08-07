@@ -5,6 +5,7 @@
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/apply\\.html", "status": 308, "headers": { "Location": "/community/join" } },
     { "src": "/community/join", "dest": "/apply.html" },
+    { "src": "/blog", "dest": "/blog.html" },
     { "src": "/login(.*)", "dest": "/app/index.html" },
     { "src": "/signup(.*)", "dest": "/app/index.html" },
     { "src": "/home(.*)", "dest": "/app/index.html" },
