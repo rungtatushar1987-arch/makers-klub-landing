@@ -1465,3 +1465,15 @@ Navigating straight to `/#membership` landed at the top of the page instead of s
 ### Still pending
 - Real member photos — waiting on the user to actually upload/provide the 4 headshots (confirmed not present in any connected storage).
 
+---
+
+## Session — 21 August 2026 (continued) — Membership section: link instead of embed, alignment, background rhythm
+
+User feedback on the embedded Tally form: pointed out a large blank area below the visible fields (a Tally resize bug, fixed same session) and asked for three changes.
+
+- **Swapped the embed for a link.** Removed the iframe from `Membership.jsx` entirely — the section is now just the "Join the Club" heading plus an **Apply to Join →** button linking straight to `https://tally.so/r/Pde8pd` (the direct form URL, same convention already used for the site's other Tally link) with `target="_blank"`. No more iframe sizing/embedding to fight with.
+- **Left-aligned the heading.** The old layout wrapped everything in a narrow, centered 620px container built for the embed panel. Rebuilt `Membership.jsx` to use the same `.sc-mast` header pattern and `1180px` container as `WhySection`/`Network`, so "Membership" / "Join the Club" now sits at the exact same left edge as "Our Network" above it (confirmed via `getBoundingClientRect()` — both at x=24 on mobile).
+- **Fixed the background rhythm.** The "inconsistent" background the user flagged was real, once diagnosed: Network and Membership were both transparent (inheriting the paper body color) sitting back-to-back with no separation, breaking the alternating dark/light pattern the rest of the page follows (Hero navy → Marquee gold → Why navy → Events navy-deep). Gave Membership an explicit `background: var(--navy)` — same navy shade as WhySection — so the page now reads: paper (Network) → navy (Membership) → navy-deep (Footer), a deliberate light-to-dark close instead of two flat paper sections in a row.
+
+Verified: build succeeds, no console errors, button links to the correct URL in a new tab, headings align across sections at both mobile and desktop widths.
+

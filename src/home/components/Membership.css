@@ -1,35 +1,14 @@
 .sc-membership {
-  padding: 0 64px 110px;
+  background: var(--navy);
+  padding: 100px 64px 110px;
 }
 .sc-membership-inner {
-  max-width: 620px;
+  max-width: 1180px;
   margin: 0 auto;
-}
-.sc-membership-heading {
-  font-size: clamp(30px, 4vw, 46px);
-  margin: 8px 0 16px;
-}
-.sc-membership-desc {
-  margin-bottom: 44px;
-}
-
-.sc-membership-panel {
-  border: 1px solid var(--navy);
-  padding: 24px;
-}
-.sc-membership-panel-label {
-  display: block;
-  margin-bottom: 12px;
-}
-.sc-membership-panel iframe {
-  display: block;
 }
 
 @media (max-width: 900px) {
   .sc-membership {
-    padding: 0 24px 90px;
-  }
-  .sc-membership-panel {
-    padding: 28px 20px;
+    padding: 80px 24px 90px;
   }
 }
