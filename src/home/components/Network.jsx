@@ -36,7 +36,7 @@ export default function Network() {
       </div>
 
       <div className="sc-network-more">
-        <a href="#join" className="link-underline sc-network-more-link">View All Members →</a>
+        <a href="#membership" className="link-underline sc-network-more-link">View All Members →</a>
       </div>
     </section>
   )

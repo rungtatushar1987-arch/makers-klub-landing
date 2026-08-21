@@ -68,7 +68,7 @@ export default function Hero() {
         </p>
 
         <div className="sc-hero-actions">
-          <a href="#join" className="btn-solid">Become a Member →</a>
+          <a href="#membership" className="btn-solid">Become a Member →</a>
           <a href="#events" className="btn-ghost">See Upcoming Sessions</a>
         </div>
 

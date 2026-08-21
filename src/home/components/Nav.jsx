@@ -8,11 +8,7 @@ export default function Nav() {
         <span className="sc-nav-logo-text">Solopreneurs Club</span>
       </a>
       <div className="sc-nav-right">
-        <a href="#join" className="sc-nav-cta">Join</a>
-        <div className="sc-nav-burger" aria-hidden="true">
-          <span></span>
-          <span></span>
-        </div>
+        <a href="#membership" className="sc-nav-cta">Join</a>
       </div>
     </nav>
   )

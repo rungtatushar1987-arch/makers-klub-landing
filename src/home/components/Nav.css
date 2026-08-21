@@ -54,19 +54,6 @@
   color: var(--navy);
   transform: translateY(-1px);
 }
-.sc-nav-burger {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  cursor: pointer;
-  padding: 6px;
-}
-.sc-nav-burger span {
-  width: 20px;
-  height: 2px;
-  background: var(--navy);
-  display: block;
-}
 
 @media (max-width: 900px) {
   .sc-nav {

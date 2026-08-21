@@ -1414,3 +1414,54 @@ Signature device: a shared masthead header pattern (`.sc-mast` / `.sc-mast-label
 - Checked in-browser at desktop (~1180px) and mobile (375px): confirmed grid/flex layouts actually go multi-column at desktop width (via computed `gridTemplateColumns`) and stack correctly on mobile; no horizontal overflow (`scrollWidth` matches `innerWidth` at both sizes); no console errors; hero typewriter animation and waitlist success-swap both still function.
 - Not re-verified: the vertical hero edge label and roll-call ticker's exact spacing on very wide monitors (>1600px) — should still look fine given the layout's use of `max-width` containers, but wasn't checked directly.
 
+### Follow-up — Why/Network reverted from rows back to cards
+User feedback on the ledger-row treatment for Why and Network: "looks bad." Reverted both to bordered card grids (3-col Why, 4-col Network) — kept the mono `N°0X` numbering and initial-mark avatars, dropped the full-width-row layout. `Stats`/masthead/CTA-split/Membership-row changes from the pass above were not part of the complaint and were left as-is.
+
+---
+
+## Session — 21 August 2026 (continued) — Removed the standalone apply page; application form now lives on the homepage
+
+### What changed
+- Deleted `apply.html` entirely (was a static page at `/community/join`, embedding a Tally application form via `data-tally-src` + a page-level loader script).
+- The same Tally embed (form id `Pde8pd`) now lives inline in the **Membership** section (`Membership.jsx`), inside a bordered panel labeled "Apply to Join" — positioned above where the old "Apply to Join" link used to sit. The section now has `id="membership"`.
+- `vite.config.js`: removed the `apply` entry from `rollupOptions.input` and the `/apply.html` → `/community/join` dev-server redirect; `/community/join` now falls through to `index.html` in dev.
+- `vercel.json`: `/apply.html` and `/community/join` now 308-redirect to `/#membership` (production) instead of serving the deleted page — old bookmarks/links land on the new inline form instead of 404ing.
+- Confirmed no other page linked to `/apply.html` or `/community/join` (only `Membership.jsx` did). The unrelated "Platform waitlist" Tally form (`tally.so/r/J9JAjJ`, used elsewhere in nav/footer links) and the Datenschutz page's generic Tally disclosure were both left untouched — they don't reference this specific form or page.
+
+### Bug found and fixed during verification
+The original apply.html pattern (`data-tally-src` attribute + `Tally.loadEmbeds()` call from Tally's own script) didn't reliably set the iframe's `src` when the iframe is part of a React tree instead of static HTML — `Tally.loadEmbeds()` loaded successfully (confirmed `window.Tally` had real methods) but never populated the `src`, leaving a blank iframe. Fixed by setting `src` directly as a normal React prop instead of relying on the data-attribute/library-scan pattern; the Tally script is still loaded (for its resize/popup behavior) but the form no longer depends on it to render. Verified the form renders live with all its fields in-browser after the fix.
+
+### Verified
+- `npm run build` succeeds; `apply.html` no longer in `dist/`; `impressum.html`/`datenschutz.html`/`blog.html` build unchanged.
+- `/apply.html` 404s in dev as expected; `/impressum.html` still loads correctly.
+- Form renders with real fields (Name, Email, Social Profiles, membership type) in-browser; no console errors.
+
+---
+
+## Session — 21 August 2026 (continued) — Nav cleanup, one-page consolidation, waitlist removal
+
+### What was asked vs. what was done
+Five requests: remove the hamburger menu, give member cards real photos, reduce the site to one page, make "Become a Member" scroll to Membership, remove the waitlist section. Two of these had real conflicts with standing constraints, so I checked before acting instead of guessing:
+
+**Member photos** — checked everywhere accessible before touching anything: Supabase Storage (no buckets at all), the `profiles` table (no photo/avatar-url column, only `avatar_color` for the dashboard's colored-initial avatars), and the Vercel Blob store the user pointed me to directly (`store_LD1GETDCu5H4JIYG`, `images/` directory) — confirmed via the Blob REST API it holds exactly 21 files: 12 event session photos (`DSC0XXXX.jpg`), the logo, a few `mk-session-*` photos, and 2 platform screenshots. Nothing for Alessandro Tarshahani, Nupur Vartak, Ale Ponce, or Cat Johnson. **Left as gold-initial placeholders** — flagging back to the user rather than inventing stock photos, consistent with the standing instruction from the original redesign brief.
+
+**"Only one page, remove ALL other URLs"** — taken literally this would delete `impressum.html`/`datenschutz.html` (German legal disclosure pages, required by §5 TMG/DSGVO) and the entire `/app` dashboard (the actual member product — login, events, network — not a marketing page). Asked before deleting either. User confirmed: marketing pages only. Removed `blog.html` and `community.html`; left legal pages and `/app` untouched.
+
+### What changed
+- **Nav**: hamburger icon (`.sc-nav-burger`) removed from `Nav.jsx`/`Nav.css` — nav is now just logo + Join button.
+- **Waitlist section removed**: `CTA.jsx`/`CTA.css` deleted, dropped from `App.jsx`. All `#join` anchors across the site (`Hero`'s "Become a Member", `Nav`'s "Join", `Network`'s "View All Members") repointed to `#membership`, since that's the section that now actually exists.
+- **One-page consolidation**: deleted `blog.html` and `community.html`. Updated `vite.config.js` (dropped the `blog` build entry, simplified the now-unnecessary `/community` dev-server rewrite) and `vercel.json` (dropped the `/blog` rewrite). Removed the now-dead "Blog" nav/footer links from `impressum.html` and `datenschutz.html` (the only place they were still referenced) — this is the one edit made to the legal pages, and it's link-hygiene only, not a content change; their legal text is untouched.
+- **Hero → Membership scroll**: `Hero.jsx`'s CTA now targets `#membership` directly.
+
+### Bug found and fixed: hash deep-links didn't scroll on load
+Navigating straight to `/#membership` landed at the top of the page instead of scrolling down — because the React root renders empty (`<div id="root">`) at initial HTML parse, so the browser's one-shot "scroll to `#fragment` on load" already ran and found nothing before React finished mounting `id="membership"`. This is a real, common React-SPA bug, not specific to this build. Fixed two ways: added `scroll-margin-top: 96px` (clearing the fixed nav) to `#events`/`#membership` in `global.css` so native anchor-click scrolling is correct without any JS math, and added a `useEffect` in `App.jsx` that manually scrolls to the hash target on mount (after `document.fonts.ready` + one `requestAnimationFrame`, so layout has settled) to cover the direct-deep-link case the browser misses.
+- Note: live click/scroll verification in-browser was blocked this session by a tab-visibility quirk in the preview tooling (`document.hidden` stayed `true` even after explicitly fronting the tab, so no scroll — smooth or instant — would register, even via direct `scrollTop` assignment). Confirmed via source review and computed layout (`scroll-margin-top` applied, target elements have correct absolute positions) that the fix is standard and correct; just wasn't able to watch it animate live this session.
+
+### Verified
+- `npm run build` succeeds. Output is now exactly 4 pages: `index.html` (marketing), `app/index.html` (dashboard), `impressum.html`, `datenschutz.html`.
+- No stale references to `blog.html`/`community.html` anywhere in the repo (grepped after deletion).
+- No console errors in-browser; nav renders correctly without the hamburger on desktop and mobile.
+
+### Still pending
+- Real member photos — waiting on the user to actually upload/provide the 4 headshots (confirmed not present in any connected storage).
+
