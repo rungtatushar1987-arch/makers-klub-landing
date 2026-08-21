@@ -5,7 +5,6 @@ import Marquee from './components/Marquee'
 import WhySection from './components/WhySection'
 import EventsEmbed from './components/EventsEmbed'
 import Network from './components/Network'
-import Hub from './components/Hub'
 import Membership from './components/Membership'
 import CTA from './components/CTA'
 import Footer from './components/Footer'
@@ -20,7 +19,6 @@ export default function App() {
       <WhySection />
       <EventsEmbed />
       <Network />
-      <Hub />
       <Membership />
       <CTA />
       <Footer />
