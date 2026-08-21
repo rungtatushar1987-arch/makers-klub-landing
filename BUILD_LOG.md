@@ -1387,3 +1387,30 @@ User supplied the real `logo.png` (navy square badge, "The Solopreneurs Club" se
 - **"View All Members"**: no public members directory exists; linked to `#join` (become a member to meet the network) rather than a dead `#`, pending a real directory page.
 - **Member "Connect" links**: still placeholder `#` hrefs — no per-member profile URLs exist yet.
 
+---
+
+## Session — 21 August 2026 (continued) — Layout redesign: from centered template to editorial ledger
+
+### Why
+User felt the site "looks like a blatant copy of the example [prototype] site" — fair, since the build had followed the reference HTML's structure section-for-section (centered eyebrow/heading/body in every section, symmetric card grids, centered hero). Given creative freedom to change the layout so it reads as its own design rather than a reskin.
+
+### Direction: "editorial ledger"
+Kept the approved brand system untouched — navy/gold/paper tokens, Hanken Grotesk, sharp corners, no shadows, hairline borders — this pass only changed composition, not identity. Added one new type role: JetBrains Mono for small labels, numerals, and data (the "utility face"), used with restraint to reinforce a roster/attendance-ledger motif that's on-brand for a club that tracks real headcount.
+
+Signature device: a shared masthead header pattern (`.sc-mast` / `.sc-mast-label` / `.sc-mast-aside` in `global.css`) — eyebrow + left-aligned heading with supporting copy or a link on the same baseline row, replacing the centered-eyebrow-then-centered-H2 pattern that every section used identically before. Applied consistently across Why, Events, Network.
+
+### What changed, section by section
+- **Hero**: centered stack → left-aligned masthead. Headline bleeds toward the left edge instead of sitting in a centered column. The old centered stat band is gone — its numbers now live in a small mono "roll call" ticker line under the CTAs (`200+ Attendees Hosted · 50+ Community Members · 15 Sessions Run · Berlin`). Added a faint vertical mono label running down the right edge (`SOLOPRENEURS CLUB · BERLIN`, repeated, `writing-mode: vertical-rl`) as ambient texture in the empty right-hand space — hidden below 900px. Scroll indicator moved from centered-under-content to a fixed corner mark, bottom-right.
+- **Stats**: removed as a standalone section (`Stats.jsx`/`Stats.css` deleted) — folded into the hero's roll-call line, per above.
+- **Why**: 3 equal photo-background cards → numbered ledger rows (`N°01/02/03` in mono, a real justified use of sequential numbering since these are 3 distinct problems in a list) — problem and fix run side by side in a row instead of stacked in a card, divided by hairlines.
+- **Events**: centered header → masthead pattern; Luma embed and "Powered by Luma" line unchanged functionally.
+- **Network**: 4-card photo grid → a roster list (rows: initial mark, name, role, "Connect" link, hairline dividers) — reads as an attendee list rather than a generic team grid.
+- **Membership**: centered heading/button → a single bordered "ledger row" (heading left, button right), consistent with the roster/why row language elsewhere.
+- **Final CTA**: centered stack → split layout, heading/copy on the left, the waitlist form in a bordered panel on the right (stacks on mobile).
+- **Footer**: switched copyright/link type to mono, matching the new utility-label voice used throughout.
+
+### Verified
+- `npm run build` succeeds; legal pages (`impressum.html`, `datenschutz.html`) and `apply.html`/`blog.html` build unchanged.
+- Checked in-browser at desktop (~1180px) and mobile (375px): confirmed grid/flex layouts actually go multi-column at desktop width (via computed `gridTemplateColumns`) and stack correctly on mobile; no horizontal overflow (`scrollWidth` matches `innerWidth` at both sizes); no console errors; hero typewriter animation and waitlist success-swap both still function.
+- Not re-verified: the vertical hero edge label and roll-call ticker's exact spacing on very wide monitors (>1600px) — should still look fine given the layout's use of `max-width` containers, but wasn't checked directly.
+

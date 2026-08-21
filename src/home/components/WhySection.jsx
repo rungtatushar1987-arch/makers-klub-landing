@@ -25,27 +25,31 @@ export default function WhySection() {
   return (
     <section className="sc-why on-navy">
       <div className="sc-why-inner">
-        <div className="sc-why-head">
-          <p className="eyebrow">Built for solo builders</p>
-          <h2 className="h-xl">
-            Going solo
-            <br />
-            shouldn't mean <em>doing it alone</em>
-          </h2>
-          <p className="body-copy">
-            Three real problems every solo builder runs into. Here's what we actually do about each one.
+        <div className="sc-mast">
+          <div>
+            <div className="sc-mast-label">
+              <span className="sc-mast-eyebrow">Built for solo builders</span>
+            </div>
+            <h2 className="h-xl sc-why-heading">
+              Going solo shouldn't mean <em>doing it alone</em>
+            </h2>
+          </div>
+          <p className="sc-mast-aside">
+            Three real problems every solo builder runs into. Here's what we actually do about
+            each one.
           </p>
         </div>
+
         <div className="sc-why-grid">
           {ITEMS.map((item) => (
-            <div className="sc-why-item" key={item.num}>
-              <div className="sc-why-bg" />
-              <div className="sc-why-num">{item.num}</div>
+            <div className="sc-why-card" key={item.num}>
+              <span className="sc-index sc-why-num">N°{item.num}</span>
               <h3>{item.title}</h3>
               <p className="sc-why-problem">{item.problem}</p>
-              <p className="sc-why-solution">
-                <span>Our fix —</span> {item.solution}
-              </p>
+              <div className="sc-why-fix">
+                <span className="sc-mast-eyebrow">Our fix</span>
+                <p>{item.solution}</p>
+              </div>
             </div>
           ))}
         </div>

@@ -11,4 +11,6 @@
   --white-70: rgba(255, 255, 255, 0.7);
   --white-45: rgba(255, 255, 255, 0.45);
   --white-15: rgba(255, 255, 255, 0.15);
+  --navy-12: rgba(0, 27, 61, 0.12);
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }

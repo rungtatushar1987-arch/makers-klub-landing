@@ -5,8 +5,8 @@
   right: 0;
   z-index: 100;
   background: var(--white);
-  border-bottom: 1px solid rgba(0, 27, 61, 0.12);
-  padding: 0 40px;
+  border-bottom: 1px solid var(--navy-12);
+  padding: 0 64px;
   height: 76px;
   display: flex;
   align-items: center;

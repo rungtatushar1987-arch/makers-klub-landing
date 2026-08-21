@@ -4,16 +4,14 @@ const LUMA_CALENDAR_URL = 'https://luma.com/cal-GBRc6zCvxA5bqnz'
 
 export default function EventsEmbed() {
   return (
-    <section className="sc-events" id="events">
+    <section className="sc-events on-navy" id="events">
       <div className="sc-events-inner">
-        <div className="sc-events-top">
+        <div className="sc-mast">
           <div>
-            <p className="eyebrow sc-events-eyebrow">What's happening</p>
-            <h2 className="h-xl sc-events-title">
-              Upcoming
-              <br />
-              Sessions
-            </h2>
+            <div className="sc-mast-label">
+              <span className="sc-mast-eyebrow">What's happening</span>
+            </div>
+            <h2 className="h-xl sc-events-title">Upcoming Sessions</h2>
           </div>
           <a href={LUMA_CALENDAR_URL} target="_blank" rel="noopener noreferrer" className="link-underline">
             View All Events →

@@ -57,6 +57,65 @@ em {
   color: var(--white-70);
 }
 
+.sc-index {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+}
+
+.sc-mast {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding-bottom: 28px;
+  margin-bottom: 56px;
+  border-bottom: 1px solid var(--navy-12);
+}
+.on-navy .sc-mast {
+  border-bottom-color: var(--white-15);
+}
+.sc-mast-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.sc-mast-label .sc-index {
+  border: 1px solid var(--gold);
+  padding: 2px 7px;
+}
+.sc-mast-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.on-navy .sc-mast-eyebrow {
+  color: var(--white-45);
+}
+.sc-mast-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.sc-mast-aside {
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-light);
+  padding-bottom: 6px;
+}
+.on-navy .sc-mast-aside {
+  color: var(--white-45);
+}
+
 .link-underline {
   font-size: 12px;
   font-weight: 800;
