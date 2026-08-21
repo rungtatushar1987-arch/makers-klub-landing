@@ -1,0 +1,14 @@
+:root {
+  --navy: #001b3d;
+  --navy-deep: #000f24;
+  --navy-card: #051d3d;
+  --gold: #c5a059;
+  --gold-bright: #d9b673;
+  --paper: #fcfcfc;
+  --ink: #111c2c;
+  --ink-light: #5b6472;
+  --white: #ffffff;
+  --white-70: rgba(255, 255, 255, 0.7);
+  --white-45: rgba(255, 255, 255, 0.45);
+  --white-15: rgba(255, 255, 255, 0.15);
+}

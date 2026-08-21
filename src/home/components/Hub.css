@@ -1,0 +1,65 @@
+.sc-hub {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.sc-hub-bg {
+  position: absolute;
+  inset: 0;
+  /* No venue photo sourced yet — solid navy gradient placeholder. Swap in a real Denizen Eiswerk photo when available. */
+  background: linear-gradient(90deg, var(--navy) 0%, var(--navy-card) 55%, var(--navy-deep) 100%);
+  z-index: 0;
+}
+.sc-hub-content {
+  position: relative;
+  z-index: 1;
+  padding: 80px;
+  max-width: 620px;
+}
+.sc-hub-content h2 {
+  font-size: clamp(34px, 4.5vw, 54px);
+  margin: 8px 0 20px;
+}
+.sc-hub-city {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.sc-hub-pin {
+  color: var(--gold);
+  font-size: 20px;
+}
+.sc-hub-city-name {
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--white);
+  letter-spacing: -0.01em;
+}
+.sc-hub-venue {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.sc-hub-note {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--white-15);
+  font-size: 13px;
+  color: var(--white-45);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .sc-hub-content {
+    padding: 40px 24px;
+  }
+}

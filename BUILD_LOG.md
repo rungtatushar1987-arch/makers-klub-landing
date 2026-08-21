@@ -1357,3 +1357,33 @@ Per direct freelancer feedback ("hated filling it out early on"): new signups no
 - Dev/prod share one Supabase project — no isolation; flagged, not solved (declined per cost)
 - Live click-through of the modal wizard flow and the "revisit and edit" prefill path not verified from this environment (no login credentials available) — verified via clean builds/type-checks + code review only
 
+---
+
+## Session — 21 August 2026 — Homepage rebrand: Makers Klub → The Solopreneurs Club
+
+### Scope check before starting
+Confirmed with the user before touching anything: marketing site only (`index.html`), legal pages (`impressum.html`, `datenschutz.html`) and their `vite.config.js` build entries untouched, no `/app` (dashboard) or Supabase/Clerk changes.
+
+### Stack mismatch found and resolved
+The brief assumed the marketing site was already React/Vite with a component pattern to match. It isn't — `index.html`/`styles.css`/`main.js` are static HTML/CSS/vanilla JS; Vite is used only as an MPA bundler across `index.html`, `impressum.html`, `datenschutz.html`, `apply.html`, `blog.html`. React only exists under `/app` (the dashboard). Flagged this to the user; they chose to introduce React for the homepage specifically. Built it to mirror `app/src`'s existing pattern (component + co-located `.css` file, `main`/`tokens`/`global` entry split) rather than inventing a new one.
+
+### What's live
+- `index.html` now mounts a React root (`/src/home/main.jsx`) instead of the old static markup. `<head>` fonts swapped to Hanken Grotesk only (Inter/Fraunces links removed from this page); title/meta description updated for the rebrand.
+- New `src/home/` tree: `App.jsx` assembling `Nav`, `Hero`, `Stats`, `Marquee`, `WhySection`, `EventsEmbed`, `Network`, `Hub`, `Membership`, `CTA`, `Footer` — each its own component + CSS file under `src/home/components/`. Design tokens (navy/gold palette) in `src/home/tokens.css`, shared reset/typography/button classes in `src/home/global.css`.
+- New navy/gold/paper design tokens per spec, Hanken Grotesk everywhere, sharp corners, no drop shadows, 1px borders. All old blue (`#013dc4`) / lavender (`#e2d3f4`) / Fraunces references removed **from the homepage only** — `styles.css` itself was left completely untouched since `apply.html`, `blog.html`, and `community.html` still depend on it.
+- Upcoming Sessions section embeds the real Luma calendar iframe (`cal-GBRc6zCvxA5bqnz`) inside a gold-bordered paper frame, exactly as specified, with "View All Events" and "Powered by Luma" both linking to the full Luma calendar.
+- Waitlist form in the final CTA does a client-side-only success-state swap (no backend endpoint exists for this — the site's only prior "waitlist" flow was an external Tally link, not a form submission handler — so nothing to wire in without inventing an endpoint).
+- Footer keeps `/impressum.html` and `/datenschutz.html` links (verified both still build and load correctly) plus the site's real Instagram/LinkedIn URLs (reused from the previous footer rather than left as dead links).
+- Fixed one responsive gap not covered by the reference prototype: the nav wordmark collided with the JOIN button under ~480px. Wordmark now hides at that breakpoint, leaving the logo mark + JOIN + hamburger.
+- Verified: `npm run build` succeeds, `impressum.html`/`datenschutz.html`/`apply.html`/`blog.html` all build unchanged; new homepage checked in-browser (desktop + mobile 375px) with no console errors; waitlist success-swap tested programmatically.
+
+### Logo — resolved same session
+User supplied the real `logo.png` (navy square badge, "The Solopreneurs Club" serif wordmark) after the initial build. Copied into `app/public/logo.png` (already the shared `publicDir` for both this site and the dashboard — `logo.svg` left in place alongside it, untouched, since `/app` still references it). Wired into `Nav.jsx`, `Footer.jsx`, and the `<link rel="icon">` in `index.html`, replacing the interim `logo.svg` reference.
+- Found and fixed a contrast bug on first render: the badge's navy background made it nearly invisible against the equally-navy nav/footer. Added a 1px gold border on the logo `<img>` in both `Nav.css` and `Footer.css` — reuses the existing "gold for emphasis" token rather than introducing a new design element.
+
+### Explicitly deferred (by user's own choice, not an oversight)
+- **Photos**: no hero/why-section/hub photos exist anywhere in the repo (no `/images`, no `shots/`). User chose solid navy/gradient placeholders over inventing stock photography. `Hero.css`, `WhySection.css`, and `Hub.css` each have a one-line note marking exactly where a real `background-image` should go — dropping photos in and swapping those three lines is the entire remaining step.
+- **Waitlist backend wiring**: form is client-side only, per above — no endpoint exists to wire it to.
+- **"View All Members"**: no public members directory exists; linked to `#join` (become a member to meet the network) rather than a dead `#`, pending a real directory page.
+- **Member "Connect" links**: still placeholder `#` hrefs — no per-member profile URLs exist yet.
+
