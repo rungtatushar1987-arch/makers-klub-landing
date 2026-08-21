@@ -1,10 +1,10 @@
 .sc-events {
   background: var(--navy-deep);
-  padding: 100px 64px 110px;
 }
 .sc-events-inner {
   max-width: 1180px;
   margin: 0 auto;
+  padding: 100px 64px 110px;
 }
 .sc-events-title {
   font-size: clamp(32px, 4vw, 48px);
@@ -32,7 +32,7 @@
 }
 
 @media (max-width: 900px) {
-  .sc-events {
+  .sc-events-inner {
     padding: 80px 24px 90px;
   }
 }

@@ -1477,3 +1477,17 @@ User feedback on the embedded Tally form: pointed out a large blank area below t
 
 Verified: build succeeds, no console errors, button links to the correct URL in a new tab, headings align across sections at both mobile and desktop widths.
 
+---
+
+## Session — 21 August 2026 (continued) — Membership polish + a real cross-section alignment bug
+
+User feedback on the previous pass: too much top whitespace before the section title, remove the divider line under the heading, center the description paragraph, and center + gold the CTA (moved below the text instead of beside it).
+
+### Layout change
+`Membership.jsx` no longer uses the shared `.sc-mast` two-column row (heading left / aside right, with its bottom divider) — that pattern was for beside, not below. New structure: eyebrow + "Join the Club" left-aligned at top (unchanged), then a `.sc-membership-action` block below with the description and the CTA both centered. The divider disappeared naturally since `.sc-mast`'s border-bottom is no longer in the markup. CTA restyled to gold (`background: var(--gold)`, hover to `--gold-bright`) instead of white. Reduced `.sc-membership`'s top padding 100px → 56px (48px → still reduced on mobile).
+
+### Bug found: alignment only matched by coincidence, broke at real desktop widths
+Re-checked the "left edge matches Network" claim from the previous pass at an actual desktop viewport (not just mobile) and it was wrong: Network's heading sat at x=121, Membership's at x=64. Root cause — Network combines `max-width: 1180px` and its padding on the *same* element, so the padding is measured inside an already-centered box (net effect: content is a 1052px box centered in the viewport). `WhySection`, `EventsEmbed`, and `Membership` instead use a two-level pattern (outer full-bleed color + padding, inner `max-width:1180px` centered) — which is a *different* box model that only happens to produce the same left offset when the viewport is too narrow for centering to matter (which is why it looked right on mobile and in every previous screenshot, all taken at mobile width). Fixed by moving each section's padding from the outer color wrapper onto the inner `-inner` div (`WhySection.css`, `EventsEmbed.css`, `Membership.css`), replicating Network's actual box model while keeping the full-bleed background color on the outer element. Confirmed via `getBoundingClientRect()` that Why/Events/Network/Membership headings now land at the identical x-coordinate at both a wide desktop width (121px) and mobile (24px).
+
+Verified: build succeeds, no console errors, screenshots match at mobile; alignment cross-checked programmatically at desktop since this exact class of bug is invisible in a narrow viewport.
+

@@ -1,10 +1,10 @@
 .sc-why {
   background: var(--navy);
-  padding: 100px 64px 110px;
 }
 .sc-why-inner {
   max-width: 1180px;
   margin: 0 auto;
+  padding: 100px 64px 110px;
 }
 .sc-why-heading {
   font-size: clamp(32px, 4vw, 48px);
@@ -57,7 +57,7 @@
 }
 
 @media (max-width: 900px) {
-  .sc-why {
+  .sc-why-inner {
     padding: 80px 24px 90px;
   }
   .sc-why-grid {
