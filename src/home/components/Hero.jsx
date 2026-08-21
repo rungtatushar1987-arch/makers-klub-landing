@@ -15,7 +15,7 @@ export default function Hero() {
           Club
         </h1>
         <p className="sc-hero-sub-label">A club built for</p>
-        <div className="sc-hero-typed">OPERATORS</div>
+        <div className="sc-hero-typed">Freelancers, and Solopreneurs</div>
         <p className="sc-hero-desc">
           Real collaborators. No corporate networking theater. Just people who run their own show,
           building and growing together — one session at a time.
