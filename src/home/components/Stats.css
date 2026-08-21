@@ -3,7 +3,7 @@
   padding: 72px 40px;
   display: flex;
   justify-content: center;
-  gap: 120px;
+  gap: 90px;
   flex-wrap: wrap;
   text-align: center;
 }
@@ -25,6 +25,6 @@
 
 @media (max-width: 900px) {
   .sc-stats {
-    gap: 60px;
+    gap: 48px;
   }
 }
