@@ -27,6 +27,11 @@
   align-items: center;
   justify-content: center;
 }
+img.sc-member-mark {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
 .sc-member-info {
   padding: 18px 20px 22px;
   border-top: 3px solid var(--gold);
@@ -40,17 +45,6 @@
 .sc-member-role {
   font-size: 12px;
   color: var(--ink-light);
-  margin-bottom: 14px;
-}
-.sc-member-connect {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink);
-  text-decoration: none;
-}
-.sc-member-connect:hover {
-  color: var(--gold);
 }
 
 .sc-network-more {

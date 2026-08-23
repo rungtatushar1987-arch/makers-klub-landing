@@ -1,10 +1,10 @@
 import './Network.css'
 
 const MEMBERS = [
-  { initial: 'A', name: 'Alessandro Tarshahani', role: 'Founder, ALETRA Hub' },
-  { initial: 'N', name: 'Nupur Vartak', role: 'Art Director' },
-  { initial: 'A', name: 'Ale Ponce', role: 'Freelance Brand Designer' },
-  { initial: 'C', name: 'Cat Johnson', role: 'Freelance UI/UX Designer' },
+  { initial: 'A', name: 'Alessandro Tarshahani', role: 'Founder, ALETRA Hub', photo: null },
+  { initial: 'N', name: 'Nupur Vartak', role: 'Art Director', photo: null },
+  { initial: 'A', name: 'Ale Ponce', role: 'Freelance Brand Designer', photo: null },
+  { initial: 'C', name: 'Cat Johnson', role: 'Freelance UI/UX Designer', photo: null },
 ]
 
 export default function Network() {
@@ -25,11 +25,14 @@ export default function Network() {
       <div className="sc-member-grid">
         {MEMBERS.map((m) => (
           <div className="sc-member-card" key={m.name}>
-            <div className="sc-member-mark">{m.initial}</div>
+            {m.photo ? (
+              <img className="sc-member-mark" src={m.photo} alt={m.name} />
+            ) : (
+              <div className="sc-member-mark">{m.initial}</div>
+            )}
             <div className="sc-member-info">
               <div className="sc-member-name">{m.name}</div>
               <div className="sc-member-role">{m.role}</div>
-              <a href="#" className="sc-member-connect">Connect →</a>
             </div>
           </div>
         ))}
