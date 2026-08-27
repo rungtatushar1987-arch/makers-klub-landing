@@ -43,7 +43,6 @@ export default function WhySection() {
         <div className="sc-why-grid">
           {ITEMS.map((item) => (
             <div className="sc-why-card" key={item.num}>
-              <span className="sc-index sc-why-num">N°{item.num}</span>
               <h3>{item.title}</h3>
               <p className="sc-why-problem">{item.problem}</p>
               <div className="sc-why-fix">
