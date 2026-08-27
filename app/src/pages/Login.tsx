@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useSignIn, useAuth } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
+import { supabase, getInitials, type Event, type Profile } from '../supabase'
 import './Signup.css'
+
+function formatEventWhen(dateStr: string): string {
+  const d = new Date(dateStr)
+  const day = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+  return `${day} · ${time}`
+}
 
 export default function Login() {
   const { isLoaded, signIn, setActive } = useSignIn()
@@ -13,9 +21,25 @@ export default function Login() {
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
 
+  const [events, setEvents]     = useState<Event[]>([])
+  const [profiles, setProfiles] = useState<Profile[]>([])
+
   useEffect(() => {
     if (isLoaded && isSignedIn) navigate('/home', { replace: true })
   }, [isLoaded, isSignedIn])
+
+  // Public teaser content — same open-SELECT tables the PWA landing reads.
+  useEffect(() => {
+    (async () => {
+      const [{ data: eventRows }, { data: profileRows }] = await Promise.all([
+        supabase.from('events').select('*').order('date'),
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+      ])
+      const now = new Date()
+      setEvents((eventRows ?? []).filter(e => new Date(e.date) >= now).slice(0, 5))
+      setProfiles((profileRows ?? []).slice(0, 5))
+    })()
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -49,7 +73,7 @@ export default function Login() {
   }
 
   return (
-    <div className="mkw-login">
+    <div className="mkw-login mkw-login-landing">
       {/* Brand */}
       <div className="mkw-login-brand">
         <div className="mkw-brand-logo">
@@ -57,6 +81,7 @@ export default function Login() {
         </div>
         <span className="mkw-login-name">Makers Klub</span>
       </div>
+      <p className="mkw-login-tagline">Build connections that matter</p>
 
       {/* Card */}
       <div className="mkw-signup-card">
@@ -103,6 +128,47 @@ export default function Login() {
           </button>
         </form>
       </div>
+
+      {/* Live teaser — who's in the Klub and what's coming up */}
+      {(profiles.length > 0 || events.length > 0) && (
+        <div className="mkw-teaser">
+          {profiles.length > 0 && (
+            <div className="mkw-teaser-section">
+              <div className="mkw-teaser-label">Who's Attending</div>
+              <div className="mkw-teaser-list">
+                {profiles.map(p => (
+                  <div key={p.clerk_user_id} className="mkw-teaser-row">
+                    <div className="mkw-teaser-av" style={{ background: p.avatar_color || '#0f1e3d' }}>
+                      {getInitials(p.full_name)}
+                    </div>
+                    <div className="mkw-teaser-info">
+                      <div className="mkw-teaser-name">{p.full_name || 'Member'}</div>
+                      {p.role_category && <div className="mkw-teaser-role">{p.role_category}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {events.length > 0 && (
+            <div className="mkw-teaser-section">
+              <div className="mkw-teaser-label">Popular Events in Berlin</div>
+              <div className="mkw-teaser-list">
+                {events.map(e => (
+                  <div key={e.id} className="mkw-teaser-row">
+                    <div className="mkw-teaser-thumb" style={{ background: e.cover_color || '#0f1e3d' }} />
+                    <div className="mkw-teaser-info">
+                      <div className="mkw-teaser-name">{e.title}</div>
+                      <div className="mkw-teaser-role">{formatEventWhen(e.date)} · {e.location}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

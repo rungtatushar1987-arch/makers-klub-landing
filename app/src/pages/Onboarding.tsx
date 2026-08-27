@@ -65,7 +65,7 @@ export default function Onboarding() {
                 <div className="onb-progress-fill" style={{ width: `${profilePct}%` }} />
               </div>
               <p className="onb-card-body">
-                Add your services, rates, and business goals so we can match you with the right people and events.
+                Add your role, a short bio, and your interests so we can match you with the right people and events.
               </p>
               <a href="/profile" className="mk-btn mk-btn-navy mk-btn-sm">Complete your profile →</a>
             </div>
