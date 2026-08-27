@@ -43,7 +43,7 @@ export default function Hero() {
   const typed = useTypewriter(TYPED_WORDS)
 
   return (
-    <section className="sc-hero on-navy">
+    <section className="sc-hero">
       <div className="sc-hero-bg" />
       <div className="sc-hero-content">
         <div className="sc-hero-badge">

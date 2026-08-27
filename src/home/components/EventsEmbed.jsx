@@ -4,7 +4,7 @@ const LUMA_CALENDAR_URL = 'https://luma.com/cal-GBRc6zCvxA5bqnz'
 
 export default function EventsEmbed() {
   return (
-    <section className="sc-events on-navy" id="events">
+    <section className="sc-events" id="events">
       <div className="sc-events-inner">
         <div className="sc-mast">
           <div>

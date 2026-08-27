@@ -1,16 +1,73 @@
+/* The Solopreneurs Club — marketing site design tokens.
+   Structure from the web dashboard's "Aurora Glass" system (white surface,
+   cosmic gradient blob backdrop, frosted-glass cards, Poppins + Inter), but
+   a gold + blue palette rather than the dashboard's yellow + violet.
+   The --mk-yellow and --mk-violet variable names are kept (to mirror the
+   dashboard's token structure) but hold gold and blue values here.
+   Legacy navy/gold token names are aliased so older component CSS resolves.
+   ========================================================================= */
+
 :root {
-  --navy: #001b3d;
-  --navy-deep: #000f24;
-  --navy-card: #051d3d;
-  --gold: #c5a059;
-  --gold-bright: #d9b673;
-  --paper: #fcfcfc;
-  --ink: #111c2c;
-  --ink-light: #5b6472;
-  --white: #ffffff;
-  --white-70: rgba(255, 255, 255, 0.7);
-  --white-45: rgba(255, 255, 255, 0.45);
-  --white-15: rgba(255, 255, 255, 0.15);
-  --navy-12: rgba(0, 27, 61, 0.12);
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* ── Brand hues — gold primary, blue secondary ── */
+  --mk-yellow:        #c5a059;   /* PRIMARY ACCENT (gold) — CTAs, active states */
+  --mk-yellow-deep:   #8a6d2f;   /* gold-as-text on white — contrast-safe */
+  --mk-yellow-soft:   #d9b673;   /* gold hover */
+  --mk-violet:        #3b6dd9;   /* SECONDARY ACCENT (blue) — links, emphasis, numerals */
+  --mk-violet-soft:   #7ba0e8;   /* soft blue — underlines, hover borders */
+  --mk-blue:          #26489a;   /* deep blue — gradient panel end-stop */
+  --mk-navy:          #0a1340;   /* ink / headings only */
+
+  --accent:           var(--mk-yellow);
+  --accent-ink:       #0a1340;
+
+  /* ── Ink ramp (text on light) ── */
+  --ink-1:            #0c1330;
+  --ink-2:            #424a6b;
+  --ink-3:            #818aa6;
+
+  /* ── Surfaces & lines ── */
+  --surface:          #ffffff;
+  --hairline:         rgba(12, 19, 48, 0.08);
+  --hairline-strong:  rgba(12, 19, 48, 0.14);
+
+  /* ── Glass material ── */
+  --glass-blur:       22px;
+  --glass-bg:         rgba(255, 255, 255, 0.55);
+  --glass-bg-strong:  rgba(255, 255, 255, 0.72);
+  --glass-border:     rgba(255, 255, 255, 0.85);
+  --glass-hi:         inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --glass-shadow:     0 10px 34px rgba(38, 40, 90, 0.12);
+  --blob-opacity:     0.9;
+
+  /* ── Typography ── */
+  --font-display: 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  /* No monospace in the dashboard system — index chips use the display face */
+  --mono:         'Poppins', system-ui, -apple-system, sans-serif;
+
+  /* ── Radii ── */
+  --r-lg:   22px;
+  --r-sm:   14px;
+  --r-xs:   10px;
+  --r-pill: 999px;
+
+  /* ── Shadows ── */
+  --shadow-card:     0 10px 34px rgba(38, 40, 90, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --shadow-cta:      0 10px 24px rgba(197, 160, 89, 0.40);
+  --shadow-gradient: 0 18px 44px rgba(38, 72, 154, 0.34);
+
+  /* ── Legacy aliases — map the old navy/gold palette onto Aurora Glass ── */
+  --navy:        var(--mk-navy);
+  --navy-deep:   #060a22;
+  --navy-card:   var(--glass-bg);
+  --gold:        var(--mk-yellow);
+  --gold-bright: var(--mk-yellow-soft);
+  --paper:       #ffffff;
+  --ink:         var(--ink-1);
+  --ink-light:   var(--ink-2);
+  --white:       #ffffff;
+  --white-70:    var(--ink-2);
+  --white-45:    var(--ink-3);
+  --white-15:    var(--hairline-strong);
+  --navy-12:     var(--hairline);
 }

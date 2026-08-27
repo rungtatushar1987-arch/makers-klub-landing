@@ -23,7 +23,7 @@ const ITEMS = [
 
 export default function WhySection() {
   return (
-    <section className="sc-why on-navy">
+    <section className="sc-why">
       <div className="sc-why-inner">
         <div className="sc-mast">
           <div>
