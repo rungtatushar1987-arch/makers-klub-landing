@@ -11,7 +11,13 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: none;
+  /* Full-bleed hero photo. Drop the file in app/public/ (served at site root).
+     The fallback colour shows until an image is present / while it loads. */
+  background-color: #eef0f4;
+  background-image: url('/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .sc-hero-bg::after {
   content: 'SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN';
@@ -25,7 +31,8 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: var(--hairline-strong);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   white-space: nowrap;
   pointer-events: none;
@@ -37,11 +44,10 @@
   max-width: 780px;
   padding: 40px;
   border-radius: var(--r-lg);
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  /* Solid opaque card so the text stays crisp over any photo (option 1). */
+  background: #ffffff;
   border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
+  box-shadow: 0 24px 60px rgba(12, 19, 48, 0.16), 0 4px 14px rgba(12, 19, 48, 0.08);
 }
 
 .sc-hero-badge {
