@@ -17,6 +17,8 @@ BUILD_LOG.md
 
 # Images
 *.jpg
+# ...except assets the site actually ships
+!app/public/hero.jpg
 .DS_Store
 design_handoff_aurora_glass_app/package-lock.json
 

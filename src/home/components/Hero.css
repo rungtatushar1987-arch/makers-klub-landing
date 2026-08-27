@@ -5,49 +5,63 @@
   align-items: flex-end;
   padding: 160px 64px 64px;
   overflow: hidden;
+  background: #070b18;
 }
+
+/* Full-bleed event photo — blurred + darkened into an atmospheric backdrop.
+   Over-inset so the blur feather is clipped by .sc-hero's overflow:hidden.
+   Drop the file at app/public/hero.jpg (served at the site root). */
 .sc-hero-bg {
   position: absolute;
-  inset: 0;
+  inset: -40px;
   z-index: 0;
   pointer-events: none;
-  /* Full-bleed hero photo. Drop the file in app/public/ (served at site root).
-     The fallback colour shows until an image is present / while it loads. */
-  background-color: #eef0f4;
+  background-color: #0f1424;
   background-image: url('/hero.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  filter: blur(5px) saturate(0.98);
 }
-.sc-hero-bg::after {
+
+/* Dark veil over the photo — ~40% so the image reads at roughly 60%, with a
+   localised pool toward the lower-left so the white headline stays legible. */
+.sc-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(7, 11, 24, 0.30) 0%, rgba(7, 11, 24, 0.46) 100%),
+    radial-gradient(115% 95% at 16% 74%, rgba(7, 11, 24, 0.52) 0%, rgba(7, 11, 24, 0) 62%);
+}
+
+/* Vertical edge ticker — on .sc-hero so it stays sharp (not inside the blurred bg) */
+.sc-hero::before {
   content: 'SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN';
   position: absolute;
   top: 0;
   bottom: 0;
   right: 48px;
   width: 22px;
+  z-index: 1;
   writing-mode: vertical-rl;
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.6);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.45);
   overflow: hidden;
   white-space: nowrap;
   pointer-events: none;
 }
 
+/* No card — text sits directly on the darkened photo */
 .sc-hero-content {
   position: relative;
   z-index: 1;
   max-width: 780px;
-  padding: 40px;
-  border-radius: var(--r-lg);
-  /* Solid opaque card so the text stays crisp over any photo (option 1). */
-  background: #ffffff;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 24px 60px rgba(12, 19, 48, 0.16), 0 4px 14px rgba(12, 19, 48, 0.08);
 }
 
 .sc-hero-badge {
@@ -84,7 +98,8 @@
   letter-spacing: -0.03em;
   line-height: 0.98;
   font-size: clamp(44px, 7vw, 92px);
-  color: var(--ink-1);
+  color: #ffffff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.28);
   margin-bottom: 24px;
 }
 
@@ -97,7 +112,7 @@
 }
 .sc-hero-sub-label {
   font-size: clamp(16px, 2vw, 20px);
-  color: var(--ink-2);
+  color: rgba(255, 255, 255, 0.72);
   font-weight: 500;
 }
 .sc-hero-typed {
@@ -105,7 +120,7 @@
   font-size: clamp(22px, 3.2vw, 34px);
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--mk-violet);
+  color: var(--mk-yellow-soft);
 }
 .sc-hero-typed::after {
   content: '|';
@@ -117,7 +132,7 @@
 
 .sc-hero-desc {
   font-size: 16px;
-  color: var(--ink-2);
+  color: rgba(255, 255, 255, 0.8);
   max-width: 480px;
   margin-bottom: 36px;
   line-height: 1.75;
@@ -130,6 +145,21 @@
   margin-bottom: 40px;
 }
 
+/* Ghost CTA reworked for the dark context */
+.sc-hero .btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  box-shadow: none;
+}
+.sc-hero .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .sc-hero-roll {
   display: flex;
   flex-wrap: wrap;
@@ -140,14 +170,14 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--mk-violet);
-  border-top: 1px solid var(--hairline);
+  color: rgba(255, 255, 255, 0.82);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
   padding-top: 20px;
 }
 .sc-hero-roll li {
   padding-right: 18px;
   margin-right: 18px;
-  border-right: 1px solid var(--hairline);
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
 }
 .sc-hero-roll li:last-child {
   border-right: none;
@@ -167,7 +197,7 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: var(--ink-3);
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
 }
 .sc-hero-scroll-arrow {
@@ -183,10 +213,7 @@
   .sc-hero {
     padding: 140px 24px 88px;
   }
-  .sc-hero-content {
-    padding: 28px 22px;
-  }
-  .sc-hero-bg::after {
+  .sc-hero::before {
     display: none;
   }
   .sc-hero-scroll {
