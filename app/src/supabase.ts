@@ -62,12 +62,11 @@ export type Profile = {
 export function calcProfileProgress(p: Partial<Profile> | null | undefined): { pct: number; fieldsLeft: number; isComplete: boolean } {
   const has = [
     !!p?.full_name?.trim(),
+    !!p?.role_category?.trim(),
+    !!p?.bio?.trim(),
     !!p?.looking_to,
     !!(p?.industries && p.industries.length > 0),
-    !!p?.website_url?.trim(),
-    !!p?.income_goal,
-    !!p?.client_capacity,
-    !!p?.lead_availability,
+    !!(p?.website_url?.trim() || p?.linkedin_url?.trim() || p?.instagram_url?.trim()),
   ]
   const filled = has.filter(Boolean).length
   return { pct: Math.round((filled / has.length) * 100), fieldsLeft: has.length - filled, isComplete: filled === has.length }
