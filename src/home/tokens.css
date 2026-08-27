@@ -30,14 +30,15 @@
   --hairline:         rgba(12, 19, 48, 0.08);
   --hairline-strong:  rgba(12, 19, 48, 0.14);
 
-  /* ── Glass material ── */
-  --glass-blur:       22px;
-  --glass-bg:         rgba(255, 255, 255, 0.55);
-  --glass-bg-strong:  rgba(255, 255, 255, 0.72);
-  --glass-border:     rgba(255, 255, 255, 0.85);
-  --glass-hi:         inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  --glass-shadow:     0 10px 34px rgba(38, 40, 90, 0.12);
-  --blob-opacity:     0.9;
+  /* ── Card material — FLAT variant: solid white, hairline border, no blur,
+     no ambient blob backdrop. (Glassy values kept in comments for reference.) ── */
+  --glass-blur:       0px;                              /* was 22px */
+  --glass-bg:         #ffffff;                          /* was rgba(255,255,255,0.55) */
+  --glass-bg-strong:  #ffffff;                          /* was rgba(255,255,255,0.72) */
+  --glass-border:     rgba(12, 19, 48, 0.10);           /* was rgba(255,255,255,0.85) */
+  --glass-hi:         inset 0 0 0 0 transparent;        /* was inset 0 1px 0 rgba(255,255,255,0.75) */
+  --glass-shadow:     0 1px 2px rgba(12, 19, 48, 0.05), 0 8px 20px rgba(12, 19, 48, 0.05);
+  --blob-opacity:     0;                                /* was 0.9 — hides the cosmic backdrop */
 
   /* ── Typography ── */
   --font-display: 'Poppins', system-ui, -apple-system, sans-serif;

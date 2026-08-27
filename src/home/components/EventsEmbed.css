@@ -3,14 +3,7 @@
   z-index: 1;
 }
 .sc-events::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(46% 55% at 88% 6%,  rgba(59, 109, 217, 0.22) 0%, transparent 68%),
-    radial-gradient(40% 50% at 6% 44%,  rgba(197, 160, 89, 0.20) 0%, transparent 66%);
+  content: none;
 }
 .sc-events-inner {
   position: relative;
