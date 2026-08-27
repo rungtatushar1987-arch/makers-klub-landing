@@ -1,6 +1,8 @@
 import './EventsEmbed.css'
 
-const LUMA_CALENDAR_URL = 'https://luma.com/cal-GBRc6zCvxA5bqnz'
+// Public calendar page (vanity URL). The embed route still needs the cal- id.
+const LUMA_CALENDAR_URL = 'https://luma.com/thesolopreneursclub'
+const LUMA_EMBED_URL = 'https://luma.com/embed/calendar/cal-GBRc6zCvxA5bqnz/events'
 
 export default function EventsEmbed() {
   return (
@@ -20,7 +22,7 @@ export default function EventsEmbed() {
 
         <div className="sc-luma-frame">
           <iframe
-            src="https://luma.com/embed/calendar/cal-GBRc6zCvxA5bqnz/events"
+            src={LUMA_EMBED_URL}
             width="100%"
             height="560"
             frameBorder="0"
