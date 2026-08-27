@@ -11,10 +11,7 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(48% 44% at 82% 6%,   rgba(197, 160, 89, 0.42) 0%, transparent 62%),
-    radial-gradient(46% 46% at 8% 30%,   rgba(59, 109, 217, 0.34) 0%, transparent 64%),
-    radial-gradient(60% 50% at 55% 118%, rgba(59, 109, 217, 0.30) 0%, transparent 68%);
+  background: none;
 }
 .sc-hero-bg::after {
   content: 'SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN · SOLOPRENEURS CLUB · BERLIN';
