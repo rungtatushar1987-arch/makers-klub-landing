@@ -4,7 +4,7 @@ const TALLY_FORM_URL = 'https://tally.so/r/Pde8pd'
 
 export default function Membership() {
   return (
-    <section className="sc-membership on-navy" id="membership">
+    <section className="sc-membership" id="membership">
       <div className="sc-membership-inner">
         <div className="sc-mast-label">
           <span className="sc-mast-eyebrow">Membership</span>

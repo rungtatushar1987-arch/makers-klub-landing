@@ -1,14 +1,27 @@
 .sc-why {
-  background: var(--navy);
+  position: relative;
+  z-index: 1;
+}
+.sc-why::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 55% at 10% 8%,   rgba(59, 109, 217, 0.24) 0%, transparent 66%),
+    radial-gradient(44% 50% at 94% 40%,  rgba(197, 160, 89, 0.24) 0%, transparent 68%);
 }
 .sc-why-inner {
+  position: relative;
+  z-index: 1;
   max-width: 1180px;
   margin: 0 auto;
   padding: 100px 64px 110px;
 }
 .sc-why-heading {
-  font-size: clamp(32px, 4vw, 48px);
-  max-width: 620px;
+  font-size: clamp(32px, 4vw, 46px);
+  max-width: 640px;
 }
 
 .sc-why-grid {
@@ -17,8 +30,12 @@
   gap: 20px;
 }
 .sc-why-card {
-  border: 1px solid var(--white-15);
-  background: var(--navy-card);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-hi);
+  border-radius: var(--r-lg);
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
@@ -28,20 +45,20 @@
   margin-bottom: 20px;
 }
 .sc-why-card h3 {
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--white);
+  color: var(--ink-1);
   margin-bottom: 12px;
 }
 .sc-why-problem {
   font-size: 14px;
-  color: var(--white-70);
+  color: var(--ink-2);
   line-height: 1.7;
   padding-bottom: 24px;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--white-15);
+  border-bottom: 1px solid var(--hairline);
 }
 .sc-why-fix {
   margin-top: auto;
@@ -52,7 +69,7 @@
 }
 .sc-why-fix p {
   font-size: 14px;
-  color: var(--gold-bright);
+  color: var(--ink-1);
   line-height: 1.7;
 }
 
