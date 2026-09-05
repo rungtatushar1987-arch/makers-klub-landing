@@ -6,11 +6,11 @@ import Onboarding from './Onboarding'
 
 // Avatar color map from design tokens — cycles through brand palette
 const AV_COLORS = [
-  { bg: '#fcb813', fg: '#0a1340' },  // yellow
-  { bg: '#7a4ed8', fg: '#ffffff' },  // violet
+  { bg: '#c5a059', fg: '#0a1340' },  // yellow
+  { bg: '#3b6dd9', fg: '#ffffff' },  // violet
   { bg: '#3b6dd9', fg: '#ffffff' },  // blue
   { bg: '#0a1340', fg: '#ffffff' },  // navy
-  { bg: '#a587f0', fg: '#0a1340' },  // soft violet
+  { bg: '#7ba0e8', fg: '#0a1340' },  // soft violet
 ]
 function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
 
@@ -256,7 +256,7 @@ export default function Dashboard() {
                             {conn.action_tags.map(tag => (
                               <span key={tag} style={{
                                 display: 'inline-flex', alignItems: 'center', gap: 4,
-                                background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)',
+                                background: 'rgba(197,160,89,0.18)', color: 'var(--mk-yellow-deep)',
                                 fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
                                 padding: '3px 10px', borderRadius: 999,
                               }}>

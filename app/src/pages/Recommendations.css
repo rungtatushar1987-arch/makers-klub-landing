@@ -13,8 +13,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 20px 22px;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: var(--glass-shadow);
 }
 
 .ins-section-head {
@@ -232,7 +231,7 @@
 }
 
 .ins-people-col {
-  background: rgba(255,255,255,0.04);
+  background: rgba(12,19,48,0.02);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   padding: 14px 16px;
@@ -334,7 +333,7 @@
 .ins-ai-idle {
   padding: 24px;
   text-align: center;
-  background: rgba(255,255,255,0.03);
+  background: rgba(12,19,48,0.02);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
@@ -420,7 +419,7 @@
 
 /* AI event card */
 .ins-ai-card {
-  background: rgba(255,255,255,0.04);
+  background: rgba(12,19,48,0.02);
   border: 1px solid var(--hairline);
   border-radius: 14px;
   overflow: hidden;
@@ -476,7 +475,7 @@
   padding: 3px 10px;
   border-radius: 999px;
   background: rgba(59,109,217,0.12);
-  color: #7aaeff;
+  color: var(--mk-violet);
   flex-shrink: 0;
 }
 
@@ -515,7 +514,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(12,19,48,0.02);
   border: 1px solid var(--hairline);
   border-radius: 10px;
   gap: 8px;
@@ -573,8 +572,8 @@
   font-weight: 600;
   padding: 4px 11px;
   border-radius: 999px;
-  border: 1px solid rgba(252,184,19,0.3);
-  background: rgba(252,184,19,0.08);
+  border: 1px solid rgba(197,160,89,0.3);
+  background: rgba(197,160,89,0.08);
   color: var(--mk-yellow-deep);
   cursor: pointer;
   white-space: nowrap;
@@ -582,7 +581,7 @@
   transition: background 0.15s;
 }
 
-.ins-copy-btn:hover { background: rgba(252,184,19,0.15); }
+.ins-copy-btn:hover { background: rgba(197,160,89,0.15); }
 
 .ins-copy-btn.copied {
   background: rgba(52,210,123,0.12);
@@ -598,7 +597,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   background: rgba(224,82,79,0.10);
-  color: #ff8a89;
+  color: var(--danger);
   border: 1px solid rgba(224,82,79,0.18);
   flex-shrink: 0;
 }

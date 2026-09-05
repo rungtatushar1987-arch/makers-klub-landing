@@ -8,7 +8,7 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--mk-yellow-deep);
-  background: rgba(252,184,19,0.14);
+  background: rgba(197,160,89,0.14);
   padding: 5px 14px;
   border-radius: 999px;
 }
@@ -39,7 +39,6 @@
   border: 1.5px solid var(--hairline-strong);
   border-radius: 999px;
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(12px);
   color: var(--ink-1);
   font-family: var(--font-body);
   font-size: 14px;
@@ -80,7 +79,7 @@
   border-bottom: 1px solid var(--hairline);
   transition: background 0.12s;
 }
-.adm-mrow:hover { background: rgba(255,255,255,0.5); }
+.adm-mrow:hover { background: rgba(12,19,48,0.03); }
 
 .adm-mrow-identity {
   display: flex;
@@ -120,7 +119,7 @@
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  background: rgba(252,184,19,0.18);
+  background: rgba(197,160,89,0.18);
   color: var(--mk-yellow-deep);
   padding: 2px 7px;
   border-radius: 999px;
@@ -142,7 +141,7 @@
   text-transform: uppercase;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(122,78,216,0.12);
+  background: rgba(59,109,217,0.12);
   color: var(--mk-violet);
 }
 
@@ -257,7 +256,7 @@
   transition: background 0.12s;
   cursor: pointer;
 }
-.adm-erow:hover { background: rgba(255,255,255,0.5); }
+.adm-erow:hover { background: rgba(12,19,48,0.03); }
 .adm-erow.past  { opacity: 0.75; }
 
 .adm-date-block {
@@ -368,7 +367,7 @@
 .adm-view-type-badge {
   padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(122,78,216,0.12);
+  background: rgba(59,109,217,0.12);
   color: var(--mk-violet);
   font-family: var(--font-display);
   font-size: 10px;
@@ -410,9 +409,9 @@
 }
 
 .adm-view-icon--navy   { background: var(--mk-navy); }
-.adm-view-icon--violet { background: rgba(122,78,216,0.12); }
+.adm-view-icon--violet { background: rgba(59,109,217,0.12); }
 .adm-view-icon--green  { background: rgba(52,210,123,0.12); }
-.adm-view-icon--yellow { background: rgba(252,184,19,0.15); }
+.adm-view-icon--yellow { background: rgba(197,160,89,0.15); }
 
 .adm-view-meta-primary {
   font-family: var(--font-display);
@@ -560,8 +559,6 @@
   inset: 0;
   z-index: 200;
   background: rgba(10,19,64,0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
 .adm-modal {
@@ -574,11 +571,9 @@
   max-height: calc(100vh - 80px);
   overflow-y: auto;
   background: var(--surface);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  box-shadow: 0 32px 80px rgba(10,19,64,0.22), 0 0 0 1px rgba(255,255,255,0.5);
+  box-shadow: 0 32px 80px rgba(10,19,64,0.22), 0 0 0 1px var(--hairline);
   padding: 32px;
 }
 

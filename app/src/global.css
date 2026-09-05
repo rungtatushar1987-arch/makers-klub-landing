@@ -1,6 +1,7 @@
-/* Makers Klub — Aurora Glass · global shell styles
-   Surface: white. Backdrop: yellow + violet + blue blobs (fixed, z-index 0).
-   Material: frosted glass. Fonts: Poppins (display/UI) + Inter (body).
+/* Makers Klub — Flat system · global shell styles
+   Surface: solid white. No ambient backdrop, no frosted glass.
+   Gold = actions / active. Blue = links / emphasis / marks / gradients.
+   Fonts: Poppins (display/UI) + Inter (body).
    ============================================================================ */
 
 html, body, #root { height: 100%; }
@@ -16,6 +17,8 @@ a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: var(--font-display); }
 input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 
+em { font-style: normal; color: var(--mk-violet); }
+
 /* ── App shell ── */
 .mkw {
   display: grid;
@@ -24,32 +27,14 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   position: relative;
 }
 
-/* ── Ambient backdrop — cosmic blobs behind all glass ── */
-.mkw::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--blob-opacity);
-  background:
-    radial-gradient(42% 50% at 12% 0%,    rgba(252,184,19,0.50)  0%, transparent 70%),
-    radial-gradient(48% 40% at 100% 28%,  rgba(122,78,216,0.38)  0%, transparent 72%),
-    radial-gradient(55% 40% at 55% 110%,  rgba(59,109,217,0.35)  0%, transparent 70%),
-    radial-gradient(38% 30% at 78% 85%,   rgba(165,135,240,0.28) 0%, transparent 72%);
-}
-
-/* Everything inside must stack above the blobs */
 .mkw > * { position: relative; z-index: 1; }
 
 /* ── Sidebar ── */
 .mkw-side {
   width: var(--sidebar-w);
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(160%);
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 6px)) saturate(160%);
   border-right: 1px solid var(--glass-border);
-  box-shadow: 2px 0 24px rgba(38,40,90,0.08);
+  box-shadow: 2px 0 24px rgba(38,40,90,0.06);
   padding: 28px 0;
   display: flex;
   flex-direction: column;
@@ -104,7 +89,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 }
 
 .mkw-nav-item:hover {
-  background: rgba(122,78,216,0.08);
+  background: rgba(59,109,217,0.08);
   color: var(--ink-1);
 }
 
@@ -121,12 +106,12 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   display: flex; align-items: center; justify-content: center;
 }
 
-/* Active nav-ic as yellow pill */
+/* Active nav-ic as gold pill */
 .mkw-nav-item.active .nav-ic {
   background: var(--mk-yellow);
   color: var(--mk-navy);
   width: 28px; height: 22px; border-radius: var(--r-pill);
-  box-shadow: 0 3px 8px rgba(252,184,19,0.38);
+  box-shadow: 0 3px 8px rgba(197,160,89,0.38);
   font-size: 13px;
 }
 
@@ -142,7 +127,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   background: var(--mk-yellow); color: var(--mk-navy);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-size: 11px; font-weight: 700; flex-shrink: 0;
-  box-shadow: 0 3px 8px rgba(252,184,19,0.30);
+  box-shadow: 0 3px 8px rgba(197,160,89,0.30);
 }
 
 .mkw-side-foot .who {
@@ -184,12 +169,10 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 .mkw-pagehead {
   display: flex; justify-content: space-between; align-items: center;
   padding: 16px 36px 16px 40px;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--glass-border);
   gap: 24px; flex-shrink: 0;
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(150%);
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 4px)) saturate(150%);
-  box-shadow: 0 2px 16px rgba(38,40,90,0.06);
+  box-shadow: 0 4px 24px rgba(38,40,90,0.06);
   position: sticky; top: 0; z-index: 40;
   /* Expose height as a custom property for right-rail offset */
   --pagehead-h: 81px;
@@ -230,11 +213,9 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   font-family: var(--font-display);
 }
 
-/* ── Glass card ── */
+/* ── Card (flat) ── */
 .mkw-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-hi);
   border-radius: var(--r-sm);
@@ -251,8 +232,6 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 
 .mkw-stat {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-hi);
   border-radius: var(--r-sm);
@@ -307,7 +286,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   cursor: pointer; flex-shrink: 0; transition: background 0.12s;
 }
 
-.mkw-row-action:hover { background: var(--glass-bg); }
+.mkw-row-action:hover { background: rgba(12,19,48,0.04); }
 .mkw-row-action.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 /* ── Chips ── */
@@ -316,8 +295,8 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   font-family: var(--font-display); font-size: 10px; letter-spacing: 0.3px; font-weight: 700;
 }
 
-.mkw-chip-tag.lavender { background: rgba(122,78,216,0.16); color: var(--mk-violet); }
-.mkw-chip-tag.ochre    { background: rgba(252,184,19,0.20); color: var(--mk-yellow-deep); }
+.mkw-chip-tag.lavender { background: rgba(59,109,217,0.14); color: var(--mk-violet); }
+.mkw-chip-tag.ochre    { background: rgba(197,160,89,0.20); color: var(--mk-yellow-deep); }
 .mkw-chip-tag.green    { background: rgba(52,210,123,0.18); color: #1e7a3f; }
 
 /* ── Buttons ── */
@@ -336,16 +315,18 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   background: var(--accent); color: var(--accent-ink);
   box-shadow: var(--shadow-cta);
 }
-.mk-btn-primary:hover { background: var(--mk-yellow-soft); }
+.mk-btn-primary:hover {
+  background: var(--mk-yellow-soft);
+  box-shadow: 0 14px 30px rgba(197,160,89,0.5);
+}
 
 .mk-btn-ghost {
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--ink-1);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-hi);
 }
+.mk-btn-ghost:hover { border-color: var(--mk-violet-soft); color: var(--mk-violet); }
 
 .mk-btn-navy { background: var(--mk-navy); color: #fff; }
 .mk-btn-navy:hover { background: #0c1a55; }
@@ -364,7 +345,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   padding: 10px 14px;
   border-left: 3px solid var(--accent);
   border-radius: 0 var(--r-xs) var(--r-xs) 0;
-  background: rgba(252,184,19,0.08);
+  background: rgba(197,160,89,0.10);
 }
 
 /* ── Tags ── */
@@ -373,16 +354,14 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   border-radius: var(--r-pill); letter-spacing: 0.4px; font-weight: 700;
 }
 .mkw-tag.green  { background: rgba(52,210,123,0.18); color: #1e7a3f; }
-.mkw-tag.ochre  { background: rgba(252,184,19,0.20); color: var(--mk-yellow-deep); }
-.mkw-tag.violet { background: rgba(122,78,216,0.16); color: var(--mk-violet); }
+.mkw-tag.ochre  { background: rgba(197,160,89,0.20); color: var(--mk-yellow-deep); }
+.mkw-tag.violet { background: rgba(59,109,217,0.14); color: var(--mk-violet); }
 
 /* ── Profile / Settings rows ── */
 .mkw-set-list { padding: 0; display: flex; flex-direction: column; gap: 8px; }
 
 .mkw-set-row {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-hi);
   border-radius: var(--r-sm); padding: 13px 15px;
@@ -391,7 +370,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 
 .mkw-set-ic {
   width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
-  background: rgba(122,78,216,0.12); color: var(--mk-violet);
+  background: rgba(59,109,217,0.12); color: var(--mk-violet);
   display: flex; align-items: center; justify-content: center; font-size: 16px;
 }
 
@@ -428,15 +407,14 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 .mkw-form-input, .mkw-form-textarea, .mkw-form-select {
   width: 100%; padding: 11px 16px;
   border: 1.5px solid var(--hairline-strong); border-radius: var(--r-sm);
-  font-size: 14px; font-family: var(--font-body); background: var(--glass-bg);
+  font-size: 14px; font-family: var(--font-body); background: var(--surface);
   color: var(--ink-1); outline: none;
-  backdrop-filter: blur(var(--glass-blur));
   transition: border-color 0.15s, box-shadow 0.15s; appearance: none;
 }
 .mkw-form-input::placeholder, .mkw-form-textarea::placeholder { color: var(--ink-3); }
 .mkw-form-input:focus, .mkw-form-textarea:focus, .mkw-form-select:focus {
   border-color: var(--mk-violet);
-  box-shadow: 0 0 0 3px rgba(122,78,216,0.12);
+  box-shadow: 0 0 0 3px rgba(59,109,217,0.12);
 }
 .mkw-form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
 
@@ -448,7 +426,7 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 }
 .mkw-filter-select {
   padding: 7px 14px; border-radius: var(--r-pill); border: 1px solid var(--glass-border);
-  background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+  background: var(--surface);
   color: var(--ink-2); font-family: var(--font-display); font-size: 12px; font-weight: 600;
   cursor: pointer; outline: none; appearance: none;
   transition: background 0.12s, border-color 0.12s;
@@ -462,34 +440,51 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 }
 .mkw-empty { text-align: center; padding: 48px 24px; color: var(--ink-3); font-size: 15px; font-family: var(--font-body); }
 
-/* ── Login / Signup ── */
+/* ── Login / Signup — dark photo hero (no card), white text ── */
 .mkw-login {
-  /* Scoped dark-mode tokens so glass card text reads white on navy backdrop */
-  --ink-1:           #ffffff;
-  --ink-2:           rgba(255,255,255,0.74);
-  --ink-3:           rgba(255,255,255,0.46);
-  --hairline:        rgba(255,255,255,0.10);
-  --hairline-strong: rgba(255,255,255,0.20);
-  --glass-bg:        rgba(255,255,255,0.10);
-  --glass-bg-strong: rgba(255,255,255,0.16);
-  --glass-border:    rgba(255,255,255,0.22);
-  --glass-hi:        inset 0 1px 0 rgba(255,255,255,0.18);
-  --glass-shadow:    0 16px 48px rgba(0,0,0,0.38);
-  --mk-yellow-deep:  #fcb813;
-
   min-height: 100vh;
-  background: var(--mk-navy);
+  background: #070b18;
   display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 32px;
+  padding: 96px 24px 64px;
   position: relative; overflow: hidden;
+
+  /* Scoped light-on-dark tokens so form controls read on the dark hero */
+  --ink-1:           #ffffff;
+  --ink-2:           rgba(255,255,255,0.78);
+  --ink-3:           rgba(255,255,255,0.52);
+  --surface:         rgba(255,255,255,0.06);
+  --hairline:        rgba(255,255,255,0.14);
+  --hairline-strong: rgba(255,255,255,0.28);
+  --glass-bg:        rgba(255,255,255,0.06);
+  --glass-bg-strong: rgba(255,255,255,0.08);
+  --glass-border:    rgba(255,255,255,0.16);
+  --glass-hi:        inset 0 0 0 0 transparent;
+  --glass-shadow:    0 16px 48px rgba(0,0,0,0.38);
+  --mk-yellow-deep:  var(--mk-yellow-soft);
 }
 
+/* Blurred full-bleed photo layer — over-inset so the blur feather is clipped
+   by .mkw-login's overflow:hidden. */
 .mkw-login::before {
   content: '';
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  position: absolute;
+  inset: -40px;
+  z-index: 0;
+  pointer-events: none;
+  background: #0f1424 url('/hero.jpg') center / cover no-repeat;
+  filter: blur(5px) saturate(0.98);
+}
+
+/* Dark veil over the photo — image reads ~60%, with a pool behind the card */
+.mkw-login::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
-    radial-gradient(55% 50% at 15% 5%,  rgba(252,184,19,0.38) 0%, transparent 65%),
-    radial-gradient(50% 45% at 88% 85%, rgba(122,78,216,0.42) 0%, transparent 65%),
-    radial-gradient(40% 35% at 70% 15%, rgba(59,109,217,0.22) 0%, transparent 60%);
+    linear-gradient(180deg, rgba(7,11,24,0.34) 0%, rgba(7,11,24,0.52) 100%),
+    radial-gradient(120% 90% at 50% 46%, rgba(7,11,24,0.55) 0%, rgba(7,11,24,0) 64%);
 }
 
 .mkw-login > * { position: relative; z-index: 1; }
@@ -502,12 +497,13 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-weight: 800; font-size: 16px;
   color: var(--mk-navy); letter-spacing: -0.5px;
-  box-shadow: 0 8px 24px rgba(252,184,19,0.45);
+  box-shadow: var(--shadow-cta);
 }
 
 .mkw-login-name {
   font-family: var(--font-display); font-weight: 800;
   font-size: 26px; color: #fff; letter-spacing: -0.5px;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.28);
 }
 
 /* ── Pulse animation (match cards) ── */

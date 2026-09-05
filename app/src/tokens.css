@@ -1,28 +1,29 @@
-/* Makers Klub — Aurora Glass design tokens
-   Light theme: white surface, cosmic gradient backdrop, frosted-glass cards.
-   Display: Poppins (700/800). Body: Inter. Script: Caveat (logo only).
-   Legacy cream/navy/ochre tokens kept for backward compat during migration.
+/* Makers Klub — Flat design tokens (ported from the marketing site)
+   Gold primary + blue secondary. Solid white surfaces, no frosted glass,
+   no ambient gradient backdrop. Display: Poppins. Body: Inter.
+   The --glass-* token *names* are kept so component CSS still resolves —
+   only their values are flattened.
    ============================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@600;700&family=Fraunces:ital,wght@0,400;0,700;0,800;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
 :root {
-  /* ── Aurora Glass brand hues ── */
-  --mk-yellow:        #fcb813;   /* PRIMARY ACCENT — actions, active states, CTAs */
-  --mk-yellow-deep:   #e0a000;   /* yellow text on light — contrast-safe */
-  --mk-yellow-soft:   #ffce47;   /* hover */
-  --mk-violet:        #7a4ed8;   /* secondary accent — links, stat numerals, gradient */
-  --mk-violet-soft:   #a587f0;   /* violet on dark, soft-violet avatar */
-  --mk-blue:          #3b6dd9;   /* gradient cards, avatars, glow */
-  --mk-navy:          #0a1340;   /* ink / headings, ink-on-yellow, active chip fill */
+  /* ── Brand hues — gold primary, blue secondary ── */
+  --mk-yellow:        #c5a059;   /* PRIMARY ACCENT (gold) — CTAs, badges, active states */
+  --mk-yellow-deep:   #8a6d2f;   /* gold-as-text on white — contrast-safe (~5:1) */
+  --mk-yellow-soft:   #d9b673;   /* gold hover / gold on dark */
+  --mk-violet:        #3b6dd9;   /* SECONDARY ACCENT (blue) — links, <em>, numerals, marks */
+  --mk-violet-soft:   #7ba0e8;   /* soft blue — link underlines, hover borders */
+  --mk-blue:          #26489a;   /* deep blue — gradient end-stop only */
+  --mk-navy:          #0a1340;   /* ink for headings; text on gold */
 
   /* ── Accent indirection ── */
   --accent:           var(--mk-yellow);
   --accent-ink:       #0a1340;
 
-  /* ── Ink ramp (text on light) ── */
+  /* ── Ink ramp (text on white) ── */
   --ink-1:            #0c1330;
   --ink-2:            #424a6b;
   --ink-3:            #818aa6;
@@ -32,16 +33,14 @@
   --hairline:         rgba(12,19,48,0.08);
   --hairline-strong:  rgba(12,19,48,0.14);
 
-  /* ── Glass material ── */
-  --glass-blur:       22px;
-  --glass-bg:         rgba(255,255,255,0.55);
-  --glass-bg-strong:  rgba(255,255,255,0.72);
-  --glass-border:     rgba(255,255,255,0.85);
-  --glass-hi:         inset 0 1px 0 rgba(255,255,255,0.75);
-  --glass-shadow:     0 10px 34px rgba(38,40,90,0.12);
-
-  /* ── Blob opacity ── */
-  --blob-opacity:     0.9;
+  /* ── Card material — FLAT (glass tokens, flattened) ── */
+  --glass-blur:       0px;
+  --glass-bg:         #ffffff;
+  --glass-bg-strong:  #ffffff;
+  --glass-border:     rgba(12,19,48,0.10);
+  --glass-hi:         inset 0 0 0 0 transparent;
+  --glass-shadow:     0 1px 2px rgba(12,19,48,0.05), 0 8px 20px rgba(12,19,48,0.05);
+  --blob-opacity:     0;
 
   /* ── Status ── */
   --ok:               #34d27b;
@@ -58,14 +57,14 @@
   --sp-5: 22px; --sp-6: 28px; --sp-7: 44px; --sp-8: 72px;
 
   /* ── Shadows ── */
-  --shadow-cta:      0 10px 24px rgba(252,184,19,0.40);
-  --shadow-gradient: 0 18px 44px rgba(80,60,200,0.34);
-  --shadow-card:     0 10px 34px rgba(38,40,90,0.12), inset 0 1px 0 rgba(255,255,255,0.75);
+  --shadow-cta:      0 10px 24px rgba(197,160,89,0.40);   /* gold glow under primary buttons */
+  --shadow-gradient: 0 18px 44px rgba(38,72,154,0.34);    /* blue glow under gradient panels */
+  --shadow-card:     0 10px 34px rgba(38,40,90,0.12), inset 0 1px 0 rgba(255,255,255,0.75); /* legacy, unused */
 
   /* ── Typography ── */
   --font-display: 'Poppins', system-ui, -apple-system, sans-serif;
   --font-body:    'Inter', system-ui, -apple-system, sans-serif;
-  --font-script:  'Caveat', cursive;
+  --font-script:  'Poppins', system-ui, -apple-system, sans-serif; /* legacy alias — script face retired */
 
   /* ── Type scale ── */
   --fs-topbar:   27px;   /* Poppins 700 */
@@ -78,6 +77,7 @@
 
   /* ── Sidebar ── */
   --sidebar-w: 248px;
+  --sidebar-width: 248px;
 
   /* ── Legacy tokens (keep for backward compat) ── */
   --mk-cream:     #f5f1ea;
@@ -86,26 +86,11 @@
   --mk-ochre:     var(--mk-yellow);
   --mk-ochre-2:   var(--mk-yellow-soft);
   --mk-lavender:  var(--mk-violet);
+  --navy:         var(--mk-navy);
+  --ochre:        var(--mk-yellow);
   --fg-1:         var(--ink-1);
   --fg-2:         var(--ink-2);
   --fg-3:         var(--ink-3);
   --border-1:     var(--hairline-strong);
   --border-2:     rgba(12,19,48,0.20);
-}
-
-/* ── Dark theme ── */
-[data-theme="dark"] {
-  --ink-1:           #ffffff;
-  --ink-2:           rgba(255,255,255,0.74);
-  --ink-3:           rgba(255,255,255,0.46);
-  --surface:         #060a22;
-  --hairline:        rgba(255,255,255,0.10);
-  --hairline-strong: rgba(255,255,255,0.18);
-  --glass-bg:        rgba(255,255,255,0.08);
-  --glass-bg-strong: rgba(255,255,255,0.13);
-  --glass-border:    rgba(255,255,255,0.16);
-  --glass-hi:        inset 0 1px 0 rgba(255,255,255,0.14);
-  --glass-shadow:    0 12px 40px rgba(0,0,0,0.45);
-  --mk-yellow-deep:  #fcb813;
-  --mk-violet:       #a587f0;
 }

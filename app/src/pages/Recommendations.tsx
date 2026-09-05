@@ -26,9 +26,9 @@ type AiLoadState = 'idle' | 'loading' | 'done' | 'error'
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const AV_COLORS = [
-  { bg: 'rgba(122,78,216,0.25)',  fg: '#c4a8ff' },
+  { bg: 'rgba(59,109,217,0.25)',  fg: '#7ba0e8' },
   { bg: 'rgba(59,109,217,0.25)', fg: '#7aaeff'  },
-  { bg: 'rgba(252,184,19,0.2)',  fg: '#fcb813'  },
+  { bg: 'rgba(197,160,89,0.2)',  fg: '#c5a059'  },
   { bg: 'rgba(226,75,74,0.2)',   fg: '#ff8a89'  },
   { bg: 'rgba(52,210,123,0.2)',  fg: '#1a7a4a'  },
 ]
@@ -57,8 +57,8 @@ function copyMessage(item: AiItem, event: AdminEvent): void {
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
 const TYPE_COLORS: Record<string, string> = {
-  Networking: '#7a4ed8',
-  Workshop:   '#fcb813',
+  Networking: '#3b6dd9',
+  Workshop:   '#c5a059',
   Social:     '#3b6dd9',
   Panel:      '#34d27b',
   Fireside:   '#f4822a',
@@ -233,11 +233,11 @@ function MembersLineChart({ members }: { members: OrgMember[] }) {
         datasets: [{
           label: 'Members',
           data: points.map(p => p.y),
-          borderColor: '#7a4ed8',
-          backgroundColor: 'rgba(122,78,216,0.08)',
+          borderColor: '#3b6dd9',
+          backgroundColor: 'rgba(59,109,217,0.08)',
           borderWidth: 2,
           pointRadius: real.length <= 20 ? 4 : 2,
-          pointBackgroundColor: '#7a4ed8',
+          pointBackgroundColor: '#3b6dd9',
           fill: true,
           tension: 0.3,
         }],

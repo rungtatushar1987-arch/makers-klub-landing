@@ -11,20 +11,6 @@
   padding: 56px 24px 80px;
 }
 
-.ow-page::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--blob-opacity);
-  background:
-    radial-gradient(42% 50% at 12% 0%,    rgba(252,184,19,0.50)  0%, transparent 70%),
-    radial-gradient(48% 40% at 100% 28%,  rgba(122,78,216,0.38)  0%, transparent 72%),
-    radial-gradient(55% 40% at 55% 110%,  rgba(59,109,217,0.35)  0%, transparent 70%),
-    radial-gradient(38% 30% at 78% 85%,   rgba(165,135,240,0.28) 0%, transparent 72%);
-}
-
 .ow-inner {
   position: relative;
   z-index: 1;
@@ -91,8 +77,6 @@
 
 .ow-card {
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-hi), var(--glass-shadow);
   border-radius: var(--r-lg);
@@ -168,9 +152,9 @@
 
 .ow-polish-btn {
   padding: 4px 10px;
-  background: rgba(122,78,216,0.10);
+  background: rgba(59,109,217,0.10);
   color: var(--mk-violet);
-  border: 1px solid rgba(122,78,216,0.25);
+  border: 1px solid rgba(59,109,217,0.25);
   border-radius: var(--r-pill);
   font-family: var(--font-body);
   font-size: 11px;
@@ -181,7 +165,7 @@
 }
 
 .ow-polish-btn:hover:not(:disabled) {
-  background: rgba(122,78,216,0.18);
+  background: rgba(59,109,217,0.18);
 }
 
 .ow-polish-btn:disabled {
@@ -218,7 +202,7 @@
   padding: 8px 12px;
   border: 1.5px solid var(--hairline-strong);
   border-radius: var(--r-sm);
-  background: rgba(255,255,255,0.6);
+  background: #fff;
   transition: border-color 0.15s;
 }
 
@@ -232,9 +216,9 @@
   align-items: center;
   gap: 5px;
   padding: 5px 7px 5px 12px;
-  background: rgba(122,78,216,0.10);
+  background: rgba(59,109,217,0.10);
   color: var(--mk-violet);
-  border: 1px solid rgba(122,78,216,0.25);
+  border: 1px solid rgba(59,109,217,0.25);
   border-radius: var(--r-pill);
   font-family: var(--font-body);
   font-size: 13px;
@@ -280,7 +264,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: rgba(255,255,255,0.5);
+  background: #fff;
   border: 1px solid var(--hairline-strong);
   border-radius: var(--r-xs);
 }
@@ -314,7 +298,7 @@
   padding: 9px 8px;
   border: 1.5px solid var(--hairline-strong);
   border-radius: var(--r-xs);
-  background: rgba(255,255,255,0.7);
+  background: #fff;
   color: var(--ink-1);
   font-size: 13px;
   font-family: var(--font-body);
@@ -361,14 +345,10 @@
   padding: 8px 12px;
   border: 1.5px solid var(--hairline-strong);
   border-radius: var(--r-sm);
-  background: rgba(255,255,255,0.6);
+  background: #fff;
   cursor: pointer;
   transition: border-color 0.15s;
   outline: none;
-}
-
-[data-theme="dark"] .ow-multiselect-trigger {
-  background: rgba(255,255,255,0.06);
 }
 
 .ow-multiselect-trigger:hover,
@@ -437,11 +417,11 @@
 }
 
 .ow-multiselect-option:hover {
-  background: rgba(252,184,19,0.10);
+  background: rgba(197,160,89,0.10);
 }
 
 .ow-multiselect-option-selected {
-  background: rgba(122,78,216,0.08);
+  background: rgba(59,109,217,0.08);
   font-weight: 600;
 }
 
@@ -475,7 +455,7 @@
   padding: 9px 16px;
   border-radius: var(--r-pill);
   border: 1.5px solid var(--hairline-strong);
-  background: rgba(255,255,255,0.6);
+  background: #fff;
   color: var(--ink-1);
   font-family: var(--font-body);
   font-size: 13px;
@@ -487,18 +467,13 @@
   outline: none;
 }
 
-[data-theme="dark"] .ow-goal-chip,
-[data-theme="dark"] .ow-tech-chip {
-  background: rgba(255,255,255,0.06);
-}
-
 .ow-goal-chip:focus-visible {
   box-shadow: 0 0 0 2px var(--mk-yellow);
 }
 
 .ow-goal-chip:hover:not(:disabled):not(.ow-goal-chip-selected) {
   border-color: var(--mk-yellow);
-  background: rgba(252,184,19,0.08);
+  background: rgba(197,160,89,0.08);
 }
 
 .ow-goal-chip-selected {
@@ -553,7 +528,7 @@
   padding: 10px 12px;
   border-radius: var(--r-sm);
   border: 1.5px solid var(--hairline-strong);
-  background: rgba(255,255,255,0.6);
+  background: #fff;
   color: var(--ink-1);
   font-family: var(--font-body);
   font-size: 13px;
@@ -567,7 +542,7 @@
 
 .ow-tech-chip:hover:not(.ow-tech-chip-selected) {
   border-color: var(--mk-yellow);
-  background: rgba(252,184,19,0.08);
+  background: rgba(197,160,89,0.08);
 }
 
 .ow-tech-chip-selected {
@@ -597,7 +572,7 @@
   padding: 13px 18px;
   border-radius: var(--r-sm);
   border: 1.5px solid var(--hairline-strong);
-  background: rgba(255,255,255,0.6);
+  background: #fff;
   color: var(--ink-1);
   font-family: var(--font-body);
   font-size: 14px;
@@ -609,7 +584,7 @@
 
 .ow-option-card:hover:not(.ow-option-card-selected) {
   border-color: var(--mk-yellow);
-  background: rgba(252,184,19,0.08);
+  background: rgba(197,160,89,0.08);
 }
 
 .ow-option-card-selected {

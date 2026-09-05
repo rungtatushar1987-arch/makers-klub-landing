@@ -11,8 +11,6 @@
 /* ── Cards ── */
 .onb-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-hi);
   border-radius: var(--r-sm);
@@ -39,8 +37,8 @@
 
 /* Profile card */
 .onb-card-profile {
-  border-color: rgba(122,78,216,0.30);
-  background: rgba(122,78,216,0.06);
+  border-color: rgba(59,109,217,0.30);
+  background: rgba(59,109,217,0.06);
 }
 
 .onb-card-head {
@@ -63,13 +61,14 @@
   border-radius: 999px; transition: width 0.4s ease;
 }
 
-/* ── Community card ── */
+/* ── Community card — blue gradient panel ── */
 .onb-card-community {
-  background: var(--mk-navy);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(150deg, var(--mk-violet) 0%, var(--mk-blue) 100%);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: var(--shadow-gradient), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
-.onb-card-community .onb-card-label { color: var(--mk-yellow); }
+.onb-card-community .onb-card-label { color: var(--mk-yellow-soft); }
 
 .onb-community-stats {
   display: flex; gap: 0; margin: 14px 0;
@@ -136,8 +135,8 @@
 .onb-activity-item {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.35);
-  border: 1px solid var(--hairline-strong);
+  background: rgba(12,19,48,0.02);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-xs);
 }
 

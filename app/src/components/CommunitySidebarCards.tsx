@@ -35,7 +35,7 @@ export function RecommendedPeopleCard({ members }: { members: Profile[] }) {
       <div className="onb-member-strip onb-member-strip--col">
         {members.map(m => (
           <div key={m.clerk_user_id} className="onb-member-chip">
-            <div className="onb-member-av" style={{ background: m.avatar_color || '#0f1e3d' }}>
+            <div className="onb-member-av" style={{ background: m.avatar_color || '#0a1340' }}>
               {getInitials(m.full_name)}
             </div>
             <div className="onb-member-info">
