@@ -6,11 +6,11 @@ import './Events.css'
 
 // Aurora Glass avatar palette
 const AV_COLORS = [
-  { bg: '#fcb813', fg: '#0a1340' },
-  { bg: '#7a4ed8', fg: '#ffffff' },
+  { bg: '#c5a059', fg: '#0a1340' },
+  { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#0a1340', fg: '#ffffff' },
-  { bg: '#a587f0', fg: '#0a1340' },
+  { bg: '#7ba0e8', fg: '#0a1340' },
 ]
 const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
@@ -370,7 +370,7 @@ function EventModal({ event, going, onClose }: { event: Event; going: boolean; o
           </div>
           {event.location && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(122,78,216,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>📍</div>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(59,109,217,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>📍</div>
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>{event.location}</div>
                 {event.address && <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>{event.address}</div>}

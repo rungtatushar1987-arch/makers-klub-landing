@@ -25,7 +25,7 @@
 .sidebar-logo img { height: 32px; }
 
 .sidebar-logo span {
-  font-family: 'Fraunces', serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 15px;
   color: white;
@@ -57,8 +57,8 @@
 }
 
 .nav-item.active {
-  background: rgba(244,168,51,0.15);
-  color: var(--ochre);
+  background: rgba(197,160,89,0.15);
+  color: var(--mk-yellow-deep);
 }
 
 .nav-icon {

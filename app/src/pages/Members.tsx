@@ -3,11 +3,11 @@ import { useKlub } from '../KlubContext'
 import { type Connection, ACTION_TAGS, getInitials } from '../supabase'
 
 const AV_COLORS = [
-  { bg: '#fcb813', fg: '#0a1340' },
-  { bg: '#7a4ed8', fg: '#ffffff' },
+  { bg: '#c5a059', fg: '#0a1340' },
+  { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#0a1340', fg: '#ffffff' },
-  { bg: '#a587f0', fg: '#0a1340' },
+  { bg: '#7ba0e8', fg: '#0a1340' },
 ]
 const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
@@ -104,13 +104,13 @@ export default function Members() {
             marginBottom: 24,
             border: '1.5px solid var(--mk-yellow)',
             borderRadius: 'var(--r-sm)',
-            background: 'rgba(252,184,19,0.05)',
+            background: 'rgba(197,160,89,0.05)',
             overflow: 'hidden',
           }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '12px 18px 10px',
-              borderBottom: '1px solid rgba(252,184,19,0.18)',
+              borderBottom: '1px solid rgba(197,160,89,0.18)',
             }}>
               <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--ink-1)' }}>
                 Connection Requests
@@ -132,7 +132,7 @@ export default function Members() {
                 <div key={conn.id} style={{
                   display: 'flex', alignItems: 'center', gap: 14,
                   padding: '14px 18px',
-                  borderBottom: i < incomingRequests.length - 1 ? '1px solid rgba(252,184,19,0.10)' : 'none',
+                  borderBottom: i < incomingRequests.length - 1 ? '1px solid rgba(197,160,89,0.10)' : 'none',
                 }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
@@ -209,7 +209,7 @@ export default function Members() {
                 backdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
                 WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(150%)',
                 border: `1px solid ${isEditing ? 'var(--mk-violet)' : 'var(--glass-border)'}`,
-                boxShadow: isEditing ? '0 0 0 3px rgba(122,78,216,0.12), var(--glass-shadow)' : 'var(--glass-shadow), var(--glass-hi)',
+                boxShadow: isEditing ? '0 0 0 3px rgba(59,109,217,0.12), var(--glass-shadow)' : 'var(--glass-shadow), var(--glass-hi)',
                 borderRadius: 'var(--r-sm)', overflow: 'hidden', transition: 'border-color 0.15s, box-shadow 0.15s',
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '16px 18px' }}>
@@ -220,10 +220,10 @@ export default function Members() {
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: 'var(--ink-1)', marginBottom: 3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       {conn.profile?.full_name || 'Member'}
                       {(conn as any).follow_up && (
-                        <span style={{ padding: '2px 9px', borderRadius: 999, background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700 }}>↻ Follow up</span>
+                        <span style={{ padding: '2px 9px', borderRadius: 999, background: 'rgba(197,160,89,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700 }}>↻ Follow up</span>
                       )}
                       {conn.direction === 'incoming' && (
-                        <span style={{ padding: '2px 9px', borderRadius: 999, background: 'rgba(91,91,214,0.12)', color: 'var(--mk-violet)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700 }}>They connected with you</span>
+                        <span style={{ padding: '2px 9px', borderRadius: 999, background: 'rgba(59,109,217,0.12)', color: 'var(--mk-violet)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700 }}>They connected with you</span>
                       )}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', marginBottom: conn.notes || tags.length > 0 ? 8 : 0 }}>
@@ -233,14 +233,14 @@ export default function Members() {
                       {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
                     {conn.notes && !isEditing && (
-                      <div style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13, color: 'var(--ink-2)', padding: '9px 13px', borderLeft: '3px solid var(--accent)', background: 'rgba(252,184,19,0.08)', borderRadius: '0 var(--r-xs) var(--r-xs) 0', lineHeight: 1.5, marginBottom: tags.length > 0 ? 8 : 0 }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13, color: 'var(--ink-2)', padding: '9px 13px', borderLeft: '3px solid var(--accent)', background: 'rgba(197,160,89,0.08)', borderRadius: '0 var(--r-xs) var(--r-xs) 0', lineHeight: 1.5, marginBottom: tags.length > 0 ? 8 : 0 }}>
                         {conn.notes}
                       </div>
                     )}
                     {tags.length > 0 && !isEditing && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {tags.map((tag: string) => (
-                          <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(252,184,19,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 999 }}>
+                          <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(197,160,89,0.18)', color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 999 }}>
                             {tag}
                           </span>
                         ))}

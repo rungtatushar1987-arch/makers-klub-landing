@@ -138,7 +138,7 @@ export default function Login() {
               <div className="mkw-teaser-list">
                 {profiles.map(p => (
                   <div key={p.clerk_user_id} className="mkw-teaser-row">
-                    <div className="mkw-teaser-av" style={{ background: p.avatar_color || '#0f1e3d' }}>
+                    <div className="mkw-teaser-av" style={{ background: p.avatar_color || '#0a1340' }}>
                       {getInitials(p.full_name)}
                     </div>
                     <div className="mkw-teaser-info">
@@ -157,7 +157,7 @@ export default function Login() {
               <div className="mkw-teaser-list">
                 {events.map(e => (
                   <div key={e.id} className="mkw-teaser-row">
-                    <div className="mkw-teaser-thumb" style={{ background: e.cover_color || '#0f1e3d' }} />
+                    <div className="mkw-teaser-thumb" style={{ background: e.cover_color || '#0a1340' }} />
                     <div className="mkw-teaser-info">
                       <div className="mkw-teaser-name">{e.title}</div>
                       <div className="mkw-teaser-role">{formatEventWhen(e.date)} · {e.location}</div>

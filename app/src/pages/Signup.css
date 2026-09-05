@@ -3,10 +3,8 @@
 /* Glass card */
 .mkw-signup-card {
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi), 0 32px 80px rgba(10,19,64,0.28);
+  box-shadow: var(--glass-shadow), var(--glass-hi), 0 32px 80px rgba(7,11,24,0.36);
   border-radius: var(--r-lg);
   padding: 40px;
   width: 100%;
@@ -92,7 +90,7 @@
 .mk-btn-ochre:hover {
   background: var(--mk-yellow-soft);
   border-color: var(--mk-yellow-soft);
-  box-shadow: 0 12px 28px rgba(252,184,19,0.50);
+  box-shadow: 0 12px 28px rgba(197,160,89,0.50);
 }
 .mk-btn-ochre:disabled {
   opacity: 0.45;
@@ -109,8 +107,6 @@
   gap: 24px;
 }
 
-/* Keep the ambient blobs pinned while the page scrolls */
-.mkw-login-landing::before { position: fixed; }
 
 .mkw-login-tagline {
   margin-top: -12px;
@@ -162,8 +158,6 @@
   border-radius: var(--r-lg);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
 }
 
 .mkw-teaser-av,

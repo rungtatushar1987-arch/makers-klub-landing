@@ -114,7 +114,7 @@ export const ACTION_TAGS = [
   'Connect on LinkedIn',
 ]
 
-export const AVATAR_COLORS = ['#f4a833', '#cdbcf5', '#0f1e3d', '#e89a1f', '#b8a2eb', '#5dcaa5', '#f0997b']
+export const AVATAR_COLORS = ['#f4a833', '#cdbcf5', '#0a1340', '#e89a1f', '#b8a2eb', '#5dcaa5', '#f0997b']
 
 export function getInitials(name?: string) {
   if (!name) return '?'

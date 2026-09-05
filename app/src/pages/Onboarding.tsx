@@ -78,7 +78,7 @@ export default function Onboarding() {
               <div className="onb-activity-list">
                 {activityFeed.map((item, i) => (
                   <div key={i} className="onb-activity-item">
-                    <div className="onb-activity-av" style={{ background: item.profile.avatar_color || '#0f1e3d' }}>
+                    <div className="onb-activity-av" style={{ background: item.profile.avatar_color || '#0a1340' }}>
                       {getInitials(item.profile.full_name)}
                     </div>
                     <div className="onb-activity-text">
@@ -115,7 +115,7 @@ export default function Onboarding() {
               <div className="onb-member-strip onb-member-strip--col">
                 {connections.slice(0, 6).map(c => (
                   <div key={c.id} className="onb-member-chip">
-                    <div className="onb-member-av" style={{ background: c.profile?.avatar_color || '#0f1e3d' }}>
+                    <div className="onb-member-av" style={{ background: c.profile?.avatar_color || '#0a1340' }}>
                       {getInitials(c.profile?.full_name)}
                     </div>
                     <div className="onb-member-info">

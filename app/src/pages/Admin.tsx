@@ -33,11 +33,11 @@ const VALID_TABS: Tab[] = ['members', 'events', 'analytics', 'recommendations']
 const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
 
 const AV_COLORS = [
-  { bg: '#fcb813', fg: '#0a1340' },
-  { bg: '#7a4ed8', fg: '#ffffff' },
+  { bg: '#c5a059', fg: '#0a1340' },
+  { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#3b6dd9', fg: '#ffffff' },
   { bg: '#0a1340', fg: '#ffffff' },
-  { bg: '#a587f0', fg: '#0a1340' },
+  { bg: '#7ba0e8', fg: '#0a1340' },
 ]
 function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
 
@@ -71,9 +71,9 @@ type EngagementBand = { label: string; color: string; bg: string; min: number }
 const ENGAGEMENT_BANDS: EngagementBand[] = [
   { label: 'New',      color: '#8a94a8', bg: 'rgba(138,148,168,0.12)', min: -1 },
   { label: 'Observer', color: '#3b6dd9', bg: 'rgba(59,109,217,0.12)',  min: 1  },
-  { label: 'Regular',  color: '#7a4ed8', bg: 'rgba(122,78,216,0.12)',  min: 31 },
+  { label: 'Regular',  color: '#3b6dd9', bg: 'rgba(59,109,217,0.12)',  min: 31 },
   { label: 'Core',     color: '#f4822a', bg: 'rgba(244,130,42,0.12)',  min: 61 },
-  { label: 'Champion', color: '#ca8e00', bg: 'rgba(252,184,19,0.18)',  min: 81 },
+  { label: 'Champion', color: '#8a6d2f', bg: 'rgba(197,160,89,0.18)',  min: 81 },
 ]
 function getEngagementBand(score: number, eventsAttended: number): EngagementBand {
   if (eventsAttended === 0) return ENGAGEMENT_BANDS[0]
@@ -1169,7 +1169,7 @@ function RoleBreakdown({ members }: { members: OrgMember[] }) {
   for (const m of members) counts.set(m.profile?.role_category || 'unknown', (counts.get(m.profile?.role_category || 'unknown') || 0) + 1)
   const total = members.length || 1
   const sorted = Array.from(counts.entries()).sort((a, b) => b[1] - a[1])
-  const barColors = ['#fcb813', '#7a4ed8', '#3b6dd9', '#a587f0', '#0a1340', '#34d27b']
+  const barColors = ['#c5a059', '#3b6dd9', '#3b6dd9', '#7ba0e8', '#0a1340', '#34d27b']
   return (
     <div className="adm-rb">
       {sorted.map(([role, count], i) => (
@@ -1186,7 +1186,7 @@ function RoleBreakdown({ members }: { members: OrgMember[] }) {
 }
 
 function AtRiskList({ members }: { members: OrgMember[] }) {
-  const AV = [{ bg: '#fcb813', fg: '#0a1340' }, { bg: '#7a4ed8', fg: '#fff' }, { bg: '#3b6dd9', fg: '#fff' }, { bg: '#0a1340', fg: '#fff' }, { bg: '#a587f0', fg: '#0a1340' }]
+  const AV = [{ bg: '#c5a059', fg: '#0a1340' }, { bg: '#3b6dd9', fg: '#fff' }, { bg: '#3b6dd9', fg: '#fff' }, { bg: '#0a1340', fg: '#fff' }, { bg: '#7ba0e8', fg: '#0a1340' }]
   return (
     <div className="mkw-card">
       <div className="mkw-h3" style={{ marginBottom: 4 }}>

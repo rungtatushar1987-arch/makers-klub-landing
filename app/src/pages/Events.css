@@ -57,8 +57,6 @@
 /* Individual upcoming/recommended event card */
 .ev-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-hi);
   border-radius: var(--r-sm);
@@ -132,7 +130,7 @@
 .ev-type-badge {
   padding: 2px 9px;
   border-radius: 999px;
-  background: rgba(122,78,216,0.12);
+  background: rgba(59,109,217,0.12);
   color: var(--mk-violet);
   font-family: var(--font-display);
   font-size: 10px;
