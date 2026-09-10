@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import { type Event, getInitials, getAvatarColor, AVATAR_COLORS } from '../supabase'
+import { getInitials, getAvatarColor, AVATAR_COLORS } from '../supabase'
 import { CommunityStatsCard, RecommendedPeopleCard } from '../components/CommunitySidebarCards'
 import Onboarding from './Onboarding'
 
@@ -16,19 +16,15 @@ function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
 
 export default function Dashboard() {
   const { user } = useUser()
-  const { connections, events, rsvpd, loading, clearTag, isOnboarding, allProfiles, totalMembers } = useKlub()
+  const { connections, events, loading, clearTag, isOnboarding, allProfiles, totalMembers } = useKlub()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
   const firstName = user?.firstName || 'there'
   const now = new Date()
 
-  const upcoming = events.filter(e => new Date(e.date) >= now)
-  const attended = events.filter(e => new Date(e.date) < now && rsvpd.has(e.id))
   const eventsAttended = new Set(connections.map(c => c.event_name).filter(Boolean)).size
   const eventsRun = events.filter(e => new Date(e.date) < now).length
-  const registeredUpcoming = upcoming.filter(e => rsvpd.has(e.id))
-  const recommendedUpcoming = upcoming.filter(e => !rsvpd.has(e.id))
   const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
   const followUpCount = connections.filter(c => c.remind_followup).length
   const recommendedPeople = allProfiles.filter(p => p.clerk_user_id !== user?.id).slice(0, 8)
@@ -44,49 +40,6 @@ export default function Dashboard() {
       <Onboarding />
     </div>
   )
-
-  // ── Event row component ──
-  const EventRow = ({ event, compact = false }: { event: Event, compact?: boolean }) => {
-    const going = rsvpd.has(event.id)
-    const isPast = new Date(event.date) < now
-    const day = new Date(event.date).getDate()
-    const mon = new Date(event.date).toLocaleString('en', { month: 'short' }).toUpperCase()
-    const time = new Date(event.date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })
-
-    return (
-      <div className="mkw-row" style={{ opacity: isPast ? 0.55 : 1 }}>
-        {/* Date block */}
-        <div style={{
-          width: compact ? 40 : 44, height: compact ? 44 : 48,
-          borderRadius: 10, flexShrink: 0,
-          background: isPast ? 'rgba(12,19,48,0.06)' : 'var(--mk-navy)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-display)', fontWeight: 800,
-            fontSize: compact ? 15 : 17, lineHeight: 1,
-            color: isPast ? 'var(--ink-3)' : '#fff',
-          }}>{day}</div>
-          <div style={{
-            fontSize: 7, letterSpacing: 1.2, fontWeight: 700,
-            color: isPast ? 'var(--ink-3)' : 'var(--mk-yellow)', marginTop: 2,
-          }}>{mon}</div>
-        </div>
-
-        <div className="mkw-row-main">
-          <div className="mkw-row-name" style={{ fontSize: compact ? 13 : 14 }}>
-            {event.title}
-            {going && <span className="mkw-chip-tag green">Going</span>}
-          </div>
-          <div className="mkw-row-meta">
-            {event.location}{!isPast && ` · ${time}`}
-          </div>
-        </div>
-
-
-      </div>
-    )
-  }
 
   return (
     <>
@@ -135,47 +88,18 @@ export default function Dashboard() {
             <div className="mkw-card">
               <div className="mkw-h3">
                 <span>Events</span>
-                <a href="/events">See all →</a>
+                <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" rel="noreferrer">See all →</a>
               </div>
 
-              {registeredUpcoming.length > 0 && (
-                <>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--mk-yellow-deep)', fontWeight: 700, marginBottom: 10 }}>
-                    Registered
-                  </div>
-                  <div className="mkw-rows" style={{ marginBottom: 20 }}>
-                    {registeredUpcoming.map(e => <EventRow key={e.id} event={e} />)}
-                  </div>
-                </>
-              )}
-
-              {recommendedUpcoming.length > 0 && (
-                <>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--ink-3)', fontWeight: 700, marginBottom: 10 }}>
-                    Recommended
-                  </div>
-                  <div className="mkw-rows" style={{ marginBottom: 20 }}>
-                    {recommendedUpcoming.slice(0, 3).map(e => <EventRow key={e.id} event={e} />)}
-                  </div>
-                </>
-              )}
-
-              {attended.length > 0 && (
-                <>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', color: 'var(--ink-3)', fontWeight: 700, marginBottom: 10 }}>
-                    Attended
-                  </div>
-                  <div className="mkw-rows">
-                    {attended.map(e => <EventRow key={e.id} event={e} />)}
-                  </div>
-                </>
-              )}
-
-              {registeredUpcoming.length === 0 && recommendedUpcoming.length === 0 && attended.length === 0 && (
-                <div style={{ padding: '16px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>No events yet.</p>
-                </div>
-              )}
+              <iframe
+                src="https://luma.com/embed/calendar/cal-GBRc6zCvxA5bqnz/events"
+                title="Makers Klub events calendar"
+                style={{ width: '100%', height: 450, border: '1px solid #bfcbda88', borderRadius: 4 }}
+                frameBorder="0"
+                allowFullScreen
+                aria-hidden="false"
+                tabIndex={0}
+              />
             </div>
           </div>
 
