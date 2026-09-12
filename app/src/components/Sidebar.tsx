@@ -1,13 +1,8 @@
 import { NavLink, Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useUser, useClerk } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import { getInitials } from '../supabase'
+import { getInitials, MK_ADMIN_USER_IDS } from '../supabase'
 import { useEffect, useState } from 'react'
-
-// The one Clerk user ID treated as the org's admin/owner — matches the
-// hardcoded check baked into RLS (e.g. rls_events_write_admin) and the
-// PWA's own Admin.tsx, since org_members-based gating was retired.
-const MK_ADMIN_USER_ID = 'user_3E5D484FC0PzCZpEVqBeKCYOnbM'
 
 export default function Sidebar() {
   const { user } = useUser()
@@ -28,7 +23,7 @@ export default function Sidebar() {
   const firstName = user?.firstName || 'there'
 
   useEffect(() => {
-    setIsAdmin(user?.id === MK_ADMIN_USER_ID)
+    setIsAdmin(!!user?.id && MK_ADMIN_USER_IDS.includes(user.id))
   }, [user])
 
   return (

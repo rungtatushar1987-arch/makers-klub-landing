@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES, type Gig, GIG_TYPES } from '../supabase'
+import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES, type Gig, GIG_TYPES, MK_ADMIN_USER_IDS } from '../supabase'
 import Recommendations from './Recommendations'
 import './Admin.css'
 
@@ -45,11 +45,6 @@ function gigTypeLabel(type: Gig['type']) {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
-
-// The one Clerk user ID treated as the org's admin/owner — matches the
-// hardcoded check baked into RLS (e.g. rls_events_write_admin) and the
-// PWA's own Admin.tsx, since org_members-based gating was retired.
-const MK_ADMIN_USER_ID = 'user_3E5D484FC0PzCZpEVqBeKCYOnbM'
 
 const AV_COLORS = [
   { bg: '#c5a059', fg: '#0a1340' },
@@ -184,7 +179,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (!user) return
-    if (user.id !== MK_ADMIN_USER_ID) {
+    if (!MK_ADMIN_USER_IDS.includes(user.id)) {
       navigate('/home', { replace: true })
     } else {
       setIsAdmin(true)
