@@ -692,3 +692,39 @@
 .adm-btn-ghost    { border: 1.5px solid var(--hairline-strong); background: transparent; color: var(--ink-2); }
 .adm-btn-danger   { border: none; background: rgba(224,82,79,0.15); color: var(--danger); }
 .adm-btn-danger-soft { border: none; background: rgba(224,82,79,0.10); color: var(--danger); }
+.adm-btn-success  { border: none; background: rgba(52,210,123,0.18); color: #1e7a3f; }
+
+/* ── Gigs tab ───────────────────────────────────────────────────────────────── */
+
+.adm-gig-row {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.adm-gig-row:last-child { border-bottom: none; }
+
+.adm-gig-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.adm-gig-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--ink-1); }
+.adm-gig-desc  { font-size: 12.5px; color: var(--ink-2); font-family: var(--font-body); line-height: 1.5; }
+.adm-gig-meta  { font-size: 11.5px; color: var(--ink-3); font-family: var(--font-body); display: flex; gap: 12px; }
+
+.adm-gig-footer  { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.adm-gig-poster  { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.adm-gig-poster-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.adm-gig-poster-name { font-size: 12px; font-weight: 600; color: var(--ink-2); font-family: var(--font-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-gig-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.adm-gig-count {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(12,19,48,0.07);
+  color: var(--ink-2);
+}

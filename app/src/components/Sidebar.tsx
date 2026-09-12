@@ -1,14 +1,16 @@
 import { NavLink, Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
-import { useUser, useSession, useClerk } from '@clerk/clerk-react'
+import { useUser, useClerk } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import { getInitials, getSupabaseClient } from '../supabase'
+import { getInitials } from '../supabase'
 import { useEffect, useState } from 'react'
 
-const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
+// The one Clerk user ID treated as the org's admin/owner — matches the
+// hardcoded check baked into RLS (e.g. rls_events_write_admin) and the
+// PWA's own Admin.tsx, since org_members-based gating was retired.
+const MK_ADMIN_USER_ID = 'user_3E5D484FC0PzCZpEVqBeKCYOnbM'
 
 export default function Sidebar() {
   const { user } = useUser()
-  const { session } = useSession()
   const { signOut } = useClerk()
   const navigate = useNavigate()
   const { isOnboarding } = useKlub()
@@ -26,13 +28,8 @@ export default function Sidebar() {
   const firstName = user?.firstName || 'there'
 
   useEffect(() => {
-    if (!session) return
-    session.getToken().then(async token => {
-      const db = getSupabaseClient(token)
-      const { data } = await db.rpc('jwt_is_org_admin', { org: MK_ORG })
-      if (data) setIsAdmin(true)
-    })
-  }, [session])
+    setIsAdmin(user?.id === MK_ADMIN_USER_ID)
+  }, [user])
 
   return (
     <aside className="mkw-side">
@@ -84,6 +81,7 @@ export default function Sidebar() {
             {([
               { tab: 'members',         icon: '👥', label: 'Members'     },
               { tab: 'events',          icon: '▦',  label: 'Events'      },
+              { tab: 'gigs',            icon: '💼', label: 'Gigs'        },
               { tab: 'analytics',       icon: '◈',  label: 'Analytics'   },
               { tab: 'recommendations', icon: '✦',  label: 'Insights'    },
               { tab: 'resources',       icon: '📚', label: 'Resources'   },

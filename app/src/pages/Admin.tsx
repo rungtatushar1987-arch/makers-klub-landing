@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES } from '../supabase'
+import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES, type Gig, GIG_TYPES } from '../supabase'
 import Recommendations from './Recommendations'
 import './Admin.css'
 
@@ -25,12 +25,31 @@ export type AdminEvent = Event & {
 
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
-type Tab = 'members' | 'events' | 'analytics' | 'recommendations' | 'resources'
-const VALID_TABS: Tab[] = ['members', 'events', 'analytics', 'recommendations', 'resources']
+type Tab = 'members' | 'events' | 'gigs' | 'analytics' | 'recommendations' | 'resources'
+const VALID_TABS: Tab[] = ['members', 'events', 'gigs', 'analytics', 'recommendations', 'resources']
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const h = Math.floor(diff / 3600000)
+  const d = Math.floor(diff / 86400000)
+  if (h < 1) return 'just now'
+  if (h < 24) return `${h}h ago`
+  if (d === 1) return 'yesterday'
+  return `${d}d ago`
+}
+
+function gigTypeLabel(type: Gig['type']) {
+  return GIG_TYPES.find(t => t.value === type)?.label || type
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
+
+// The one Clerk user ID treated as the org's admin/owner — matches the
+// hardcoded check baked into RLS (e.g. rls_events_write_admin) and the
+// PWA's own Admin.tsx, since org_members-based gating was retired.
+const MK_ADMIN_USER_ID = 'user_3E5D484FC0PzCZpEVqBeKCYOnbM'
 
 const AV_COLORS = [
   { bg: '#c5a059', fg: '#0a1340' },
@@ -122,6 +141,13 @@ export default function Admin() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [deletingResourceId, setDeletingResourceId] = useState<string | null>(null)
 
+  // Gigs tab
+  const [pendingGigs, setPendingGigs] = useState<(Gig & { profile?: Profile })[]>([])
+  const [approvedGigs, setApprovedGigs] = useState<(Gig & { profile?: Profile })[]>([])
+  const [gigsLoading, setGigsLoading] = useState(true)
+  const [actioningGigId, setActioningGigId] = useState<string | null>(null)
+  const [deletingGigId, setDeletingGigId] = useState<string | null>(null)
+
   // Stats
   const [stats, setStats] = useState({
     totalMembers: 0, totalEvents: 0, totalRsvps: 0,
@@ -157,17 +183,13 @@ export default function Admin() {
   // ── Auth guard ──────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!user || !session) return
-    session.getToken().then(async token => {
-      const db = getSupabaseClient(token)
-      const { data } = await db.rpc('jwt_is_org_admin', { org: MK_ORG })
-      if (!data) {
-        navigate('/home', { replace: true })
-      } else {
-        setIsAdmin(true)
-      }
-    })
-  }, [user, session])
+    if (!user) return
+    if (user.id !== MK_ADMIN_USER_ID) {
+      navigate('/home', { replace: true })
+    } else {
+      setIsAdmin(true)
+    }
+  }, [user])
 
   // ── Data loaders ────────────────────────────────────────────────────────────
 
@@ -286,8 +308,29 @@ export default function Admin() {
     setResourcesLoading(false)
   }, [session])
 
+  const loadGigs = useCallback(async () => {
+    if (!session) return
+    setGigsLoading(true)
+    const token = await session.getToken()
+    const db = getSupabaseClient(token)
+    const [{ data: pendingData }, { data: approvedData }] = await Promise.all([
+      db.from('gigs').select('*').eq('status', 'pending').order('created_at', { ascending: false }),
+      db.from('gigs').select('*').eq('status', 'approved').order('created_at', { ascending: false }),
+    ])
+    const allGigs = [...(pendingData || []), ...(approvedData || [])] as Gig[]
+    const posterIds = [...new Set(allGigs.map(g => g.clerk_user_id))]
+    let profileMap = new Map<string, Profile>()
+    if (posterIds.length > 0) {
+      const { data: profiles } = await db.from('profiles').select('*').in('clerk_user_id', posterIds)
+      profileMap = new Map((profiles || []).map((p: Profile) => [p.clerk_user_id, p]))
+    }
+    setPendingGigs(((pendingData as Gig[]) || []).map(g => ({ ...g, profile: profileMap.get(g.clerk_user_id) })))
+    setApprovedGigs(((approvedData as Gig[]) || []).map(g => ({ ...g, profile: profileMap.get(g.clerk_user_id) })))
+    setGigsLoading(false)
+  }, [session])
+
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadEvents(); loadResources() }
+    if (isAdmin) { loadMembers(); loadEvents(); loadResources(); loadGigs() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
@@ -380,6 +423,35 @@ export default function Admin() {
       setSelectedResource(null)
     }
     setDeletingResourceId(null)
+  }
+
+  // ── Gig moderation ────────────────────────────────────────────────────────────
+
+  async function handleGigAction(gigId: string, action: 'approved' | 'rejected') {
+    setActioningGigId(gigId)
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    if (action === 'rejected') {
+      await db.from('gigs').delete().eq('id', gigId)
+      setPendingGigs(prev => prev.filter(g => g.id !== gigId))
+    } else {
+      await db.from('gigs').update({ status: 'approved' }).eq('id', gigId)
+      const gig = pendingGigs.find(g => g.id === gigId)
+      if (gig) {
+        setPendingGigs(prev => prev.filter(g => g.id !== gigId))
+        setApprovedGigs(prev => [{ ...gig, status: 'approved' }, ...prev])
+      }
+    }
+    setActioningGigId(null)
+  }
+
+  async function handleDeleteGig(gigId: string) {
+    setDeletingGigId(gigId)
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { error } = await db.from('gigs').delete().eq('id', gigId)
+    if (!error) setApprovedGigs(prev => prev.filter(g => g.id !== gigId))
+    setDeletingGigId(null)
   }
 
   // ── Guard ───────────────────────────────────────────────────────────────────
@@ -522,6 +594,54 @@ export default function Admin() {
                 onDelete={selectedEvent ? () => deleteEvent(selectedEvent.id) : undefined}
                 onClose={() => { setEventFormOpen(false); setSelectedEvent(null) }}
               />
+            )}
+          </>
+        )}
+
+        {/* ══ GIGS ══ */}
+        {tab === 'gigs' && (
+          <>
+            {gigsLoading ? (
+              <p className="adm-tab-loading">Loading…</p>
+            ) : (
+              <>
+                <div className="mkw-card adm-table-card" style={{ marginBottom: 16 }}>
+                  <div className="mkw-h3" style={{ padding: '18px 20px 0' }}>
+                    <span>Pending review</span>
+                    <span className="adm-gig-count">{pendingGigs.length}</span>
+                  </div>
+                  {pendingGigs.length === 0 ? (
+                    <p className="adm-table-empty">No gigs pending review.</p>
+                  ) : (
+                    pendingGigs.map(g => (
+                      <GigAdminRow
+                        key={g.id} gig={g} pending
+                        busy={actioningGigId === g.id}
+                        onApprove={() => handleGigAction(g.id, 'approved')}
+                        onReject={() => handleGigAction(g.id, 'rejected')}
+                      />
+                    ))
+                  )}
+                </div>
+
+                <div className="mkw-card adm-table-card">
+                  <div className="mkw-h3" style={{ padding: '18px 20px 0' }}>
+                    <span>Live</span>
+                    <span className="adm-gig-count">{approvedGigs.length}</span>
+                  </div>
+                  {approvedGigs.length === 0 ? (
+                    <p className="adm-table-empty">No approved gigs yet.</p>
+                  ) : (
+                    approvedGigs.map(g => (
+                      <GigAdminRow
+                        key={g.id} gig={g}
+                        busy={deletingGigId === g.id}
+                        onDelete={() => handleDeleteGig(g.id)}
+                      />
+                    ))
+                  )}
+                </div>
+              </>
             )}
           </>
         )}
@@ -1299,6 +1419,58 @@ function AtRiskList({ members }: { members: OrgMember[] }) {
             </div>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+// ── Gigs tab ───────────────────────────────────────────────────────────────────
+
+function GigAdminRow({ gig, pending, busy, onApprove, onReject, onDelete }: {
+  gig: Gig & { profile?: Profile }
+  pending?: boolean
+  busy?: boolean
+  onApprove?: () => void
+  onReject?: () => void
+  onDelete?: () => void
+}) {
+  return (
+    <div className="adm-gig-row">
+      <div className="adm-gig-head">
+        <span className="adm-event-type">{gigTypeLabel(gig.type)}</span>
+        <span className="adm-event-date">{timeAgo(gig.created_at)}</span>
+      </div>
+      <div className="adm-gig-title">{gig.title}</div>
+      {pending && <p className="adm-gig-desc">{gig.description}</p>}
+      {(gig.budget || gig.timeline) && (
+        <div className="adm-gig-meta">
+          {gig.budget && <span>💰 {gig.budget}</span>}
+          {gig.timeline && <span>⏱ {gig.timeline}</span>}
+        </div>
+      )}
+      <div className="adm-gig-footer">
+        <div className="adm-gig-poster">
+          <div className="adm-gig-poster-av" style={{ background: gig.profile?.avatar_color || 'var(--mk-navy)' }}>
+            {getInitials(gig.profile?.full_name)}
+          </div>
+          <span className="adm-gig-poster-name">{gig.profile?.full_name || 'Unknown'}</span>
+        </div>
+        <div className="adm-gig-actions">
+          {pending ? (
+            <>
+              <button className="adm-btn adm-btn-sm adm-btn-success" onClick={onApprove} disabled={busy}>
+                {busy ? '…' : '✓ Approve'}
+              </button>
+              <button className="adm-btn adm-btn-sm adm-btn-danger" onClick={onReject} disabled={busy}>
+                ✕ Reject
+              </button>
+            </>
+          ) : (
+            <button className="adm-btn adm-btn-sm adm-btn-danger-soft" onClick={onDelete} disabled={busy}>
+              {busy ? 'Removing…' : 'Remove'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
