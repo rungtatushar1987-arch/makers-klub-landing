@@ -1,0 +1,144 @@
+/* ── Gigs page — Aurora Glass ── */
+
+.gig-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.gig-col-left,
+.gig-col-right {
+  min-width: 0;
+}
+
+.gig-col-right {
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+/* Gig card list */
+.gig-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gig-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-hi);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+
+.gig-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(10,19,64,0.12), var(--glass-hi);
+}
+
+.gig-card-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.gig-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gig-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.gig-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-1);
+}
+
+.gig-type-badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(59,109,217,0.12);
+  color: var(--mk-violet);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.gig-card-desc {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gig-card-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}
+
+.gig-card-chevron {
+  color: var(--ink-3);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Post-a-gig type picker */
+.gig-type-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gig-type-btn {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--hairline-strong);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+}
+
+.gig-type-btn.active {
+  border-color: var(--mk-navy);
+  background: rgba(10,19,64,0.05);
+}
+
+.gig-type-btn-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-1);
+}
+
+.gig-type-btn-desc {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+}

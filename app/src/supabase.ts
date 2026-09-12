@@ -103,6 +103,38 @@ export type Connection = {
   direction?: 'outgoing' | 'incoming'
 }
 
+export type GigType = 'collab' | 'freelance' | 'hire'
+
+export type Gig = {
+  id: string
+  clerk_user_id: string
+  title: string
+  description: string
+  type: GigType
+  budget: string | null
+  timeline: string | null
+  status: 'pending' | 'approved'
+  created_at: string
+}
+
+export const GIG_TYPES: { value: GigType; label: string; desc: string }[] = [
+  { value: 'collab', label: 'Collab', desc: 'Working together on a project' },
+  { value: 'freelance', label: 'Freelance', desc: 'Paid short-term work' },
+  { value: 'hire', label: 'Hire', desc: 'Looking for someone long-term' },
+]
+
+export type Resource = {
+  id: string
+  title: string
+  url: string
+  description: string | null
+  category: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export const RESOURCE_CATEGORIES = ['Templates', 'Guides', 'Tools', 'Legal & Tax', 'Funding', 'Community', 'Other']
+
 export const ACTION_TAGS = [
   'Intro call',
   'Send email',

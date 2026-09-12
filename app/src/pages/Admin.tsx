@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { getSupabaseClient, getInitials, type Profile, type Event } from '../supabase'
+import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES } from '../supabase'
 import Recommendations from './Recommendations'
 import './Admin.css'
 
@@ -25,8 +25,8 @@ export type AdminEvent = Event & {
 
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
-type Tab = 'members' | 'events' | 'analytics' | 'recommendations'
-const VALID_TABS: Tab[] = ['members', 'events', 'analytics', 'recommendations']
+type Tab = 'members' | 'events' | 'analytics' | 'recommendations' | 'resources'
+const VALID_TABS: Tab[] = ['members', 'events', 'analytics', 'recommendations', 'resources']
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -114,6 +114,13 @@ export default function Admin() {
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null)
   const [attendees, setAttendees] = useState<Record<string, EventAttendee[]>>({})
   const [attendeesLoading, setAttendeesLoading] = useState<string | null>(null)
+
+  // Resources tab
+  const [resources, setResources] = useState<Resource[]>([])
+  const [resourcesLoading, setResourcesLoading] = useState(true)
+  const [resourceFormOpen, setResourceFormOpen] = useState(false)
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
+  const [deletingResourceId, setDeletingResourceId] = useState<string | null>(null)
 
   // Stats
   const [stats, setStats] = useState({
@@ -269,8 +276,18 @@ export default function Admin() {
     setAttendeesLoading(null)
   }, [session, attendees, attendeesLoading])
 
+  const loadResources = useCallback(async () => {
+    if (!session) return
+    setResourcesLoading(true)
+    const token = await session.getToken()
+    const db = getSupabaseClient(token)
+    const { data } = await db.from('resources').select('*').order('created_at', { ascending: false })
+    setResources((data as Resource[]) || [])
+    setResourcesLoading(false)
+  }, [session])
+
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadEvents() }
+    if (isAdmin) { loadMembers(); loadEvents(); loadResources() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
@@ -326,6 +343,43 @@ export default function Admin() {
       setSelectedEvent(null)
     }
     setDeletingEventId(null)
+  }
+
+  // ── Resource CRUD ─────────────────────────────────────────────────────────────
+
+  async function createResource(fields: ResourceFormFields) {
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { data, error } = await db.from('resources').insert({
+      ...fields,
+      created_by: user?.id,
+    }).select().single()
+    if (!error && data) {
+      setResources(prev => [data as Resource, ...prev])
+    }
+    setResourceFormOpen(false)
+  }
+
+  async function updateResource(id: string, fields: ResourceFormFields) {
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { data, error } = await db.from('resources').update(fields).eq('id', id).select().single()
+    if (!error && data) {
+      setResources(prev => prev.map(r => r.id === id ? { ...r, ...data } : r))
+    }
+    setSelectedResource(null)
+  }
+
+  async function deleteResource(id: string) {
+    setDeletingResourceId(id)
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { error } = await db.from('resources').delete().eq('id', id)
+    if (!error) {
+      setResources(prev => prev.filter(r => r.id !== id))
+      setSelectedResource(null)
+    }
+    setDeletingResourceId(null)
   }
 
   // ── Guard ───────────────────────────────────────────────────────────────────
@@ -467,6 +521,43 @@ export default function Admin() {
                 onSave={(fields) => selectedEvent ? updateEvent(selectedEvent.id, fields) : createEvent(fields)}
                 onDelete={selectedEvent ? () => deleteEvent(selectedEvent.id) : undefined}
                 onClose={() => { setEventFormOpen(false); setSelectedEvent(null) }}
+              />
+            )}
+          </>
+        )}
+
+        {/* ══ RESOURCES ══ */}
+        {tab === 'resources' && (
+          <>
+            <div className="adm-sub-tabs">
+              <button className="adm-add-btn" onClick={() => setResourceFormOpen(true)}>
+                + Add resource
+              </button>
+            </div>
+
+            {resourcesLoading ? (
+              <p className="adm-tab-loading">Loading…</p>
+            ) : (
+              <div className="mkw-card adm-table-card">
+                <ResourceTableHead />
+                {resources.length === 0 && (
+                  <p className="adm-table-empty">No resources yet. Add your first one.</p>
+                )}
+                {resources.map(r => (
+                  <ResourceRow
+                    key={r.id} resource={r}
+                    onClick={() => setSelectedResource(r)}
+                  />
+                ))}
+              </div>
+            )}
+            {(resourceFormOpen || selectedResource) && (
+              <ResourceFormModal
+                resource={selectedResource}
+                deleting={!!selectedResource && deletingResourceId === selectedResource.id}
+                onSave={(fields) => selectedResource ? updateResource(selectedResource.id, fields) : createResource(fields)}
+                onDelete={selectedResource ? () => deleteResource(selectedResource.id) : undefined}
+                onClose={() => { setResourceFormOpen(false); setSelectedResource(null) }}
               />
             )}
           </>
@@ -1210,5 +1301,185 @@ function AtRiskList({ members }: { members: OrgMember[] }) {
         })}
       </div>
     </div>
+  )
+}
+
+// ── Resources tab ────────────────────────────────────────────────────────────
+
+function ResourceTableHead() {
+  return (
+    <div className="adm-thead adm-thead--resources">
+      <span>Resource</span>
+      <span>Category</span>
+      <span>Link</span>
+      <span className="adm-col-center">Added</span>
+    </div>
+  )
+}
+
+function ResourceRow({ resource: r, onClick }: { resource: Resource; onClick: () => void }) {
+  return (
+    <div className="adm-rrow" onClick={onClick}>
+      <div>
+        <div className="adm-event-title">{r.title}</div>
+        {r.description && <div className="adm-event-location">{r.description}</div>}
+      </div>
+      <div>{r.category && <span className="adm-event-type">{r.category}</span>}</div>
+      <div className="adm-event-location">{r.url}</div>
+      <div className="adm-col-center adm-event-date">{formatDate(r.created_at)}</div>
+    </div>
+  )
+}
+
+type ResourceFormFields = {
+  title: string
+  url: string
+  category: string
+  description: string
+}
+
+const BLANK_RESOURCE_FORM: ResourceFormFields = {
+  title: '', url: '', category: RESOURCE_CATEGORIES[0], description: '',
+}
+
+function ResourceFormModal({ resource, deleting, onSave, onDelete, onClose }: {
+  resource: Resource | null
+  deleting: boolean
+  onSave: (fields: ResourceFormFields) => Promise<void>
+  onDelete?: () => void
+  onClose: () => void
+}) {
+  const isNew = resource === null
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [form, setForm] = useState<ResourceFormFields>(resource ? {
+    title: resource.title || '',
+    url: resource.url || '',
+    category: resource.category || RESOURCE_CATEGORIES[0],
+    description: resource.description || '',
+  } : BLANK_RESOURCE_FORM)
+  const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<Partial<ResourceFormFields>>({})
+
+  function setField(k: keyof ResourceFormFields, v: string) {
+    setForm(f => ({ ...f, [k]: v }))
+    setErrors(e => ({ ...e, [k]: undefined }))
+  }
+
+  function inputCls(hasError?: boolean) {
+    return ['adm-modal-input', hasError ? 'error' : ''].filter(Boolean).join(' ')
+  }
+
+  async function handleSave(ev: React.FormEvent) {
+    ev.preventDefault()
+    const errs: Partial<ResourceFormFields> = {}
+    if (!form.title.trim()) errs.title = 'Required'
+    if (!form.url.trim()) errs.url = 'Required'
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    setSaving(true)
+    await onSave(form)
+    setSaving(false)
+  }
+
+  return (
+    <>
+      <div className="adm-modal-backdrop" onClick={onClose} />
+      <div className="adm-modal">
+        <button className="adm-modal-close" onClick={onClose}>×</button>
+
+        <div className="adm-modal-header">
+          <h2 className="adm-modal-title">{isNew ? 'New resource' : 'Edit resource'}</h2>
+        </div>
+
+        <form className="adm-modal-form" onSubmit={handleSave}>
+          <div>
+            <label className="adm-modal-label">Title *</label>
+            <input
+              className={inputCls(!!errors.title)}
+              value={form.title}
+              onChange={e => setField('title', e.target.value)}
+              placeholder="e.g. Freelance contract template"
+            />
+            {errors.title && <div className="adm-modal-error">{errors.title}</div>}
+          </div>
+
+          <div>
+            <label className="adm-modal-label">URL *</label>
+            <input
+              className={inputCls(!!errors.url)}
+              value={form.url}
+              onChange={e => setField('url', e.target.value)}
+              placeholder="https://…"
+            />
+            {errors.url && <div className="adm-modal-error">{errors.url}</div>}
+          </div>
+
+          <div>
+            <label className="adm-modal-label">Category</label>
+            <select className={inputCls()} value={form.category} onChange={e => setField('category', e.target.value)}>
+              {RESOURCE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="adm-modal-label">Description</label>
+            <textarea
+              className={`${inputCls()} adm-modal-textarea`}
+              value={form.description}
+              onChange={e => setField('description', e.target.value)}
+              placeholder="One or two lines on what this is and why it's useful"
+            />
+          </div>
+
+          <div className="adm-modal-footer">
+            <div>
+              {onDelete && (
+                confirmDelete ? (
+                  <div className="adm-modal-confirm">
+                    <span className="adm-modal-confirm-text">Delete this resource?</span>
+                    <button
+                      type="button"
+                      className="adm-btn adm-btn-sm adm-btn-danger"
+                      onClick={onDelete}
+                      disabled={deleting}
+                      style={{ opacity: deleting ? 0.5 : 1 }}
+                    >
+                      {deleting ? 'Removing…' : 'Yes, remove'}
+                    </button>
+                    <button
+                      type="button"
+                      className="adm-btn adm-btn-sm adm-btn-ghost"
+                      onClick={() => setConfirmDelete(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="adm-btn adm-btn-md adm-btn-danger-soft"
+                    onClick={() => setConfirmDelete(true)}
+                  >
+                    Remove
+                  </button>
+                )
+              )}
+            </div>
+            <div className="adm-modal-actions">
+              <button type="button" className="adm-btn adm-btn-md adm-btn-ghost" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="adm-btn adm-btn-lg adm-btn-navy"
+                disabled={saving}
+                style={{ opacity: saving ? 0.6 : 1, cursor: saving ? 'default' : 'pointer' }}
+              >
+                {saving ? 'Saving…' : isNew ? 'Add resource' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </>
   )
 }

@@ -1,0 +1,95 @@
+/* ── Resources page — Aurora Glass ── */
+
+.res-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 20px;
+}
+
+.res-tab {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--ink-3);
+  padding: 10px 16px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+}
+
+.res-tab.active {
+  color: var(--ink-1);
+  border-bottom-color: var(--mk-navy);
+}
+
+.res-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.res-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-hi);
+  border-radius: var(--r-sm);
+  padding: 18px 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+
+.res-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(10,19,64,0.12), var(--glass-hi);
+}
+
+.res-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.res-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink-1);
+}
+
+.res-category-chip {
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(197,160,89,0.20);
+  color: var(--mk-yellow-deep);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.res-card-desc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.res-card-link {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mk-violet);
+}
