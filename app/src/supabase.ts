@@ -135,6 +135,11 @@ export type Resource = {
 
 export const RESOURCE_CATEGORIES = ['Templates', 'Guides', 'Tools', 'Legal & Tax', 'Funding', 'Community', 'Other']
 
+// Clerk user IDs treated as org admins/owners — matches the hardcoded
+// checks baked into RLS (e.g. rls_gigs_admin) and the PWA's own
+// Admin.tsx, since org_members-based gating was retired.
+export const MK_ADMIN_USER_IDS = ['user_3E5D484FC0PzCZpEVqBeKCYOnbM', 'user_3HsXKj9IGkxDr41ZuZndhdJYqxi']
+
 export const ACTION_TAGS = [
   'Intro call',
   'Send email',
