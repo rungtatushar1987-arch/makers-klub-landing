@@ -204,7 +204,6 @@ function GigModal({ gig, poster, onClose }: { gig: Gig; poster?: Profile; onClos
 function PostGigModal({ onClose, onPosted }: { onClose: () => void; onPosted: (gig: Gig) => void }) {
   const { user } = useUser()
   const { session } = useSession()
-  const [type, setType] = useState<GigType>('collab')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [budget, setBudget] = useState('')
@@ -225,8 +224,8 @@ function PostGigModal({ onClose, onPosted }: { onClose: () => void; onPosted: (g
       clerk_user_id: user.id,
       title: title.trim(),
       description: description.trim(),
-      type,
-      budget: budget.trim() || null,
+      type: 'freelance',
+      budget: budget.trim() ? `€${budget.trim()}` : null,
       timeline: timeline.trim() || null,
     }).select().single()
     setSubmitting(false)
@@ -252,23 +251,6 @@ function PostGigModal({ onClose, onPosted }: { onClose: () => void; onPosted: (g
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="mkw-form-group">
-            <label className="mkw-form-label">What kind of gig?</label>
-            <div className="gig-type-row">
-              {GIG_TYPES.map(t => (
-                <button
-                  type="button"
-                  key={t.value}
-                  className={`gig-type-btn${type === t.value ? ' active' : ''}`}
-                  onClick={() => setType(t.value)}
-                >
-                  <span className="gig-type-btn-label">{t.label}</span>
-                  <span className="gig-type-btn-desc">{t.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mkw-form-group">
             <label className="mkw-form-label">Title</label>
             <input
               className="mkw-form-input"
@@ -280,7 +262,7 @@ function PostGigModal({ onClose, onPosted }: { onClose: () => void; onPosted: (g
           </div>
 
           <div className="mkw-form-group">
-            <label className="mkw-form-label">What are you looking for?</label>
+            <label className="mkw-form-label">Description</label>
             <textarea
               className="mkw-form-textarea"
               rows={4}
@@ -295,13 +277,18 @@ function PostGigModal({ onClose, onPosted }: { onClose: () => void; onPosted: (g
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div className="mkw-form-group">
               <label className="mkw-form-label">Budget <span style={{ fontWeight: 400 }}>(optional)</span></label>
-              <input
-                className="mkw-form-input"
-                value={budget}
-                onChange={e => setBudget(e.target.value)}
-                placeholder="e.g. €500, rev share"
-                maxLength={40}
-              />
+              <div className="gig-budget-wrap">
+                <span className="gig-budget-currency">€</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  className="mkw-form-input gig-budget-input"
+                  value={budget}
+                  onChange={e => setBudget(e.target.value)}
+                  placeholder="500"
+                />
+              </div>
             </div>
             <div className="mkw-form-group">
               <label className="mkw-form-label">Timeline <span style={{ fontWeight: 400 }}>(optional)</span></label>
