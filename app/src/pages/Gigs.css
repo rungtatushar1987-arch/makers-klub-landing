@@ -103,42 +103,19 @@
   margin-top: 2px;
 }
 
-/* Post-a-gig type picker */
-.gig-type-row {
+/* Post-a-gig budget field */
+.gig-budget-wrap {
   display: flex;
+  align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
-.gig-type-btn {
-  flex: 1;
-  min-width: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1.5px solid var(--hairline-strong);
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.12s;
-}
-
-.gig-type-btn.active {
-  border-color: var(--mk-navy);
-  background: rgba(10,19,64,0.05);
-}
-
-.gig-type-btn-label {
+.gig-budget-currency {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ink-1);
+  color: var(--ink-2);
+  flex-shrink: 0;
 }
 
-.gig-type-btn-desc {
-  font-size: 11px;
-  color: var(--ink-3);
-  font-family: var(--font-body);
-}
+.gig-budget-input { max-width: 140px; }
