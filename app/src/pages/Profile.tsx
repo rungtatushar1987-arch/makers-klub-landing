@@ -236,13 +236,6 @@ export default function Profile() {
                 </div>
               )
             })()}
-
-            <div className="prof-events-card">
-              <div className="prof-events-num">{upcomingCount}</div>
-              <div className="prof-events-title">upcoming event{upcomingCount !== 1 ? 's' : ''} waiting to be discovered</div>
-              <div className="prof-events-sub">Complete your profile so we can match you to the right events and people in the Klub.</div>
-              <a href="/events" className="prof-events-link">Browse events →</a>
-            </div>
           </div>
         </div>
       </div>

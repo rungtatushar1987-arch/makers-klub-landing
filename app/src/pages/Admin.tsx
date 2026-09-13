@@ -26,7 +26,9 @@ export type AdminEvent = Event & {
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
 type Tab = 'members' | 'events' | 'gigs' | 'analytics' | 'recommendations' | 'resources'
-const VALID_TABS: Tab[] = ['members', 'events', 'gigs', 'analytics', 'recommendations', 'resources']
+// 'events' and 'resources' are hidden from the UI for now — not in VALID_TABS, so a direct
+// ?tab=events / ?tab=resources link falls back to 'members' too. Code kept intact for later.
+const VALID_TABS: Tab[] = ['members', 'gigs', 'analytics', 'recommendations']
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -491,7 +493,6 @@ export default function Admin() {
         <div className="mkw-stats adm-stats">
           {[
             { lbl: 'Members',   num: stats.totalMembers,  delta: 'In your community' },
-            { lbl: 'Events',    num: stats.totalEvents,   delta: 'Total hosted' },
             { lbl: 'RSVP rate', num: `${engagementPct}%`, delta: 'members typically rsvp for your events' },
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
