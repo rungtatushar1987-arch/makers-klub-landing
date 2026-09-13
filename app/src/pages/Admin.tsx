@@ -26,9 +26,10 @@ export type AdminEvent = Event & {
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
 type Tab = 'members' | 'events' | 'gigs' | 'analytics' | 'recommendations' | 'resources'
-// 'events' and 'resources' are hidden from the UI for now — not in VALID_TABS, so a direct
-// ?tab=events / ?tab=resources link falls back to 'members' too. Code kept intact for later.
-const VALID_TABS: Tab[] = ['members', 'gigs', 'analytics', 'recommendations']
+// 'events', 'resources', 'analytics' and 'recommendations' are hidden from the UI for now —
+// not in VALID_TABS, so a direct ?tab=... link to any of them falls back to 'members' too.
+// Code kept intact for later.
+const VALID_TABS: Tab[] = ['members', 'gigs']
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
