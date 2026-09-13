@@ -73,8 +73,6 @@ export default function Sidebar() {
             {([
               { tab: 'members',         icon: '👥', label: 'Members'     },
               { tab: 'gigs',            icon: '💼', label: 'Gigs'        },
-              { tab: 'analytics',       icon: '◈',  label: 'Analytics'   },
-              { tab: 'recommendations', icon: '✦',  label: 'Insights'    },
             ] as const).map(({ tab, icon, label }) => (
               <Link
                 key={tab}
