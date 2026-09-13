@@ -1,7 +1,7 @@
 import { getInitials, type Profile } from '../supabase'
 import '../pages/Onboarding.css'
 
-export function CommunityStatsCard({ totalMembers, eventsRun }: { totalMembers: number; eventsRun: number }) {
+export function CommunityStatsCard({ totalMembers }: { totalMembers: number; eventsRun?: number }) {
   return (
     <div className="onb-card onb-card-community">
       <div className="onb-card-label">The community</div>
@@ -10,10 +10,7 @@ export function CommunityStatsCard({ totalMembers, eventsRun }: { totalMembers: 
           <div className="onb-comm-num">{totalMembers}</div>
           <div className="onb-comm-lbl">Members</div>
         </div>
-        <div className="onb-comm-stat">
-          <div className="onb-comm-num">{eventsRun}</div>
-          <div className="onb-comm-lbl">Events run</div>
-        </div>
+        {/* Events run — hidden while event handling is off, kept as an optional prop */}
         <div className="onb-comm-stat">
           <div className="onb-comm-num">Berlin</div>
           <div className="onb-comm-lbl">Based in</div>

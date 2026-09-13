@@ -1491,3 +1491,230 @@ Re-checked the "left edge matches Network" claim from the previous pass at an ac
 
 Verified: build succeeds, no console errors, screenshots match at mobile; alignment cross-checked programmatically at desktop since this exact class of bug is invisible in a narrow viewport.
 
+---
+
+## Session — 25 August 2026 — Aurora Glass structural layer on the homepage (colors untouched)
+
+Applied the Aurora Glass system's *structural* devices per the design doc §6 (marketing-site variant): frosted glass panels (blur + translucency + top-edge highlight), ambient radial-gradient "blob" backdrops behind glass, and a pill/rounded radius system. Palette (`navy`, `gold`, `paper`, `ink` tokens) was not touched — every glass/backdrop color is `rgba()` white or the site's own navy/gold, exactly as documented. Legal pages (`impressum.html`, `datenschutz.html`) not touched.
+
+⚠️ Not yet run through a browser check — visual review recommended before treating this as final.
+
+### `tokens.css`
+Added `--r-lg/-sm/-xs/-pill`, `--glass-blur`, `--glass-bg(-strong/-dark/-dark-strong)`, `--glass-border(-dark)`, `--glass-highlight(-dark)`, `--glass-shadow`, `--shadow-cta` — all from doc §6, no existing variables changed.
+
+### `global.css`
+- `.btn-solid`: added `border-radius: var(--r-pill)` + `box-shadow: var(--shadow-cta)` (gold glow). Fill color unchanged.
+- `.btn-ghost`: converted from flat-transparent to dark glass (`glass-bg-dark` + blur + `glass-border-dark`), pill radius.
+- New reusable classes: `.aurora-glass`, `.aurora-glass-dark`, `.aurora-glass-strong`, `.aurora-backdrop` (+ `.subtle` modifier) — direct ports of the doc's §3/§6 recipes.
+
+### Per-component
+- **Nav** — bar changed from solid white to `glass-bg-strong` + blur (frosted on scroll); CTA button now pill with gold glow; logo mark gets `r-xs` rounding.
+- **Hero** — added an `.aurora-backdrop.subtle` blob layer behind the existing navy gradient; badge chip now pill + glow.
+- **WhySection** — the three problem/fix cards converted from flat `navy-card` boxes to `.aurora-glass-dark` (blur + translucent navy + rounded `r-sm`); added blob backdrop behind the section for the glass to refract against.
+- **EventsEmbed** — Luma iframe frame converted from a flat paper box to a light glass panel (`r-lg`, blurred, 6px inset padding so the glass edge is visible around the embed); blob backdrop added behind the section.
+- **Network** — member cards converted to light glass (`aurora-glass` recipe, `r-sm`), `overflow:hidden` added since the radius now clips the square avatar mark; blob backdrop added behind the section; mast/grid/link explicitly re-layered to `z-index:1` above the backdrop.
+- **Membership** — CTA block wrapped in `.aurora-glass-dark` as a floating panel; full-strength blob backdrop behind the section (not `.subtle` — this is the most gradient-forward section by design intent, matching the doc's CTA-card treatment).
+- **Footer** — logo mark gets `r-xs` rounding for consistency; left otherwise flat (it's a utility bar, not a card — no glass needed here).
+
+### Not changed
+Marquee (solid gold strip, no card surface to glass), mono index chips (`.sc-index`) and eyebrow labels (doc explicitly keeps these as-is), all color tokens, all copy, legal pages, routing.
+
+---
+
+## Session — 28 August 2026 — Dashboard↔PWA profile sync, marketing home re-skin (→ flat → dark photo hero), Luma link fix
+
+Long iterative session, almost entirely in `makers-klub-landing`. Two threads: (1) bringing the web dashboard's onboarding/profile in line with the PWA's August `profiles` changes, and (2) a multi-round redesign of the marketing homepage that ended on a dark-blurred event-photo hero. Every change verified with `vite build` (both the root MPA config and `vite.app.config.js`) plus browser checks where the preview pane cooperated — it repeatedly failed to screenshot below the fold this session, so several lower-section checks were done via computed styles / DOM inspection instead. Landed as seven small branches, each merged `--no-ff` to `main` (`d3342ca` → `a229d28`).
+
+### 1. Dashboard onboarding + profile — synced to the PWA (`5636a95`)
+Mirrored the PWA's Aug 12 + Aug 18 `profiles` changes into `MakersKlub/app` (both apps share one Supabase project, `xfvigqggnpajnidkutmk`). No migration — the retired columns still exist, the dashboard just stops reading/writing them.
+- **`profileOptions.ts`**: `INDUSTRIES` → `INTERESTS` (same list); dropped `INCOME_GOAL_OPTIONS` / `CLIENT_CAPACITY_OPTIONS` / `LEAD_AVAILABILITY_OPTIONS`; added `LOOKING_FOR_OPTIONS` (`hangout` / `networking` / `surprise`). Now matches `mk-event-app/src/data/profileOptions.ts`.
+- **`supabase.ts` `calcProfileProgress`**: the website-only bug flagged in the PWA's build summary — it required a personal `website_url` specifically. Now accepts any social link; reweighted to `full_name + role_category + bio + looking_to + industries + any-social`, identical to the PWA's copy.
+- **`OnboardingWizard.tsx`**: the 2-step wizard (name / hire·freelancer toggle / industries, then income-goal / client-capacity / lead-availability) collapsed to **one step** — Role, one-line bio, Interests, "what are you looking for". Keeps the `onClose` modal prop and the `/onboarding` route.
+- **`Profile.tsx`**: the gated read-only "Services & business profile" section + its modal wizard replaced with an inline-editable **"About you"** section (Role / Interests / looking-for). `isBusinessComplete`, `optionLabel`, `LOOKING_TO_LABELS` removed.
+- `MultiSelectDropdown` extracted from the wizard into `app/src/components/` so `Profile` can reuse it.
+- The onboarding gate (`KlubContext`'s `isOnboarding`, consumed by `Dashboard`/`Sidebar`) derives from `calcProfileProgress().isComplete`, so updating that function updated the gate. One stale copy line in `Onboarding.tsx` (the new-user home screen) updated to match.
+- **Out of scope (user's call):** the PWA's violet→navy accent swap and the Login `email_code` device-verification step-up were not ported.
+
+### 2. Dashboard `/login` → landing page (same merge)
+The dashboard app had no landing route — signed-out users hit the bare sign-in form, and `/` serves the separate marketing site. Reworked `/login` into the dashboard's de-facto landing, mirroring the PWA's `Landing.tsx`:
+- Brand tagline "Build connections that matter" under the wordmark.
+- Two live teaser sections below the sign-in card — **"Who's Attending"** (5 members: avatar + name + role) and **"Popular Events in Berlin"** (5 upcoming events: cover-colour thumb + title + when/where), fetched via the existing anon `supabase` client (open-SELECT `events`/`profiles`). Sign-in logic untouched.
+- `Signup.css`: `.mkw-login-landing` layout modifier (top-aligned, scrollable, pinned blobs) + `.mkw-teaser*` styles adapted from the PWA's `Landing.module.css` to the dashboard's tokens and its `.mkw-login` scoped white-on-navy palette.
+
+### 3. Marketing home — Aurora Glass re-skin, then gold + blue (`6aa8ed8`)
+Dropped the "Solopreneurs Club" editorial palette (navy `#001b3d` / gold `#c5a059`, Hanken Grotesk + JetBrains Mono, dark `.on-navy` inverted sections) and rebuilt the homepage on the web dashboard's **Aurora Glass** structure — white surface, fixed cosmic-blob backdrop, frosted-glass cards, Poppins + Inter. Re-skin only: brand name, copy, and the 8-section structure (Nav · Hero · Marquee · WhySection · EventsEmbed · Network · Membership · Footer) unchanged.
+- `tokens.css` rewritten with the Aurora Glass token set; the old `--navy` / `--gold` / `--white-*` names kept as aliases so component CSS still resolves.
+- `index.html` font `<link>`: Hanken Grotesk + JetBrains Mono → Poppins + Inter.
+- `global.css`: white body + pinned `body::before` blob backdrop; `.aurora-glass` / `.aurora-backdrop` helpers; `.btn-solid` gold pill + glow, `.btn-ghost` frosted; links gold→blue; retired the dead `.on-navy` rules (and removed the class from four JSX files).
+- Every section restyled: frosted Nav, glass Hero content panel, gold Marquee, glass Why/Network/Events cards, gradient avatar marks + gradient Membership CTA panel, frosted Footer.
+- **Palette:** per user direction, *not* the dashboard's yellow + violet but **gold + blue** — `--mk-yellow*` holds gold (`#c5a059` / `#d9b673` / `#8a6d2f`), `--mk-violet*` holds blue (`#3b6dd9` / `#7ba0e8`), `--mk-blue` repurposed as the deep-blue gradient end-stop (`#26489a`); all literal `rgba()` blob colours swapped to match. Fixed a build break — a `*/` sequence inside the `tokens.css` header comment was closing the comment early.
+
+### 4. Flattened — no glass (`1045063`)
+User asked to see it with a plain white background, no gloss. Reworked through the `--glass-*` tokens: `--glass-bg` → solid `#fff`, `--glass-blur` → `0`, `--glass-border` → a real hairline, `--glass-hi` → none, `--glass-shadow` → a faint flat shadow, `--blob-opacity` → `0` (hides the cosmic backdrop). Removed the per-section blob washes on Hero / WhySection / EventsEmbed. Gold + blue accents, rounded corners, gold Marquee, and the blue gradient Membership panel kept.
+
+### 5. Hero background photo → dark-blurred, no card, white text (`7f2bb2d`, `be3e3b6`)
+- Added **`app/public/hero.jpg`** — a real Makers Klub Berlin event photo. `*.jpg` was blanket-ignored in `.gitignore`; added a `!app/public/hero.jpg` negation so it tracks.
+- Iterated the hero treatment: solid white card over the photo → frosted-glass card → **final: no card**. `.sc-hero-bg` renders the photo full-bleed with `filter: blur(5px) saturate(.98)`, over-inset `-40px` so the blur feather is clipped by `overflow:hidden`. `.sc-hero::after` lays a ~40% dark veil (photo reads ~60% — lightened from an initial `brightness(0.42)` after the user said it was too dark) with a lower-left radial pool for headline legibility. Hero text goes white (heading `#fff` + soft shadow, body/stat row 72–82%), typed word stays gold, ghost CTA reworked translucent-white. The vertical edge ticker moved from `.sc-hero-bg::after` onto `.sc-hero::before` so it isn't caught by the blur.
+- **Cover swap** (`be3e3b6`): replaced `hero.jpg` with the red book-café group-session frame (photographer's `DSC05077`, cropped 16:9 → `3000×1688`, ~770 KB). A pasted image can't be written to disk, so it was matched from the original in the user's photo folder.
+- **N° labels removed**: the `N°01 / N°02 / N°03` index chips dropped from the three WhySection cards, plus the now-unused `.sc-why-num` rule.
+
+### 6. Luma calendar link fix (`a229d28`)
+The "View All Events" / "view full calendar" links pointed at `https://luma.com/cal-GBRc6zCvxA5bqnz`, which now **404s**. The calendar moved to the vanity URL **`https://luma.com/thesolopreneursclub`** — updated both click-throughs. The **embed iframe keeps the `cal-` id**: the calendar's `api_id` is still `cal-GBRc6zCvxA5bqnz` (only the public URL changed), and `/embed/calendar/<vanity-slug>/events` does **not** resolve the slug — tested live, the slug form returns "No Upcoming Events" while the `cal-` id shows the Freelancer Fridays meetups (4 Sep / 9 Oct / 6 Nov).
+
+### Infra issues diagnosed (no code — handed to the user)
+- **Production PWA blank at `app.thesoloprenuers.club`.** Console showed Clerk JS failing to load from `https://clerk.makersklub.com/...` with `ERR_SSL_VERSION_OR_CIPHER_MISMATCH`. Confirmed via `openssl`/`curl`: `clerk.makersklub.com` has no valid cert (TLS handshake fails), while `clerk.thesoloprenuers.club` has a valid cert issued 25 Aug. The Clerk **production instance** was moved to the new custom domain, which rotates the `pk_live_` publishable key — Vercel still has the old one. Fix (user's to do): copy the current publishable key from the Clerk dashboard into `VITE_CLERK_PUBLISHABLE_KEY` on the `mk-event-app` **and** `makers_klub_landing` Vercel projects, redeploy; also update the Clerk domain under Supabase → Auth → Third-Party Auth.
+- When adding that var, Vercel rejects `visibility: secret` for a `VITE_`-prefixed variable ("public framework prefix") — it must be plaintext (`config`). Correct and safe: a publishable key is public by design; only `CLERK_SECRET_KEY` should be sensitive.
+
+### Branches (all merged `--no-ff` to `main`, safe to delete)
+`sync-pwa-onboarding-profile` · `marketing-aurora-glass-reskin` · `marketing-flat-variant` · `marketing-hero-photo` · `marketing-hero-dark-photo` · `marketing-cover-photo-swap` · `fix-luma-calendar-link`
+
+### Supersedes the 25 August entry above
+That pass (glass panels + blob backdrops, navy/gold palette kept) was never browser-checked and was replaced here: full Aurora Glass re-skin → flattened → dark event-photo hero. **Current live state on `main`:** flat, gold + blue marketing home with a dark-blurred red-library event-photo hero and no hero card.
+
+---
+
+## Marketing site design system — final spec (reference for replacing "Aurora Glass" on the PWA)
+
+This is the visual system the marketing home (`src/home/`) ended on, written as a porting guide for `mk-event-app`. It is the dashboard's Aurora Glass **token structure** kept intact, but with three deliberate departures: **(a) a gold + blue palette** instead of yellow + violet, **(b) flat surfaces** — every frosted-glass effect removed (no `backdrop-filter`, no translucency, no ambient gradient "blob" backdrops), **(c)** one bespoke pattern: a **dark-blurred full-bleed photo hero with no card**. Fonts: Poppins (display/UI) + Inter (body).
+
+### TL;DR — what changes vs. Aurora Glass
+| Aurora Glass (PWA today) | This system |
+|---|---|
+| Yellow `#fcb813` primary, violet `#7a4ed8` secondary | **Gold `#c5a059`** primary, **blue `#3b6dd9`** secondary |
+| `backdrop-filter: blur(22px)` on cards/nav/sheets | **no blur** anywhere (`--glass-blur: 0`) |
+| Translucent card fills `rgba(255,255,255,0.55–0.72)` | **solid `#ffffff`** |
+| Light glass border `rgba(255,255,255,0.85)` + inset white highlight | **hairline `rgba(12,19,48,0.10)`**, no inset highlight |
+| Fixed cosmic radial-gradient blob backdrop (`--blob-opacity: 0.9`) | **none** (`--blob-opacity: 0`; `body` is plain `#fff`) |
+| Big diffuse card shadow `0 10px 34px rgba(38,40,90,0.12)` | **faint flat shadow** `0 1px 2px / 0 8px 20px rgba(12,19,48,0.05)` |
+| Inter + Poppins + Caveat + Fraunces | **Poppins + Inter only** |
+
+The `--glass-*` token *names* were kept (so component CSS referencing them still resolves) — only their values were flattened. Same trick works on the PWA: redefine the tokens, leave the `var(--glass-*)` call sites alone.
+
+### Palette — final `:root` values
+```css
+/* Brand hues — gold primary, blue secondary */
+--mk-yellow:      #c5a059;   /* PRIMARY ACCENT (gold) — CTAs, badges, active states, marquee */
+--mk-yellow-deep: #8a6d2f;   /* gold-as-text on white — contrast-safe (~5:1) */
+--mk-yellow-soft: #d9b673;   /* gold hover */
+--mk-violet:      #3b6dd9;   /* SECONDARY ACCENT (blue) — links, <em>, numerals, icon marks */
+--mk-violet-soft: #7ba0e8;   /* soft blue — link underlines, hover borders */
+--mk-blue:        #26489a;   /* deep blue — gradient end-stop only */
+--mk-navy:        #0a1340;   /* ink for headings; also --accent-ink (text on gold) */
+
+--accent:     var(--mk-yellow);
+--accent-ink: #0a1340;
+
+/* Ink ramp on white */
+--ink-1: #0c1330;   /* headings, primary text */
+--ink-2: #424a6b;   /* body copy */
+--ink-3: #818aa6;   /* meta, captions, footer links */
+
+/* Surfaces & lines */
+--surface:         #ffffff;
+--hairline:        rgba(12,19,48,0.08);   /* section dividers */
+--hairline-strong: rgba(12,19,48,0.14);
+
+/* Card material — FLAT (all the "glass" tokens, flattened) */
+--glass-blur:      0px;
+--glass-bg:        #ffffff;
+--glass-bg-strong: #ffffff;
+--glass-border:    rgba(12,19,48,0.10);
+--glass-hi:        inset 0 0 0 0 transparent;
+--glass-shadow:    0 1px 2px rgba(12,19,48,0.05), 0 8px 20px rgba(12,19,48,0.05);
+--blob-opacity:    0;
+
+/* Type */
+--font-display: 'Poppins', system-ui, -apple-system, sans-serif;
+--font-body:    'Inter', system-ui, -apple-system, sans-serif;
+
+/* Radii (unchanged from Aurora Glass) */
+--r-lg: 22px;  --r-sm: 14px;  --r-xs: 10px;  --r-pill: 999px;
+
+/* Shadows */
+--shadow-card:     0 10px 34px rgba(38,40,90,0.12), inset 0 1px 0 rgba(255,255,255,0.75); /* legacy, unused */
+--shadow-cta:      0 10px 24px rgba(197,160,89,0.40);   /* gold glow under primary buttons */
+--shadow-gradient: 0 18px 44px rgba(38,72,154,0.34);    /* blue glow under gradient panels / card hover */
+```
+Accent → hue map: **gold** = anything actionable or "active" (primary buttons, nav CTA, the marquee strip, eyebrow/section labels via `--mk-yellow-deep`, badge fills, card top-border accents, avatar-info top border). **blue** = anything referential (text links, `<em>` emphasis, section index chips/numerals, gradient panels, avatar/thumbnail placeholder marks, link-underline). Never put gold text on white without `--mk-yellow-deep`.
+
+### Fonts
+Replace the PWA's font `@import` / `<link>` with just:
+`https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap`
+Poppins for every heading, label, button, nav item, stat; Inter for paragraphs and form fields. Drop Caveat and Fraunces.
+
+### Surfaces
+- `body { background: #ffffff }`. No fixed backdrop. (The `body::before` blob rule can stay in the stylesheet — `opacity: var(--blob-opacity)` = 0 makes it inert — or be deleted outright.)
+- The `.aurora-glass` / `.aurora-glass-strong` / `.aurora-backdrop` helper classes still exist but are now no-ops (blur 0, and `.aurora-backdrop` is only shown by parents that were removed). Keep or strip; they cost nothing.
+- Sections do **not** alternate dark/light anymore — the old `.on-navy` inverted-section pattern is fully retired (class removed from markup, rules deleted). Rhythm now comes from the gold marquee strip, the frosted-look (now just tinted-white) nav/footer bars, and the one blue gradient CTA panel.
+
+### Components
+
+**Card** (`.sc-why-card`, `.sc-member-card`, `.sc-luma-frame`):
+```css
+background: var(--glass-bg);              /* #fff */
+border: 1px solid var(--glass-border);    /* hairline */
+box-shadow: var(--glass-shadow), var(--glass-hi);
+border-radius: var(--r-lg);               /* 22px */
+```
+(The `backdrop-filter: blur(var(--glass-blur))` line is left in place but resolves to `blur(0)` — harmless. On the PWA you can just delete those lines.)
+
+**Primary button** (`.btn-solid`, `.sc-nav-cta`, `.sc-membership-cta`): gold pill.
+```css
+background: var(--accent); color: var(--accent-ink);
+border-radius: var(--r-pill); padding: 15px 28px;
+font: 700 14px var(--font-display); letter-spacing: 0.01em;
+box-shadow: var(--shadow-cta);
+/* :hover */ background: var(--mk-yellow-soft); transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(197,160,89,0.5);
+```
+
+**Ghost button** (`.btn-ghost`, light context): solid white pill, hairline border, `--ink-1` text; hover → blue border + blue text. (In the dark hero it's overridden — see hero section.)
+
+**Text link** (`.link-underline`, `.sc-luma-powered a`): blue, `--mk-violet-soft` 1px underline, uppercase Poppins 700 12px; hover → `--mk-yellow-deep` text + gold underline.
+
+**Section masthead** (`.sc-mast`): heading left / aside right, `border-bottom: 1px solid var(--hairline)`. Eyebrow label = `--mk-yellow-deep`, Poppins 700, 11px, `letter-spacing: 0.18em`, uppercase. Index chip (`.sc-mast-label .sc-index`) = blue text in a blue 1px `--r-pill` outline.
+
+**Nav** (`.sc-nav`): fixed bar, `background: var(--glass-bg-strong)` (= `#fff`), `border-bottom: 1px solid var(--glass-border)`, `box-shadow: 0 4px 24px rgba(38,40,90,0.06)`. Logo mark `border-radius: var(--r-xs)`. (The `backdrop-filter` line is inert now.)
+
+**Marquee** (`.sc-marquee`): full-bleed **gold** strip (`background: var(--accent)`), navy text (`--accent-ink`), Poppins 800 22px, `box-shadow: var(--shadow-cta)`. This is the main colour "beat" of the page.
+
+**Gradient CTA panel** (`.sc-membership-inner`): the one saturated surface. `background: linear-gradient(150deg, var(--mk-violet) 0%, var(--mk-blue) 100%)` (blue → deep blue), `border-radius: var(--r-lg)`, `box-shadow: var(--shadow-gradient), inset 0 1px 0 rgba(255,255,255,0.18)`. White heading, `rgba(255,255,255,0.7–0.82)` sub-text, gold CTA inside.
+
+**Avatar / thumbnail placeholder mark** (`.sc-member-mark`): `linear-gradient(150deg, var(--mk-violet) 0%, var(--mk-blue) 100%)`, white initials, Poppins 700. Card hover lifts `translateY(-3px)` and swaps to `box-shadow: var(--shadow-gradient)`.
+
+**Footer** (`.sc-footer`): `background: var(--glass-bg-strong)` (= `#fff`), `border-top: 1px solid var(--glass-border)`, `--ink-3` text/links, links hover to blue. Logo mark `--r-xs`.
+
+### The photo hero pattern (`.sc-hero`)
+Full-bleed event photo, blurred + darkened, **no card**, white text. Reusable for any hero on the PWA.
+```css
+.sc-hero {
+  position: relative; min-height: 100vh; overflow: hidden;
+  display: flex; align-items: flex-end; padding: 160px 64px 64px;
+  background: #070b18;                       /* base behind the photo */
+}
+.sc-hero-bg {                                /* the photo layer */
+  position: absolute; inset: -40px;          /* over-inset so the blur feather is clipped */
+  z-index: 0; pointer-events: none;
+  background: #0f1424 url('/hero.jpg') center / cover no-repeat;
+  filter: blur(5px) saturate(0.98);
+}
+.sc-hero::after {                            /* dark veil — photo reads ~60% */
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(7,11,24,0.30) 0%, rgba(7,11,24,0.46) 100%),
+    radial-gradient(115% 95% at 16% 74%, rgba(7,11,24,0.52) 0%, rgba(7,11,24,0) 62%); /* pool under the text */
+}
+.sc-hero-content { position: relative; z-index: 1; max-width: 780px; } /* no bg/border/shadow */
+```
+Text on top: heading `#fff` + `text-shadow: 0 2px 16px rgba(0,0,0,0.28)`; supporting text `rgba(255,255,255,0.72–0.82)`; divider rules `rgba(255,255,255,0.22)`; the one animated/accent word stays **gold** (`--mk-yellow-soft`); badge stays gold-fill/navy-text. Ghost button in this context: `background: rgba(255,255,255,0.08)`, `border: 1px solid rgba(255,255,255,0.4)`, white text, hover → `rgba(255,255,255,0.16)` + white border. Any decorative element that must stay sharp (e.g. the vertical edge ticker) goes on `.sc-hero`, **not** inside `.sc-hero-bg`, so the `filter: blur` doesn't hit it.
+Photo asset: ~3000px wide, 16:9, JPEG q~60, keep under ~800 KB; served from the public dir. Original `brightness(0.42)` on the photo filter was dropped — too dark; the veil alone does the darkening now.
+
+### Porting checklist for `mk-event-app`
+1. Swap the font import to Poppins + Inter; find/replace Caveat/Fraunces usages.
+2. Drop the palette block above into the PWA's token file; delete `--mk-yellow`/`--mk-violet` old hex values.
+3. Flatten the `--glass-*` tokens + `--blob-opacity: 0` as above. Then either delete every `backdrop-filter` / translucent-`rgba` / blob-`radial-gradient` in component CSS, or leave them (they go inert once the tokens flatten) and clean up opportunistically.
+4. Remove the app-shell ambient backdrop (`.mkw::before` equivalent) and any per-screen blob layers.
+5. Retire dark/inverted section treatments; move contrast onto the gold marquee + the single blue gradient CTA panel.
+6. Repoint accents: gold = actions/active, blue = links/emphasis/marks/gradients.
+7. For dark login/auth/hero screens, use the photo-hero pattern instead of a navy fill.
+

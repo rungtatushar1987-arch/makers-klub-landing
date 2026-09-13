@@ -71,35 +71,12 @@ export default function Dashboard() {
                 <div className="delta">People you've met</div>
               </div>
               <div className="mkw-stat">
-                <div className="lbl">Events</div>
-                <div className="num">{eventsAttended}</div>
-                <div className="delta">Sessions attended</div>
-              </div>
-              <div className="mkw-stat">
                 <div className="lbl">Follow-ups</div>
                 <div className="num" style={{ color: followUpCount > 0 ? 'var(--mk-yellow-deep)' : undefined }}>
                   {followUpCount}
                 </div>
                 <div className="delta">{followUpCount > 0 ? 'Waiting' : 'All clear'}</div>
               </div>
-            </div>
-
-            {/* Events */}
-            <div className="mkw-card">
-              <div className="mkw-h3">
-                <span>Events</span>
-                <a href="https://luma.com/calendar/cal-GBRc6zCvxA5bqnz" target="_blank" rel="noreferrer">See all →</a>
-              </div>
-
-              <iframe
-                src="https://luma.com/embed/calendar/cal-GBRc6zCvxA5bqnz/events"
-                title="Makers Klub events calendar"
-                style={{ width: '100%', height: 450, border: '1px solid #bfcbda88', borderRadius: 4 }}
-                frameBorder="0"
-                allowFullScreen
-                aria-hidden="false"
-                tabIndex={0}
-              />
             </div>
           </div>
 
@@ -116,10 +93,9 @@ export default function Dashboard() {
               </div>
               {connections.length === 0 ? (
                 <div style={{ padding: '16px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, color: 'var(--ink-3)', marginBottom: 12, fontFamily: 'var(--font-body)' }}>
-                    No connections yet. Come to an event.
+                  <p style={{ fontSize: 14, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>
+                    No connections yet.
                   </p>
-                  <a href="/events" className="mk-btn mk-btn-navy mk-btn-sm">See events →</a>
                 </div>
               ) : (
                 <div className="mkw-rows">

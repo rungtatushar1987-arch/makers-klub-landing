@@ -71,28 +71,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Activity feed */}
-          {activityFeed.length > 0 && (
-            <div className="onb-card">
-              <div className="onb-card-label">Community activity</div>
-              <div className="onb-activity-list">
-                {activityFeed.map((item, i) => (
-                  <div key={i} className="onb-activity-item">
-                    <div className="onb-activity-av" style={{ background: item.profile.avatar_color || '#0a1340' }}>
-                      {getInitials(item.profile.full_name)}
-                    </div>
-                    <div className="onb-activity-text">
-                      <strong>{item.profile.full_name?.split(' ')[0] || 'Someone'}</strong>
-                      {' '}is going to{' '}
-                      <span className="onb-activity-event">{item.eventTitle}</span>
-                    </div>
-                    <span className="onb-activity-age">{timeAgo(item.createdAt)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
         </div>
 
         {/* Right column */}
@@ -105,12 +83,9 @@ export default function Onboarding() {
             <div className="onb-card-label">Your network</div>
             <div className="onb-card-title" style={{ marginBottom: 10 }}>Current network</div>
             {connections.length === 0 ? (
-              <>
-                <p className="onb-card-body" style={{ marginBottom: 12 }}>
-                  No connections yet. Come to an event to start building your network.
-                </p>
-                <a href="/events" className="mk-btn mk-btn-navy mk-btn-sm">Browse events →</a>
-              </>
+              <p className="onb-card-body" style={{ marginBottom: 12 }}>
+                No connections yet.
+              </p>
             ) : (
               <div className="onb-member-strip onb-member-strip--col">
                 {connections.slice(0, 6).map(c => (
