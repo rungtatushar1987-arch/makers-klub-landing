@@ -4,7 +4,6 @@ import Hero from './components/Hero'
 import Marquee from './components/Marquee'
 import WhySection from './components/WhySection'
 import EventsEmbed from './components/EventsEmbed'
-import Network from './components/Network'
 import Membership from './components/Membership'
 import Footer from './components/Footer'
 
@@ -28,7 +27,6 @@ export default function App() {
       <Marquee />
       <WhySection />
       <EventsEmbed />
-      <Network />
       <Membership />
       <Footer />
     </>
