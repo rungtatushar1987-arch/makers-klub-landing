@@ -12,15 +12,14 @@
   justify-content: center;
 }
 .sc-membership-heading {
-  font-size: clamp(32px, 4vw, 46px);
+  font-size: clamp(32px, 4vw, 48px);
   margin: 4px 0 18px;
 }
 .sc-membership-desc {
   max-width: 620px;
   margin: 0 auto 56px;
-  color: var(--ink-2);
-  font-size: 16px;
-  line-height: 1.7;
+  font: var(--text-body);
+  color: var(--ink-body);
 }
 
 .sc-tier-grid {
@@ -31,12 +30,10 @@
 .sc-tier-card {
   width: 100%;
   max-width: 420px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  border: 1px solid var(--mk-yellow);
+  background: var(--surface-page);
+  border: 1px solid var(--gold);
   box-shadow: var(--shadow-cta);
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
 }
@@ -44,64 +41,64 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 32px 32px 24px;
+  padding: var(--space-4) var(--space-4) var(--space-3);
 }
 .sc-tier-name {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 800;
+  font: var(--text-headline-sm);
   letter-spacing: -0.01em;
-  color: var(--ink-1);
+  color: var(--ink);
 }
 .sc-tier-tagline {
+  font: var(--text-body-small);
   font-size: 13px;
-  color: var(--ink-3);
-  margin-top: 6px;
+  color: var(--ink-muted);
+  margin-top: var(--space-1);
 }
 .sc-tier-price {
   font-family: var(--font-display);
-  font-size: 28px;
   font-weight: 800;
-  color: var(--mk-yellow-deep);
+  font-size: 28px;
+  color: var(--gold-text);
   text-align: right;
   white-space: nowrap;
 }
 .sc-tier-price span {
   display: block;
+  font: var(--text-body-small);
   font-size: 11px;
   font-weight: 700;
-  color: var(--ink-3);
+  color: var(--ink-muted);
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: var(--space-1);
 }
 .sc-tier-list {
-  padding: 8px 32px 32px;
+  padding: var(--space-2) var(--space-4) var(--space-4);
 }
 .sc-tier-row {
   display: flex;
-  gap: 12px;
-  padding: 20px 0;
-  border-top: 1px solid var(--hairline);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border-hairline);
 }
 .sc-tier-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--mk-yellow);
+  background: var(--gold);
   margin-top: 8px;
   flex-shrink: 0;
 }
 .sc-tier-row-text strong {
   display: block;
-  font-size: 14px;
-  color: var(--ink-1);
+  font: var(--text-body-small);
   font-weight: 700;
-  margin-bottom: 4px;
+  color: var(--ink);
+  margin-bottom: var(--space-1);
 }
 .sc-tier-row-text p {
+  font: var(--text-body-small);
   font-size: 13px;
-  color: var(--ink-2);
-  line-height: 1.6;
+  color: var(--ink-body);
 }
 .sc-membership-cta {
   display: inline-flex;

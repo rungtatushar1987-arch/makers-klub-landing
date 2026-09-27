@@ -13,53 +13,47 @@
   padding: 100px 64px 110px;
 }
 .sc-why-heading {
-  font-size: clamp(32px, 4vw, 46px);
+  font-size: clamp(32px, 4vw, 48px);
   max-width: 640px;
 }
 
 .sc-why-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: var(--space-3);
 }
 .sc-why-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
-  border-radius: var(--r-lg);
-  padding: 32px 28px;
+  background: var(--surface-page);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
 }
 .sc-why-card h3 {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
+  font: var(--text-headline-sm);
   letter-spacing: -0.01em;
-  color: var(--ink-1);
-  margin-bottom: 12px;
+  color: var(--ink);
+  margin-bottom: var(--space-3);
 }
 .sc-why-problem {
-  font-size: 14px;
-  color: var(--ink-2);
-  line-height: 1.7;
-  padding-bottom: 24px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--hairline);
+  font: var(--text-body-small);
+  color: var(--ink-body);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-hairline);
 }
 .sc-why-fix {
   margin-top: auto;
 }
 .sc-why-fix .sc-mast-eyebrow {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 .sc-why-fix p {
-  font-size: 14px;
-  color: var(--ink-1);
-  line-height: 1.7;
+  font: var(--text-body-small);
+  color: var(--ink);
 }
 
 @media (max-width: 900px) {

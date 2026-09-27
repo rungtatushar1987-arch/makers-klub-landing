@@ -1,5 +1,5 @@
-/* The Solopreneurs Club — global shell, Aurora Glass re-skin.
-   White surface, fixed cosmic-blob backdrop, frosted glass, Poppins + Inter.
+/* The Solopreneurs Club — global shell.
+   Flat surfaces per the design system: no glass, no ambient blobs.
    ========================================================================= */
 
 *,
@@ -21,30 +21,13 @@ html {
 }
 
 body {
-  font-family: var(--font-body);
-  background: var(--surface);
-  color: var(--ink-1);
-  line-height: 1.6;
+  font: var(--text-body);
+  background: var(--surface-page);
+  color: var(--ink-body);
   position: relative;
   overflow-x: hidden;
 }
 
-/* ── Ambient backdrop — cosmic blobs behind every section, pinned ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--blob-opacity);
-  background:
-    radial-gradient(42% 50% at 12% 0%,   rgba(197, 160, 89, 0.42) 0%, transparent 70%),
-    radial-gradient(48% 40% at 100% 22%, rgba(59, 109, 217, 0.32) 0%, transparent 72%),
-    radial-gradient(55% 42% at 52% 108%, rgba(59, 109, 217, 0.30) 0%, transparent 70%),
-    radial-gradient(36% 30% at 82% 82%,  rgba(123, 160, 232, 0.24) 0%, transparent 72%);
-}
-
-/* Keep all page content above the backdrop */
 #root {
   position: relative;
   z-index: 1;
@@ -52,74 +35,33 @@ body::before {
 
 em {
   font-style: normal;
-  color: var(--mk-violet);
-}
-
-/* ── Reusable Aurora Glass surfaces ── */
-.aurora-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
-  border-radius: var(--r-sm);
-}
-.aurora-glass-strong {
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
-  border-radius: var(--r-sm);
-}
-
-/* Local blob wash a section can layer behind its own glass */
-.aurora-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(46% 60% at 15% 10%,  rgba(197, 160, 89, 0.34) 0%, transparent 70%),
-    radial-gradient(50% 50% at 92% 30%,  rgba(59, 109, 217, 0.28) 0%, transparent 72%),
-    radial-gradient(60% 50% at 60% 108%, rgba(59, 109, 217, 0.24) 0%, transparent 70%);
-}
-.aurora-backdrop.subtle {
-  opacity: 0.6;
+  color: var(--accent-blue);
 }
 
 /* ── Shared type ── */
 .eyebrow {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
+  font: var(--text-eyebrow);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--mk-yellow-deep);
-  margin-bottom: 14px;
+  color: var(--gold-text);
+  margin-bottom: var(--space-3);
 }
 
 .h-xl {
-  font-family: var(--font-display);
-  font-weight: 800;
+  font: var(--text-headline-lg);
   letter-spacing: -0.02em;
-  line-height: 1.02;
-  color: var(--ink-1);
+  color: var(--ink);
 }
 
 .body-copy {
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--ink-2);
+  font: var(--text-body);
+  color: var(--ink-body);
   max-width: 520px;
 }
 
 .sc-index {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--mk-violet);
+  font: var(--text-eyebrow);
+  color: var(--accent-blue);
 }
 
 /* ── Section masthead ── */
@@ -127,110 +69,97 @@ em {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 40px;
+  gap: var(--space-6);
   flex-wrap: wrap;
-  padding-bottom: 28px;
-  margin-bottom: 56px;
-  border-bottom: 1px solid var(--hairline);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-hairline);
 }
 .sc-mast-label {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.sc-mast-label .sc-index {
-  border: 1px solid var(--mk-violet);
-  border-radius: var(--r-pill);
-  padding: 3px 10px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 .sc-mast-eyebrow {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
+  font: var(--text-eyebrow);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--mk-yellow-deep);
+  color: var(--gold-text);
 }
 .sc-mast-row {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 40px;
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 .sc-mast-aside {
   max-width: 340px;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--ink-3);
-  padding-bottom: 6px;
+  font: var(--text-body-small);
+  color: var(--ink-muted);
+  padding-bottom: var(--space-1);
 }
 
 /* ── Links & buttons ── */
 .link-underline {
-  font-family: var(--font-display);
+  font: var(--text-button);
   font-size: 12px;
-  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--mk-violet);
+  color: var(--accent-blue);
   text-decoration: none;
-  border-bottom: 1px solid var(--mk-violet-soft);
-  padding-bottom: 6px;
+  border-bottom: 1px solid var(--accent-blue);
+  padding-bottom: var(--space-1);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   transition: color 0.15s, border-color 0.15s;
 }
 .link-underline:hover {
-  color: var(--mk-yellow-deep);
-  border-color: var(--mk-yellow);
+  color: var(--gold-text);
+  border-color: var(--gold);
 }
 
+/* Primary: gold fill, ink label (never white on gold) */
 .btn-solid {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--gold);
+  color: var(--ink);
   border: 1px solid transparent;
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-full);
   padding: 15px 28px;
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font: var(--text-button);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
   text-decoration: none;
   box-shadow: var(--shadow-cta);
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 .btn-solid:hover {
-  background: var(--mk-yellow-soft);
+  filter: brightness(1.06);
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(197, 160, 89, 0.5);
+  box-shadow: 0 14px 30px rgba(187, 148, 78, 0.48);
 }
 
+/* Outline: brand-on-navy label + border, reserved for brand-navy grounds
+   (the photo hero) — transparent fill */
 .btn-ghost {
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  color: var(--ink-1);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--brand-on-navy);
+  border: 1px solid var(--brand-on-navy);
+  border-radius: var(--radius-full);
   padding: 15px 28px;
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font: var(--text-button);
   cursor: pointer;
   text-decoration: none;
-  box-shadow: var(--glass-hi);
-  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: background 0.15s, transform 0.15s;
 }
 .btn-ghost:hover {
-  border-color: var(--mk-violet-soft);
-  color: var(--mk-violet);
+  background: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
 }

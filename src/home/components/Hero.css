@@ -24,8 +24,8 @@
   filter: blur(5px) saturate(0.98);
 }
 
-/* Dark veil over the photo — ~40% so the image reads at roughly 60%, with a
-   localised pool toward the lower-left so the white headline stays legible. */
+/* Dark veil over the photo — brand-navy, ~40% so the image reads at roughly
+   60%, with a localised pool toward the lower-left so the headline stays legible. */
 .sc-hero::after {
   content: '';
   position: absolute;
@@ -33,8 +33,8 @@
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(7, 11, 24, 0.30) 0%, rgba(7, 11, 24, 0.46) 100%),
-    radial-gradient(115% 95% at 16% 74%, rgba(7, 11, 24, 0.52) 0%, rgba(7, 11, 24, 0) 62%);
+    linear-gradient(180deg, rgba(1, 27, 62, 0.34) 0%, rgba(1, 27, 62, 0.5) 100%),
+    radial-gradient(115% 95% at 16% 74%, rgba(1, 27, 62, 0.56) 0%, rgba(1, 27, 62, 0) 62%);
 }
 
 /* Vertical edge ticker — on .sc-hero so it stays sharp (not inside the blurred bg) */
@@ -47,9 +47,7 @@
   width: 22px;
   z-index: 1;
   writing-mode: vertical-rl;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
+  font: var(--text-eyebrow);
   letter-spacing: 0.16em;
   color: rgba(255, 255, 255, 0.45);
   overflow: hidden;
@@ -68,13 +66,11 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-radius: var(--r-pill);
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: var(--radius-full);
   padding: 9px 20px;
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
+  font: var(--text-eyebrow);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 32px;
@@ -84,7 +80,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent-ink);
+  background: var(--ink);
   animation: sc-pulse 2s infinite;
 }
 @keyframes sc-pulse {
@@ -93,11 +89,9 @@
 }
 
 .sc-hero h1 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 0.98;
-  font-size: clamp(44px, 7vw, 92px);
+  font: var(--text-hero);
+  font-size: clamp(44px, 7vw, 88px);
+  letter-spacing: -0.02em;
   color: #ffffff;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.28);
   margin-bottom: 24px;
@@ -111,16 +105,16 @@
   margin-bottom: 24px;
 }
 .sc-hero-sub-label {
+  font: var(--text-body);
   font-size: clamp(16px, 2vw, 20px);
   color: rgba(255, 255, 255, 0.72);
-  font-weight: 500;
 }
 .sc-hero-typed {
   font-family: var(--font-display);
-  font-size: clamp(22px, 3.2vw, 34px);
   font-weight: 800;
+  font-size: clamp(22px, 3.2vw, 34px);
   letter-spacing: -0.01em;
-  color: var(--mk-yellow-soft);
+  color: var(--gold);
 }
 .sc-hero-typed::after {
   content: '|';
@@ -131,11 +125,10 @@
 }
 
 .sc-hero-desc {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  font: var(--text-body);
+  color: rgba(255, 255, 255, 0.85);
   max-width: 480px;
   margin-bottom: 36px;
-  line-height: 1.75;
 }
 
 .sc-hero-actions {
@@ -145,29 +138,12 @@
   margin-bottom: 40px;
 }
 
-/* Ghost CTA reworked for the dark context */
-.sc-hero .btn-ghost {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  box-shadow: none;
-}
-.sc-hero .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: #ffffff;
-  color: #ffffff;
-}
-
 .sc-hero-roll {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 0;
   list-style: none;
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 600;
+  font: var(--text-tag);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.82);
@@ -193,9 +169,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
+  font: var(--text-eyebrow);
   letter-spacing: 0.16em;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;

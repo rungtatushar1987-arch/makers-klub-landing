@@ -1,11 +1,9 @@
 .sc-footer {
   position: relative;
   z-index: 1;
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  padding: 32px 64px;
-  border-top: 1px solid var(--glass-border);
+  background: var(--surface-page);
+  padding: var(--space-4) 64px;
+  border-top: 1px solid var(--border-hairline);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,20 +19,17 @@
 .sc-footer-logo img {
   height: 34px;
   width: 34px;
-  border-radius: var(--r-xs);
+  border-radius: var(--radius-none);
 }
 .sc-footer-logo-text {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--ink-1);
-  letter-spacing: -0.01em;
+  font: var(--text-nav-wordmark);
+  font-size: 15px;
+  color: var(--ink);
 }
 .sc-footer-text {
-  font-family: var(--font-display);
+  font: var(--text-body-small);
   font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-3);
+  color: var(--ink-muted);
 }
 .sc-footer-links {
   display: flex;
@@ -42,13 +37,13 @@
   flex-wrap: wrap;
 }
 .sc-footer-links a {
-  color: var(--ink-3);
+  color: var(--ink-muted);
   text-decoration: none;
-  font-family: var(--font-display);
+  font: var(--text-body-small);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 .sc-footer-links a:hover {
-  color: var(--mk-violet);
+  color: var(--accent-blue);
 }

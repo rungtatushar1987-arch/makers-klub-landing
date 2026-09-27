@@ -1,74 +1,68 @@
-/* The Solopreneurs Club — marketing site design tokens.
-   Structure from the web dashboard's "Aurora Glass" system (white surface,
-   cosmic gradient blob backdrop, frosted-glass cards, Poppins + Inter), but
-   a gold + blue palette rather than the dashboard's yellow + violet.
-   The --mk-yellow and --mk-violet variable names are kept (to mirror the
-   dashboard's token structure) but hold gold and blue values here.
-   Legacy navy/gold token names are aliased so older component CSS resolves.
+/* The Solopreneurs Club — design tokens.
+   Source of truth: Solopreneurs-Club-Design-System.md.
+   Cooper BT (display) has no bundled web font yet — --font-display falls
+   back to Georgia until the licensed file is added; swap it in later
+   without touching anything else. Work Sans (sans) is a proposed UI
+   pairing, not yet confirmed by the brand.
    ========================================================================= */
 
 :root {
-  /* ── Brand hues — gold primary, blue secondary ── */
-  --mk-yellow:        #c5a059;   /* PRIMARY ACCENT (gold) — CTAs, active states */
-  --mk-yellow-deep:   #8a6d2f;   /* gold-as-text on white — contrast-safe */
-  --mk-yellow-soft:   #d9b673;   /* gold hover */
-  --mk-violet:        #3b6dd9;   /* SECONDARY ACCENT (blue) — links, emphasis, numerals */
-  --mk-violet-soft:   #7ba0e8;   /* soft blue — underlines, hover borders */
-  --mk-blue:          #26489a;   /* deep blue — gradient panel end-stop */
-  --mk-navy:          #0a1340;   /* ink / headings only */
+  /* ── Surfaces (2) ── */
+  --surface-page:    #ffffff;   /* page background everywhere except the hero photo */
+  --surface-raised:  #f6f6f6;   /* the Upcoming Sessions calendar card */
 
-  --accent:           var(--mk-yellow);
-  --accent-ink:       #0a1340;
+  /* ── Text (3) ── */
+  --ink:             #0a1129;   /* headlines, card titles, nav/footer wordmark, primary UI text */
+  --ink-body:        #39405e;   /* paragraph copy */
+  --ink-muted:       #767d9b;   /* captions/helper text only — under 4.5:1 on white */
 
-  /* ── Ink ramp (text on light) ── */
-  --ink-1:            #0c1330;
-  --ink-2:            #424a6b;
-  --ink-3:            #818aa6;
+  /* ── Fills and status backgrounds (1) ── */
+  --accent-blue:     #3361d4;   /* the emphasized word in a headline; text links */
 
-  /* ── Surfaces & lines ── */
-  --surface:          #ffffff;
-  --hairline:         rgba(12, 19, 48, 0.08);
-  --hairline-strong:  rgba(12, 19, 48, 0.14);
+  /* ── Borders and rings (1) ── */
+  --border-hairline: #eae9ee;   /* section rules, card-internal dividers — decorative only */
 
-  /* ── Card material — FLAT variant: solid white, hairline border, no blur,
-     no ambient blob backdrop. (Glassy values kept in comments for reference.) ── */
-  --glass-blur:       0px;                              /* was 22px */
-  --glass-bg:         #ffffff;                          /* was rgba(255,255,255,0.55) */
-  --glass-bg-strong:  #ffffff;                          /* was rgba(255,255,255,0.72) */
-  --glass-border:     rgba(12, 19, 48, 0.10);           /* was rgba(255,255,255,0.85) */
-  --glass-hi:         inset 0 0 0 0 transparent;        /* was inset 0 1px 0 rgba(255,255,255,0.75) */
-  --glass-shadow:     0 1px 2px rgba(12, 19, 48, 0.05), 0 8px 20px rgba(12, 19, 48, 0.05);
-  --blob-opacity:     0;                                /* was 0.9 — hides the cosmic backdrop */
+  /* ── Palette ramps and brand (8) ── */
+  --brand-navy:      #011b3e;   /* logo badge fill; ground behind the photo-hero outline button */
+  --brand-on-navy:   #ffffff;   /* wordmark inside the badge; outline button label/border */
+  --gold:            #bb944e;   /* solid fills only: Join/Become a Member/Apply buttons, ticker, membership border */
+  --gold-text:       #7e6128;   /* gold set as text: eyebrows, the €50 price */
+  --tag-blue:        #145ce4;
+  --tag-blue-bg:     #dee5fd;
+  --tag-orange:      #ce8a13;
+  --tag-orange-bg:   #f6edd8;
 
-  /* ── Typography ── */
-  --font-display: 'Poppins', system-ui, -apple-system, sans-serif;
-  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
-  /* No monospace in the dashboard system — index chips use the display face */
-  --mono:         'Poppins', system-ui, -apple-system, sans-serif;
+  /* ── Type families ── */
+  --font-display: "Cooper BT", Georgia, "Times New Roman", serif;
+  --font-sans:    "Work Sans", -apple-system, "Segoe UI", sans-serif;
 
-  /* ── Radii ── */
-  --r-lg:   22px;
-  --r-sm:   14px;
-  --r-xs:   10px;
-  --r-pill: 999px;
+  /* ── Type styles (weight size/line family — use with the `font` shorthand) ── */
+  --text-wordmark-line: 600 11px/14px var(--font-display);
+  --text-hero:          800 88px/0.95 var(--font-display);
+  --text-headline-lg:   800 48px/1.05 var(--font-display);
+  --text-headline-sm:   800 28px/1.2 var(--font-display);
+  --text-eyebrow:       700 13px/16px var(--font-sans);
+  --text-nav-wordmark:  700 19px/24px var(--font-sans);
+  --text-body:          400 17px/27px var(--font-sans);
+  --text-body-small:    400 14px/21px var(--font-sans);
+  --text-button:        700 16px/20px var(--font-sans);
+  --text-tag:           600 13px/16px var(--font-sans);
 
-  /* ── Shadows ── */
-  --shadow-card:     0 10px 34px rgba(38, 40, 90, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  --shadow-cta:      0 10px 24px rgba(197, 160, 89, 0.40);
-  --shadow-gradient: 0 18px 44px rgba(38, 72, 154, 0.34);
+  /* ── Spacing (6) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
 
-  /* ── Legacy aliases — map the old navy/gold palette onto Aurora Glass ── */
-  --navy:        var(--mk-navy);
-  --navy-deep:   #060a22;
-  --navy-card:   var(--glass-bg);
-  --gold:        var(--mk-yellow);
-  --gold-bright: var(--mk-yellow-soft);
-  --paper:       #ffffff;
-  --ink:         var(--ink-1);
-  --ink-light:   var(--ink-2);
-  --white:       #ffffff;
-  --white-70:    var(--ink-2);
-  --white-45:    var(--ink-3);
-  --white-15:    var(--hairline-strong);
-  --navy-12:     var(--hairline);
+  /* ── Radius (3) — used nowhere else on the site ── */
+  --radius-none: 0px;
+  --radius-lg:   24px;
+  --radius-full: 999px;
+
+  /* ── Functional, non-token support (shadows) — not part of the brand system,
+     kept minimal so gold/navy fills still read as raised UI ── */
+  --shadow-card: 0 1px 2px rgba(10, 17, 41, 0.05), 0 8px 20px rgba(10, 17, 41, 0.06);
+  --shadow-cta:  0 10px 24px rgba(187, 148, 78, 0.38);
 }

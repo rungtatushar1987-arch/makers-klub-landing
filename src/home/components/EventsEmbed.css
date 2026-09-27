@@ -13,39 +13,37 @@
   padding: 100px 64px 110px;
 }
 .sc-events-title {
-  font-size: clamp(32px, 4vw, 46px);
+  font-size: clamp(32px, 4vw, 48px);
 }
 
+/* Raised panel off the page, per the design system — not page-level white */
 .sc-luma-frame {
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
-  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
   padding: 8px;
   overflow: hidden;
 }
 .sc-luma-frame iframe {
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: #fff;
 }
 .sc-luma-powered {
   margin-top: 16px;
-  font-family: var(--font-display);
+  font: var(--text-body-small);
   font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-3);
+  color: var(--ink-muted);
   text-align: right;
 }
 .sc-luma-powered a {
-  color: var(--mk-violet);
+  color: var(--accent-blue);
   text-decoration: none;
   font-weight: 700;
 }
 .sc-luma-powered a:hover {
-  color: var(--mk-yellow-deep);
+  color: var(--gold-text);
 }
 
 @media (max-width: 900px) {
