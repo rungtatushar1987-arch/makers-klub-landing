@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import './Membership.css'
 
 const TALLY_FORM_URL = 'https://tally.so/r/Pde8pd'
 
+const PLANS = {
+  monthly: { price: '€50', unit: '/ month' },
+  annual: { price: '€500', unit: '/ year' },
+}
+
 const TIER = {
   name: 'Membership',
   tagline: 'Standard pricing',
-  price: '€50',
   rows: [
     { title: 'Members-Only Events', desc: 'Exclusive access to in-person and virtual sessions.' },
     { title: 'Weekly Peer Feedback Calls', desc: 'Share problems, get feedback, and seek opinions from the group.' },
@@ -15,6 +20,9 @@ const TIER = {
 }
 
 export default function Membership() {
+  const [billing, setBilling] = useState('monthly')
+  const plan = PLANS[billing]
+
   return (
     <section className="sc-membership" id="membership">
       <div className="sc-membership-inner">
@@ -35,9 +43,33 @@ export default function Membership() {
                 <div className="sc-tier-name">{TIER.name}</div>
                 <div className="sc-tier-tagline">{TIER.tagline}</div>
               </div>
-              <div className="sc-tier-price">
-                {TIER.price}
-                <span>/ month</span>
+              <div className="sc-tier-price-col">
+                <div className="sc-plan-toggle" role="radiogroup" aria-label="Billing period">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={billing === 'monthly'}
+                    className="sc-plan-toggle-btn"
+                    data-active={billing === 'monthly'}
+                    onClick={() => setBilling('monthly')}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={billing === 'annual'}
+                    className="sc-plan-toggle-btn"
+                    data-active={billing === 'annual'}
+                    onClick={() => setBilling('annual')}
+                  >
+                    Annual
+                  </button>
+                </div>
+                <div className="sc-tier-price">
+                  {plan.price}
+                  <span>{plan.unit}</span>
+                </div>
               </div>
             </div>
             <div className="sc-tier-list">
