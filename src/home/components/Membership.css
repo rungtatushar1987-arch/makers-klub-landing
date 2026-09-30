@@ -15,11 +15,15 @@
   font-size: clamp(32px, 4vw, 48px);
   margin: 4px 0 18px;
 }
-.sc-membership-desc {
-  max-width: 620px;
-  margin: 0 auto 56px;
-  font: var(--text-body);
-  color: var(--ink-body);
+.sc-founding-banner {
+  max-width: 420px;
+  margin: 0 auto 24px;
+  background: var(--brand-navy);
+  color: var(--brand-on-navy);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-body-small);
+  text-align: left;
 }
 
 .sc-tier-grid {
@@ -103,38 +107,45 @@
   text-transform: uppercase;
   margin-top: var(--space-1);
 }
-.sc-tier-list {
-  padding: var(--space-2) var(--space-4) var(--space-4);
-}
-.sc-tier-row {
-  display: flex;
-  gap: var(--space-3);
-  padding: var(--space-3) 0;
-  border-top: 1px solid var(--border-hairline);
-}
-.sc-tier-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold);
-  margin-top: 8px;
-  flex-shrink: 0;
-}
-.sc-tier-row-text strong {
-  display: block;
-  font: var(--text-body-small);
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: var(--space-1);
-}
-.sc-tier-row-text p {
+.sc-tier-session-note {
   font: var(--text-body-small);
   font-size: 13px;
-  color: var(--ink-body);
+  color: var(--ink-muted);
+  padding: 0 var(--space-4) var(--space-3);
+  text-align: left;
 }
+
+.sc-tier-included {
+  list-style: none;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.sc-tier-included li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font: var(--text-body-small);
+  color: var(--ink-body);
+  text-align: left;
+}
+.sc-tier-included .sc-fit-emoji {
+  flex-shrink: 0;
+}
+
 .sc-membership-cta {
-  display: inline-flex;
-  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  margin: 0 var(--space-4) var(--space-3);
+}
+.sc-tier-fine-print {
+  font: var(--text-body-small);
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: center;
+  padding: 0 var(--space-4) var(--space-4);
 }
 
 @media (max-width: 900px) {

@@ -2,22 +2,16 @@ import './WhySection.css'
 
 const ITEMS = [
   {
-    num: '01',
-    title: 'Building alone gets lonely',
-    problem: 'No team, no colleagues, no one to talk it through with. The isolation is real.',
-    solution: "You're grouped with 5 freelancers every month. A real support group, not a group chat.",
+    problem: 'Your rates are a guess.',
+    fix: "Work out your minimum rate with the pricing module and calculator, then get help raising it from people who've done it.",
   },
   {
-    num: '02',
-    title: 'No idea where to start',
-    problem: 'Freelancing or running a business with no playbook — every step feels like guesswork.',
-    solution: 'A resource library built from what actually works, not generic advice.',
+    problem: '"Send me a proposal." Then silence.',
+    fix: 'The pitching module covers the call and the follow-up. Post the real email in Slack and get feedback within 24 hours on weekdays.',
   },
   {
-    num: '03',
-    title: "Can't find clients",
-    problem: "You know your craft. You don't know marketing, GTM, or how to get in front of the right people.",
-    solution: 'Monthly mentorship calls with experienced pros in marketing, GTM, and content.',
+    problem: 'The Finanzamt only writes in German.',
+    fix: 'The Germany admin module and checklist cover registration, invoicing and contracts. Bring the rest to the tax advisor AMA.',
   },
 ]
 
@@ -28,26 +22,21 @@ export default function WhySection() {
         <div className="sc-mast">
           <div>
             <div className="sc-mast-label">
-              <span className="sc-mast-eyebrow">Built for solo builders</span>
+              <span className="sc-mast-eyebrow">1 to 3 years in</span>
             </div>
             <h2 className="h-xl sc-why-heading">
-              Going solo shouldn't mean <em>doing it alone</em>
+              You've got your first clients. Now build the <em>business</em> around them.
             </h2>
           </div>
-          <p className="sc-mast-aside">
-            Three real problems every solo builder runs into. Here's what we actually do about
-            each one.
-          </p>
         </div>
 
         <div className="sc-why-grid">
           {ITEMS.map((item) => (
-            <div className="sc-why-card" key={item.num}>
-              <h3>{item.title}</h3>
-              <p className="sc-why-problem">{item.problem}</p>
+            <div className="sc-why-card" key={item.problem}>
+              <h3>{item.problem}</h3>
               <div className="sc-why-fix">
                 <span className="sc-mast-eyebrow">Our fix</span>
-                <p>{item.solution}</p>
+                <p>{item.fix}</p>
               </div>
             </div>
           ))}

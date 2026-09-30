@@ -20,6 +20,10 @@ export default function EventsEmbed() {
           </a>
         </div>
 
+        <p className="sc-events-note">
+          Monthly live sessions are free for members and €40 for everyone else.
+        </p>
+
         <div className="sc-luma-frame">
           <iframe
             src={LUMA_EMBED_URL}

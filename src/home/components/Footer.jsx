@@ -7,6 +7,9 @@ export default function Footer() {
         <img src="/logo.png" alt="The Solopreneurs Club" />
         <span className="sc-footer-logo-text">Solopreneurs Club</span>
       </a>
+      <p className="sc-footer-tagline">
+        A members-only club for freelancers in Germany past their first year. Based in Berlin.
+      </p>
       <p className="sc-footer-text">© 2026 The Solopreneurs Club. Berlin, Germany.</p>
       <div className="sc-footer-links">
         <a href="/impressum.html">Impressum</a>

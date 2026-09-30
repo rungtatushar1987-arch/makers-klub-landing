@@ -1,7 +1,16 @@
 import { Fragment } from 'react'
 import './Marquee.css'
 
-const WORDS = ['FOUNDERS', 'CREATIVES', 'FREELANCERS', 'CONSULTANTS', 'DESIGNERS', 'COACHES']
+const WORDS = [
+  'Marketers',
+  'Designers',
+  'Brand strategists',
+  'GTM consultants',
+  'UX designers',
+  'Content creators',
+  'International freelancers in Germany',
+  'Going full-time soon',
+]
 
 export default function Marquee() {
   const words = [...WORDS, ...WORDS]

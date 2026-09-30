@@ -1,82 +1,34 @@
-import { useEffect, useState } from 'react'
 import './Hero.css'
-
-const TYPED_WORDS = ['Freelancers', 'Solopreneurs']
-const TYPE_SPEED = 90
-const DELETE_SPEED = 50
-const PAUSE_AFTER_TYPE = 1400
-const PAUSE_AFTER_DELETE = 300
-
-function useTypewriter(words) {
-  const [text, setText] = useState('')
-  const [wordIndex, setWordIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    const currentWord = words[wordIndex]
-
-    if (!isDeleting && text === currentWord) {
-      const timeout = setTimeout(() => setIsDeleting(true), PAUSE_AFTER_TYPE)
-      return () => clearTimeout(timeout)
-    }
-
-    if (isDeleting && text === '') {
-      const timeout = setTimeout(() => {
-        setIsDeleting(false)
-        setWordIndex((wordIndex + 1) % words.length)
-      }, PAUSE_AFTER_DELETE)
-      return () => clearTimeout(timeout)
-    }
-
-    const timeout = setTimeout(() => {
-      setText(currentWord.slice(0, text.length + (isDeleting ? -1 : 1)))
-    }, isDeleting ? DELETE_SPEED : TYPE_SPEED)
-    return () => clearTimeout(timeout)
-  }, [text, isDeleting, wordIndex, words])
-
-  return text
-}
-
-const ROLL_CALL = ['200+ Attendees Hosted', '50+ Community Members', '15 Sessions Run', 'Berlin']
+import { CTA_URL, CTA_LABEL } from '../content'
 
 export default function Hero() {
-  const typed = useTypewriter(TYPED_WORDS)
-
   return (
     <section className="sc-hero">
       <div className="sc-hero-bg" />
       <div className="sc-hero-content">
         <div className="sc-hero-badge">
           <span className="sc-hero-badge-dot"></span>
-          For the Bold &amp; Independent
+          For freelancers in Germany, year one and up
         </div>
 
         <h1>
-          The Solopreneurs
-          <br />
-          Club
+          Where freelancers in Germany learn to run the <em>business side</em>.
         </h1>
 
-        <div className="sc-hero-line">
-          <span className="sc-hero-sub-label">A community built for</span>
-          <span className="sc-hero-typed">{typed}</span>
-        </div>
-
         <p className="sc-hero-desc">
-          Real collaborators. No corporate networking theater. Just people who run their own show,
-          building and growing together — one session at a time.
+          A members-only club for freelancers in Germany past their first year. Fix your
+          foundation first, then get daily coaching on real client work, a live session every
+          month, expert AMAs and a Berlin network that recommends you when it counts.
         </p>
 
         <div className="sc-hero-actions">
-          <a href="#membership" className="btn-solid">Become a Member →</a>
-          <a href="#events" className="btn-ghost">See Upcoming Sessions</a>
+          <a href={CTA_URL} target="_blank" rel="noopener noreferrer" className="btn-solid">
+            {CTA_LABEL} →
+          </a>
+          <a href="#how-it-works" className="btn-ghost">See how it works</a>
         </div>
 
-        <ul className="sc-hero-roll">
-          {ROLL_CALL.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <p className="sc-hero-note">€49.99/month.</p>
       </div>
 
       <div className="sc-hero-scroll">

@@ -1,28 +1,26 @@
-.sc-why {
+.sc-cred {
   position: relative;
   z-index: 1;
+  background: var(--surface-raised);
 }
-.sc-why::before {
-  content: none;
-}
-.sc-why-inner {
+.sc-cred-inner {
   position: relative;
   z-index: 1;
   max-width: 1180px;
   margin: 0 auto;
   padding: 100px 64px 110px;
 }
-.sc-why-heading {
+.sc-cred-heading {
   font-size: clamp(32px, 4vw, 48px);
   max-width: 640px;
 }
 
-.sc-why-grid {
+.sc-cred-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-3);
 }
-.sc-why-card {
+.sc-cred-card {
   background: var(--surface-page);
   border: 1px solid var(--border-hairline);
   box-shadow: var(--shadow-card);
@@ -31,31 +29,23 @@
   display: flex;
   flex-direction: column;
 }
-.sc-why-card h3 {
+.sc-cred-card h3 {
   font: var(--text-headline-sm);
+  font-size: 20px;
   letter-spacing: -0.01em;
   color: var(--ink);
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border-hairline);
-}
-.sc-why-fix {
-  margin-top: auto;
-}
-.sc-why-fix .sc-mast-eyebrow {
-  display: block;
   margin-bottom: var(--space-2);
 }
-.sc-why-fix p {
+.sc-cred-card p {
   font: var(--text-body-small);
-  color: var(--ink);
+  color: var(--ink-body);
 }
 
 @media (max-width: 900px) {
-  .sc-why-inner {
+  .sc-cred-inner {
     padding: 80px 24px 90px;
   }
-  .sc-why-grid {
+  .sc-cred-grid {
     grid-template-columns: 1fr;
   }
 }

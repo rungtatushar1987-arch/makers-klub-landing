@@ -15,6 +15,11 @@
 .sc-events-title {
   font-size: clamp(32px, 4vw, 48px);
 }
+.sc-events-note {
+  font: var(--text-body-small);
+  color: var(--ink-muted);
+  margin-bottom: var(--space-4);
+}
 
 /* Raised panel off the page, per the design system — not page-level white */
 .sc-luma-frame {

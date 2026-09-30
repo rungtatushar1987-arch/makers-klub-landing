@@ -1,0 +1,25 @@
+.sc-manifesto {
+  position: relative;
+  z-index: 1;
+  background: var(--brand-navy);
+  padding: 90px 64px;
+  display: flex;
+  justify-content: center;
+}
+.sc-manifesto-line {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 3.2vw, 36px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--brand-on-navy);
+  text-align: center;
+  max-width: 780px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .sc-manifesto {
+    padding: 70px 24px;
+  }
+}
