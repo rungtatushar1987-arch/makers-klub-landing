@@ -9,6 +9,54 @@ export const FOUNDING_SPOTS_LEFT = '[X]'
 export const FOUNDING_SPOTS_TOTAL = '[Y]'
 export const FOUNDING_DEADLINE = '[DATE]'
 
+export const TIERS = [
+  {
+    key: 'free',
+    name: 'Free',
+    tagline: 'See what it’s like',
+    monthly: '€0',
+    yearly: '€0',
+    unit: '',
+    highlight: false,
+    included: [
+      'Access to general Slack channels',
+      'Free events, by approval and availability',
+    ],
+  },
+  {
+    key: 'lite',
+    name: 'Lite',
+    tagline: 'For getting involved',
+    monthly: '€20',
+    yearly: '€200',
+    unit: '',
+    highlight: false,
+    included: [
+      'Full Slack community access',
+      'Priority access to free events',
+      '15% off paid events & workshops',
+      '1 free supported event per quarter*',
+    ],
+  },
+  {
+    key: 'premium',
+    name: 'Premium',
+    tagline: 'Full membership',
+    monthly: '€49.99',
+    yearly: '€499.99',
+    unit: '',
+    highlight: true,
+    included: [
+      'Full Slack community access',
+      'Priority access to ALL events',
+      '30% off paid events & workshops',
+      'Host 2 free webinars with us per quarter*',
+      'Weekly job board and listings',
+    ],
+  },
+]
+export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and member engagement.'
+
 export const HOW_IT_WORKS = {
   eyebrow: 'HOW IT WORKS',
   cards: [

@@ -26,29 +26,49 @@
   text-align: left;
 }
 
+.sc-plan-toggle-standalone {
+  margin: 0 auto 32px;
+}
+
 .sc-tier-grid {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
   text-align: left;
 }
 .sc-tier-card {
+  position: relative;
   width: 100%;
-  max-width: 420px;
   background: var(--surface-page);
-  border: 1px solid var(--gold);
-  box-shadow: var(--shadow-cta);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
 }
+.sc-tier-card[data-highlight="true"] {
+  border: 1px solid var(--gold);
+  box-shadow: var(--shadow-cta);
+}
+.sc-tier-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  color: var(--ink);
+  font: var(--text-tag);
+  font-size: 11px;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
 .sc-tier-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--space-4) var(--space-4) var(--space-3);
+  padding: var(--space-4) var(--space-4) 0;
 }
 .sc-tier-name {
   font: var(--text-headline-sm);
+  font-size: 22px;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
@@ -57,12 +77,6 @@
   font-size: 13px;
   color: var(--ink-muted);
   margin-top: var(--space-1);
-}
-.sc-tier-price-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-2);
 }
 .sc-plan-toggle {
   display: inline-flex;
@@ -92,36 +106,29 @@
 .sc-tier-price {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 28px;
+  font-size: 32px;
   color: var(--gold-text);
-  text-align: right;
   white-space: nowrap;
-  min-width: 4.5ch;
+  padding: var(--space-3) var(--space-4) 0;
 }
 .sc-tier-price span {
-  display: block;
   font: var(--text-body-small);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--ink-muted);
   text-transform: uppercase;
-  margin-top: var(--space-1);
-}
-.sc-tier-session-note {
-  font: var(--text-body-small);
-  font-size: 13px;
-  color: var(--ink-muted);
-  padding: 0 var(--space-4) var(--space-3);
-  text-align: left;
+  margin-left: 6px;
 }
 
 .sc-tier-included {
   list-style: none;
   padding: var(--space-3) var(--space-4) var(--space-4);
+  margin-top: var(--space-3);
   border-top: 1px solid var(--border-hairline);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  flex: 1;
 }
 .sc-tier-included li {
   display: flex;
@@ -138,32 +145,36 @@
 .sc-membership-cta {
   display: flex;
   justify-content: center;
-  margin: 0 var(--space-4) var(--space-3);
+  margin: var(--space-4) var(--space-4) var(--space-4);
+}
+.sc-membership-cta-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-full);
+  font: var(--text-button);
+  padding: 13px 24px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.sc-membership-cta-outline:hover {
+  border-color: var(--gold);
 }
 .sc-tier-fine-print {
   font: var(--text-body-small);
   font-size: 12px;
   color: var(--ink-muted);
   text-align: center;
-  padding: 0 var(--space-4) var(--space-4);
+  margin-top: var(--space-4);
 }
 
 @media (max-width: 900px) {
   .sc-membership {
     padding: 80px 24px 90px;
   }
-}
-
-@media (max-width: 480px) {
-  .sc-tier-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-  }
-  .sc-tier-price-col {
-    align-items: flex-start;
-  }
-  .sc-tier-price {
-    text-align: left;
+  .sc-tier-grid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin: 0 auto;
   }
 }

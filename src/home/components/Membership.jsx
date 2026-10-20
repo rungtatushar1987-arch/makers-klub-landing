@@ -1,32 +1,9 @@
 import { useState } from 'react'
 import './Membership.css'
-import {
-  CTA_URL,
-  CTA_LABEL,
-  FOUNDING_OPEN,
-  FOUNDING_SPOTS_LEFT,
-  FOUNDING_SPOTS_TOTAL,
-  FOUNDING_DEADLINE,
-} from '../content'
-
-const PLANS = {
-  monthly: { label: 'Monthly', price: '€49.99', unit: '/ month', caption: 'Billed monthly' },
-  yearly: { label: 'Yearly', price: '€499.99', unit: '/ year', caption: 'Billed yearly' },
-}
-
-const INCLUDED = [
-  'Foundation video library',
-  'Private Slack with 24-hour weekday answers',
-  'Monthly live session',
-  'Expert AMAs twice a month',
-  'Berlin meetups',
-  'Resource library',
-  "Referrals once you've done the work",
-]
+import { CTA_URL, CTA_LABEL, TIERS, TIERS_FINE_PRINT } from '../content'
 
 export default function Membership() {
   const [billing, setBilling] = useState('monthly')
-  const plan = PLANS[billing]
 
   return (
     <section className="sc-membership" id="membership">
@@ -35,70 +12,62 @@ export default function Membership() {
           <span className="sc-mast-eyebrow">Membership</span>
         </div>
         <h2 className="h-xl sc-membership-heading">
-          One plan. <em>Everything</em> included.
+          Pick the level that <em>fits</em> you.
         </h2>
 
-        {FOUNDING_OPEN && (
-          <div className="sc-founding-banner">
-            Founding members pay €20/month for as long as they stay. {FOUNDING_SPOTS_LEFT} of{' '}
-            {FOUNDING_SPOTS_TOTAL} spots left, until {FOUNDING_DEADLINE}.
-          </div>
-        )}
+        <div className="sc-plan-toggle sc-plan-toggle-standalone" role="radiogroup" aria-label="Billing period">
+          {['monthly', 'yearly'].map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={billing === key}
+              className="sc-plan-toggle-btn"
+              data-active={billing === key}
+              onClick={() => setBilling(key)}
+            >
+              {key === 'monthly' ? 'Monthly' : 'Yearly'}
+            </button>
+          ))}
+        </div>
 
         <div className="sc-tier-grid">
-          <div className="sc-tier-card">
-            <div className="sc-tier-top">
-              <div>
-                <div className="sc-tier-name">Membership</div>
-                <div className="sc-tier-tagline">{plan.caption}</div>
-              </div>
-              <div className="sc-tier-price-col">
-                <div className="sc-plan-toggle" role="radiogroup" aria-label="Billing period">
-                  {Object.entries(PLANS).map(([key, p]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      role="radio"
-                      aria-checked={billing === key}
-                      className="sc-plan-toggle-btn"
-                      data-active={billing === key}
-                      onClick={() => setBilling(key)}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="sc-tier-price">
-                  {plan.price}
-                  <span>{plan.unit}</span>
+          {TIERS.map((tier) => (
+            <div key={tier.key} className="sc-tier-card" data-highlight={tier.highlight}>
+              {tier.highlight && <div className="sc-tier-badge">Most popular</div>}
+              <div className="sc-tier-top">
+                <div>
+                  <div className="sc-tier-name">{tier.name}</div>
+                  <div className="sc-tier-tagline">{tier.tagline}</div>
                 </div>
               </div>
+
+              <div className="sc-tier-price">
+                {billing === 'monthly' ? tier.monthly : tier.yearly}
+                <span>{tier.monthly === '€0' ? 'forever' : billing === 'monthly' ? '/ month' : '/ year'}</span>
+              </div>
+
+              <ul className="sc-tier-included">
+                {tier.included.map((item) => (
+                  <li key={item}>
+                    <span className="sc-fit-emoji">👉</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href={CTA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={tier.highlight ? 'btn-solid sc-membership-cta' : 'sc-membership-cta sc-membership-cta-outline'}
+              >
+                {tier.name === 'Free' ? 'Join Free' : CTA_LABEL} →
+              </a>
             </div>
-
-            <p className="sc-tier-session-note">
-              The monthly live session alone costs non-members €40.
-            </p>
-
-            <ul className="sc-tier-included">
-              {INCLUDED.map((item) => (
-                <li key={item}>
-                  <span className="sc-fit-emoji">👉</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href={CTA_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-solid sc-membership-cta"
-            >
-              {CTA_LABEL} →
-            </a>
-            <p className="sc-tier-fine-print">€49.99/month or €499.99/year.</p>
-          </div>
+          ))}
         </div>
+        <p className="sc-tier-fine-print">{TIERS_FINE_PRINT}</p>
       </div>
     </section>
   )
