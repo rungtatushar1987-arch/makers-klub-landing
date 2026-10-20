@@ -47,15 +47,17 @@ export const TIERS = [
     unit: '',
     highlight: true,
     included: [
-      'Full Slack community access',
+      'Full access to the Slack community and channels',
       'Priority access to ALL events',
-      '30% off paid events & workshops',
+      '30% off all paid events & workshops',
       'Host 2 free webinars per quarter with full support*',
-      'Weekly job board and listings',
+      'Weekly Job board and listings',
+      '1 x 30-mins AMA with Tushar Rungta for event hosting and community-building',
+      '10% off on “Community Building for Business” coaching with Tushar Rungta',
     ],
   },
 ]
-export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and member engagement.'
+export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and members’ community engagement and event attendance.'
 
 export const HOW_IT_WORKS = {
   eyebrow: 'HOW IT WORKS',
