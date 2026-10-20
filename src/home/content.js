@@ -28,7 +28,7 @@ export const TIERS = [
     name: 'Lite',
     tagline: 'For getting involved',
     monthly: '€19.99',
-    yearly: '€200',
+    yearly: '€229',
     unit: '',
     highlight: false,
     included: [
