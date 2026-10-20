@@ -28,7 +28,7 @@ export default function Hero() {
           <a href="#how-it-works" className="btn-ghost">See how it works</a>
         </div>
 
-        <p className="sc-hero-note">Free to join. Paid tiers from €20/month.</p>
+        <p className="sc-hero-note">Free to join. Paid tiers from €19.99/month.</p>
       </div>
 
       <div className="sc-hero-scroll">
