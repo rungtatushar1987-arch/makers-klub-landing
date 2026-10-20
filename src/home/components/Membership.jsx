@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './Membership.css'
-import { CTA_URL, CTA_LABEL, TIERS, TIERS_FINE_PRINT } from '../content'
+import { CTA_URL, CTA_LABEL, TIERS, TIERS_FINE_PRINT, BUSINESS_TIER } from '../content'
 
 export default function Membership() {
   const [billing, setBilling] = useState('monthly')
@@ -68,6 +68,25 @@ export default function Membership() {
           ))}
         </div>
         <p className="sc-tier-fine-print">{TIERS_FINE_PRINT}</p>
+
+        <div className="sc-business-card">
+          <div className="sc-business-copy">
+            <div className="sc-tier-name">{BUSINESS_TIER.name}</div>
+            <div className="sc-tier-tagline">{BUSINESS_TIER.tagline}</div>
+            <p className="sc-business-note">{BUSINESS_TIER.note}</p>
+            <a href={BUSINESS_TIER.ctaUrl} className="btn-solid sc-business-cta">
+              {BUSINESS_TIER.cta} →
+            </a>
+          </div>
+          <ul className="sc-business-list">
+            {BUSINESS_TIER.included.map((item) => (
+              <li key={item}>
+                <span className="sc-fit-emoji">👉</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )
