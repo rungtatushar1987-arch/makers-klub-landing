@@ -50,9 +50,9 @@ export const TIERS = [
       'Full access to the Slack community and channels',
       'Priority access to ALL events',
       '30% off all paid events & workshops',
-      'Host 2 free webinars per quarter with full support*',
       'Weekly Job board and listings',
-      '1 x 30-mins AMA with Tushar Rungta for event hosting and community-building',
+      'Chance to host one quarterly webinar with end-to-end promotional support to grow your business.*',
+      '1 x 30-mins consultation with Tushar Rungta for event hosting and community-building (worth €125)',
       '10% off on “Community Building for Business” coaching with Tushar Rungta',
     ],
   },
@@ -70,7 +70,7 @@ export const BUSINESS_TIER = {
   ctaUrl: 'mailto:contact@tusharrungta.com?subject=Hosting%20or%20coaching%20for%20my%20business',
   note: 'Custom pricing, based on what you need.',
 }
-export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and members’ community engagement and event attendance.'
+export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and members’ community engagement.'
 
 export const HOW_IT_WORKS = {
   eyebrow: 'HOW IT WORKS',
