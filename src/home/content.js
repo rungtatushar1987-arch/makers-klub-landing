@@ -67,6 +67,7 @@ export const BUSINESS_TIER = {
     '“Community Building for Business” coaching with Tushar Rungta',
   ],
   cta: 'Talk to us',
+  email: 'contact@tusharrungta.com',
   ctaUrl: 'mailto:contact@tusharrungta.com?subject=Hosting%20or%20coaching%20for%20my%20business',
   note: 'Custom pricing, based on what you need.',
 }

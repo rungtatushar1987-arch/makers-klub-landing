@@ -77,6 +77,9 @@ export default function Membership() {
             <a href={BUSINESS_TIER.ctaUrl} className="btn-solid sc-business-cta">
               {BUSINESS_TIER.cta} →
             </a>
+            <p className="sc-email-fallback">
+              Or email <a href={`mailto:${BUSINESS_TIER.email}`}>{BUSINESS_TIER.email}</a>
+            </p>
           </div>
           <ul className="sc-business-list">
             {BUSINESS_TIER.included.map((item) => (

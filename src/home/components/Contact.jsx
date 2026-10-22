@@ -19,6 +19,9 @@ export default function Contact() {
             <a href={`mailto:${CONTACT.email}`} className="btn-solid">Get in touch →</a>
             <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a>
           </div>
+          <p className="sc-email-fallback">
+            Or email <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          </p>
         </div>
       </div>
     </section>

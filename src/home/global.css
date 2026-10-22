@@ -174,3 +174,7 @@ em {
   html { scroll-behavior: auto; }
   .fade-up { opacity: 1; transform: none; transition: none; }
 }
+
+/* Visible address next to mailto buttons, for visitors with no mail app */
+.sc-email-fallback { font: var(--text-body-small); color: var(--ink-body); margin-top: var(--space-3); }
+.sc-email-fallback a { color: var(--accent-blue); font-weight: 600; word-break: break-all; }

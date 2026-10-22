@@ -25,13 +25,20 @@ export default function App() {
     }
 
     const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve()
-    fontsReady.then(() => requestAnimationFrame(scrollToHash))
+    fontsReady.then(() => requestAnimationFrame(() => { scrollToHash(); revealNow() }))
+
+    let revealNow = () => {}
 
     // Fade-up on scroll: reveal each block once its top enters the lower part of the viewport.
     // Classes are added here (not in markup) so no-JS visitors see everything.
-    let pending = Array.from(
-      document.querySelectorAll('section > div[class$="-inner"], .sc-hero-content')
-    ).filter((el) => el.getBoundingClientRect().top >= window.innerHeight)
+    const blocks = Array.from(
+      document.querySelectorAll('section > div[class*="-inner"], .sc-hero-content')
+    )
+    // Hide only blocks below the fold; also pick up any left hidden by an earlier run of this effect
+    let pending = blocks.filter((el) => {
+      if (el.classList.contains('in')) return false
+      return el.classList.contains('fade-up') || el.getBoundingClientRect().top >= window.innerHeight
+    })
     pending.forEach((el) => el.classList.add('fade-up'))
 
     const reveal = () => {
@@ -41,14 +48,25 @@ export default function App() {
         el.classList.add('in')
         return false
       })
-      if (!pending.length) window.removeEventListener('scroll', reveal)
+      if (!pending.length) {
+        window.removeEventListener('scroll', reveal)
+        clearInterval(poll)
+      }
     }
+    // Safety net: anchor jumps and late layout shifts don't always emit a scroll event
+    const poll = setInterval(() => reveal(), 300)
+    revealNow = reveal
     reveal()
+    window.addEventListener('hashchange', reveal)
+    window.addEventListener('load', reveal)
     window.addEventListener('scroll', reveal, { passive: true })
     window.addEventListener('resize', reveal)
     return () => {
+      clearInterval(poll)
       window.removeEventListener('scroll', reveal)
       window.removeEventListener('resize', reveal)
+      window.removeEventListener('hashchange', reveal)
+      window.removeEventListener('load', reveal)
     }
   }, [])
 
