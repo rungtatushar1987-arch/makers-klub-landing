@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
-import WhatsIncluded from './components/WhatsIncluded'
 import FitCheck from './components/FitCheck'
 import EventsEmbed from './components/EventsEmbed'
 import Membership from './components/Membership'
@@ -62,7 +61,6 @@ export default function App() {
       <Marquee />
       <EventsEmbed />
       <Membership />
-      <WhatsIncluded />
       <FitCheck />
       <Newsletter />
       <Testimonials />

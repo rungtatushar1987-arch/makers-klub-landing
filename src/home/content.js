@@ -207,32 +207,32 @@ export const PARTNERS = { logos: [], href: 'mailto:contact@tusharrungta.com?subj
 // Answers are derived from existing site copy only.
 export const FAQ = [
   {
-    q: 'Who is the club for?',
+    q: 'Is The Solopreneurs Club free to join?',
+    a: 'Yes, there is a free membership at €0. It gets you the general Slack channels and free events, by approval and availability. Lite is €19.99/month or €229/year. Premium is €49.99/month or €499.99/year.',
+  },
+  {
+    q: 'Who can join The Solopreneurs Club?',
     a: "Freelancers in Germany who've freelanced for a year or more, have a few clients (mostly from their network or an old employer) and want to know what to fix next. If you're still deciding whether to freelance, or have no paying clients yet, it's too early.",
   },
   {
-    q: 'What does it cost?',
-    a: 'Free membership costs €0. Lite is €19.99/month or €229/year. Premium is €49.99/month or €499.99/year. Founders and businesses who want to host an event or take coaching get custom pricing.',
+    q: 'When is the next live session?',
+    a: 'We run a live session every month, plus expert AMAs twice a month. Dates are on the Upcoming Sessions calendar above.',
   },
   {
-    q: 'What happens after I join?',
-    a: 'Weeks 1 to 3 are the foundation: a video library on LinkedIn, positioning, messaging, your website, pricing, pitching and German admin, plus a kick-off call. After that you get the private Slack, a monthly live session, expert AMAs and reserved spots at Berlin meetups.',
+    q: 'How do I hear about upcoming events?',
+    a: 'Follow the calendar above, subscribe to our newsletter, or join the Slack community, where members hear first.',
   },
   {
-    q: 'How fast do I get answers in Slack?',
-    a: 'Coaches answer questions within 24 hours on weekdays.',
+    q: 'Do I need to live in Berlin?',
+    a: 'No. The club is for freelancers in Germany. Slack and the monthly live session (which is recorded) work from anywhere. The meetups and workshops are in Berlin.',
   },
   {
-    q: 'Can I come to events without being a member?',
-    a: 'Yes. Monthly live sessions are free for members and €40 for everyone else. Free-tier members can join free events by approval and availability.',
+    q: 'Are the live sessions and events free?',
+    a: 'Monthly live sessions are free for members and €40 for everyone else. Free-tier members can join free events by approval and availability. Lite members get 15% off paid events and workshops, and Premium members get 30% off.',
   },
   {
-    q: 'Will you find me clients?',
-    a: "No. We build freelancers that clients want. Once you've finished the foundation checklist, we start recommending you to partners in our network.",
-  },
-  {
-    q: 'Can my business host an event or take coaching?',
-    a: 'Yes. Host an event with us to reach our community of freelancers, founders and consultants, or take "Community Building for Business" coaching with Tushar Rungta. Get in touch for pricing.',
+    q: 'How can I partner with The Solopreneurs Club?',
+    a: 'Founders and businesses can host an event with us to reach our community of freelancers, founders and consultants, or take "Community Building for Business" coaching with Tushar Rungta. Email contact@tusharrungta.com and we will talk through what you need.',
   },
 ]
 
