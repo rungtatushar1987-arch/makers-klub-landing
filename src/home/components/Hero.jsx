@@ -1,5 +1,5 @@
 import './Hero.css'
-import { CTA_URL, CTA_LABEL } from '../content'
+import { CTA_URL, CTA_LABEL, HERO_SUBHEAD } from '../content'
 
 export default function Hero() {
   return (
@@ -15,17 +15,13 @@ export default function Hero() {
           Where freelancers in Germany learn to run the <em>business side</em>.
         </h1>
 
-        <p className="sc-hero-desc">
-          A members-only club for freelancers in Germany past their first year. Fix your
-          foundation first, then get daily coaching on real client work, a live session every
-          month, expert AMAs and a Berlin network that recommends you when it counts.
-        </p>
+        <p className="sc-hero-desc">{HERO_SUBHEAD}</p>
 
         <div className="sc-hero-actions">
           <a href={CTA_URL} target="_blank" rel="noopener noreferrer" className="btn-solid">
             {CTA_LABEL} →
           </a>
-          <a href="#how-it-works" className="btn-ghost">See how it works</a>
+          <a href="#about" className="link-underline sc-hero-link">Learn more →</a>
         </div>
 
         <p className="sc-hero-note">Free to join. Paid tiers from €19.99/month.</p>

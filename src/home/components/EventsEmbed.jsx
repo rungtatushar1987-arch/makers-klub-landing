@@ -1,4 +1,5 @@
 import './EventsEmbed.css'
+import { EVENTS_ACCESS } from '../content'
 
 // Public calendar page (vanity URL). The embed route still needs the cal- id.
 const LUMA_CALENDAR_URL = 'https://luma.com/thesolopreneursclub'
@@ -43,6 +44,14 @@ export default function EventsEmbed() {
             view full calendar →
           </a>
         </p>
+
+        <div className="sc-events-access">
+          <div>
+            <h3>{EVENTS_ACCESS.title}</h3>
+            <p>{EVENTS_ACCESS.body}</p>
+          </div>
+          <a href={EVENTS_ACCESS.href} className="btn-solid">{EVENTS_ACCESS.cta} →</a>
+        </div>
       </div>
     </section>
   )

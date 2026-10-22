@@ -67,3 +67,98 @@
     padding: 11px 18px;
   }
 }
+
+/* ── Section links, scroll-spy and hamburger ── */
+.sc-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-left: auto;
+  margin-right: var(--space-4);
+}
+.sc-nav-link {
+  font: var(--text-body-small);
+  font-weight: 600;
+  color: var(--ink-body);
+  text-decoration: none;
+  padding: var(--space-1) 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sc-nav-link:hover,
+.sc-nav-link[data-active='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+}
+.sc-nav-cta-menu,
+.sc-nav-burger {
+  display: none;
+}
+.sc-nav-burger {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.sc-nav-burger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--ink);
+  transition: transform 0.2s, opacity 0.2s;
+}
+.sc-nav[data-open='true'] .sc-nav-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.sc-nav[data-open='true'] .sc-nav-burger span:nth-child(2) { opacity: 0; }
+.sc-nav[data-open='true'] .sc-nav-burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 900px) {
+  .sc-nav-burger {
+    display: flex;
+  }
+  .sc-nav-right {
+    margin-left: auto;
+  }
+  .sc-nav-links {
+    position: absolute;
+    top: 76px;
+    left: 0;
+    right: 0;
+    margin: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--space-3) 24px var(--space-4);
+    background: var(--surface-page);
+    border-bottom: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-card);
+    display: none;
+  }
+  .sc-nav[data-open='true'] .sc-nav-links {
+    display: flex;
+  }
+  .sc-nav-link {
+    font-size: 17px;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .sc-nav-cta-menu {
+    display: inline-block;
+    text-align: center;
+    margin-top: var(--space-3);
+  }
+}
+@media (max-width: 560px) {
+  .sc-nav-right .sc-nav-cta {
+    display: none;
+  }
+  .sc-nav-links {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

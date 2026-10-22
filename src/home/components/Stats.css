@@ -1,0 +1,7 @@
+.sc-stats { background: var(--brand-navy); padding: var(--space-5) 64px; }
+.sc-stats-inner { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+.sc-stat { text-align: center; }
+.sc-stat-value { font: var(--text-headline-lg); color: var(--gold); letter-spacing: -0.02em; }
+.sc-stat-label { font: var(--text-body-small); color: rgba(255,255,255,0.8); margin-top: var(--space-2); }
+@media (max-width: 900px) { .sc-stats { padding: var(--space-5) 24px; } .sc-stats-inner { grid-template-columns: repeat(2, 1fr); gap: var(--space-5) var(--space-3); } .sc-stat-value { font-size: 36px; } }
+@media (max-width: 560px) { .sc-stats { padding-left: 16px; padding-right: 16px; } }

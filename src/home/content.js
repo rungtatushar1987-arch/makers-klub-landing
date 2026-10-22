@@ -147,3 +147,106 @@ export const FIT_CHECK = {
     ],
   },
 }
+
+// ── FFB-style page structure additions ──────────────────────────────────
+// Sections whose arrays/values are empty/null are NOT rendered (no placeholders).
+// Fill them in here and they appear.
+
+export const NAV_LINKS = [
+  { id: 'about', label: 'About' },
+  { id: 'events', label: 'Events' },
+  { id: 'membership', label: 'Membership' },
+  { id: 'faq', label: 'FAQ' },
+  { id: 'contact', label: 'Contact' },
+]
+
+export const HERO_SUBHEAD =
+  'Foundation first. Then daily coaching, expert AMAs and a Berlin network that vouches for you.'
+
+// 350+ members is counted by newsletter subscribers. Months running and events
+// hosted are not in the repo: add them here when known.
+export const STATS = [
+  { value: '350+', label: 'Members across the community' },
+  { value: '24h', label: 'Coach answers in Slack, on weekdays' },
+  { value: '2×', label: 'Expert AMAs every month' },
+  { value: '1×', label: 'Live session every month' },
+]
+
+export const ABOUT = {
+  eyebrow: 'ABOUT THE CLUB',
+  statement: MANIFESTO,
+  paragraphs: [
+    'A members-only club for freelancers in Germany past their first year. Fix your foundation first, then get daily coaching on real client work, a live session every month, expert AMAs and a Berlin network that recommends you when it counts.',
+    "Tax advisors, lawyers, sales coaches and senior freelancers run our AMAs and answer member questions. We work with startups and companies across Berlin, and they ask us for freelancers. We can't promise you clients. We can put your name in front of people who hire, once you've done the work.",
+  ],
+  image: '/hero.jpg', // reuses the hero photo: no separate About photo exists yet
+  imageAlt: 'Members at a Solopreneurs Club event in Berlin',
+}
+
+export const EVENTS_ACCESS = {
+  title: 'Want access to everything?',
+  body: 'Members get priority on every event, discounts on paid workshops and the full Slack community.',
+  cta: 'See membership',
+  href: '#membership',
+}
+
+// Newsletter runs on Substack. Set SUBSTACK_URL to the publication, e.g.
+// 'https://yourname.substack.com'. The section stays hidden until it is set.
+export const SUBSTACK_URL = 'https://thesolopreneursclub.substack.com'
+export const NEWSLETTER = {
+  action: SUBSTACK_URL ? `${SUBSTACK_URL}/api/v1/free?nojs=true` : null,
+  eyebrow: 'STAY IN THE LOOP',
+  title: 'Get new sessions and resources by email',
+  body: 'Join 350+ freelancers and founders. Upcoming sessions, new resources and what we are learning, straight to your inbox.',
+  consent: 'I agree to receive The Solopreneurs Club newsletter by email via Substack and can unsubscribe at any time.',
+}
+
+export const TESTIMONIALS = [] // [{ quote, name, role }]
+export const PARTNERS = { logos: [], href: 'mailto:contact@tusharrungta.com?subject=Partnering%20with%20The%20Solopreneurs%20Club' } // logos: [{ name, src, url }]
+
+// Answers are derived from existing site copy only.
+export const FAQ = [
+  {
+    q: 'Who is the club for?',
+    a: "Freelancers in Germany who've freelanced for a year or more, have a few clients (mostly from their network or an old employer) and want to know what to fix next. If you're still deciding whether to freelance, or have no paying clients yet, it's too early.",
+  },
+  {
+    q: 'What does it cost?',
+    a: 'Free membership costs €0. Lite is €19.99/month or €229/year. Premium is €49.99/month or €499.99/year. Founders and businesses who want to host an event or take coaching get custom pricing.',
+  },
+  {
+    q: 'What happens after I join?',
+    a: 'Weeks 1 to 3 are the foundation: a video library on LinkedIn, positioning, messaging, your website, pricing, pitching and German admin, plus a kick-off call. After that you get the private Slack, a monthly live session, expert AMAs and reserved spots at Berlin meetups.',
+  },
+  {
+    q: 'How fast do I get answers in Slack?',
+    a: 'Coaches answer questions within 24 hours on weekdays.',
+  },
+  {
+    q: 'Can I come to events without being a member?',
+    a: 'Yes. Monthly live sessions are free for members and €40 for everyone else. Free-tier members can join free events by approval and availability.',
+  },
+  {
+    q: 'Will you find me clients?',
+    a: "No. We build freelancers that clients want. Once you've finished the foundation checklist, we start recommending you to partners in our network.",
+  },
+  {
+    q: 'Can my business host an event or take coaching?',
+    a: 'Yes. Host an event with us to reach our community of freelancers, founders and consultants, or take "Community Building for Business" coaching with Tushar Rungta. Get in touch for pricing.',
+  },
+]
+
+export const FINAL_CTA = {
+  title: 'Join The Solopreneurs Club',
+  note: 'Free to join. Paid tiers from €19.99/month.',
+  image: '/hero.jpg',
+}
+
+export const CONTACT = {
+  eyebrow: 'CONTACT',
+  title: 'Questions? Talk to a person.',
+  note: 'About membership, hosting an event with us, or coaching for your business.',
+  founder: { name: 'Tushar Rungta', role: 'Founder', photo: '/founder.jpg' },
+  email: 'contact@tusharrungta.com',
+  linkedin: 'https://www.linkedin.com/in/tusharrungta',
+}

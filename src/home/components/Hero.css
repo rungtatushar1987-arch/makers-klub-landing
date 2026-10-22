@@ -167,3 +167,8 @@
     justify-content: center;
   }
 }
+
+/* Secondary text link sits on the navy photo: white, not accent-blue */
+.sc-hero-link { color: #fff; border-bottom-color: rgba(255,255,255,0.7); align-self: center; }
+.sc-hero-link:hover { color: #fff; border-color: var(--gold); }
+@media (max-width: 560px) { .sc-hero-actions .sc-hero-link { align-self: flex-start; } }

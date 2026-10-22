@@ -1,0 +1,7 @@
+.sc-final { position: relative; padding: 140px 64px; background-color: var(--brand-navy); background-size: cover; background-position: center; text-align: center; }
+.sc-final::before { content: ''; position: absolute; inset: 0; background: rgba(1, 27, 62, 0.74); }
+.sc-final-inner { position: relative; max-width: 900px; margin: 0 auto; }
+.sc-final h2 { font: var(--text-headline-lg); font-size: clamp(32px, 4.4vw, 56px); letter-spacing: -0.02em; color: #fff; margin-bottom: var(--space-5); }
+.sc-final p { font: var(--text-body-small); color: rgba(255,255,255,0.8); margin-top: var(--space-3); }
+@media (max-width: 900px) { .sc-final { padding: 96px 24px; } }
+@media (max-width: 560px) { .sc-final { padding-left: 16px; padding-right: 16px; } }

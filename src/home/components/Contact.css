@@ -1,0 +1,10 @@
+.sc-contact { padding: 96px 64px; }
+.sc-contact-inner { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: center; }
+.sc-contact-title { margin-bottom: var(--space-3); }
+.sc-contact-card { background: var(--surface-raised); border-radius: var(--radius-lg); padding: var(--space-5); }
+.sc-contact-card img { width: 120px; height: 120px; border-radius: var(--radius-full); object-fit: cover; object-position: 50% 38%; margin-bottom: var(--space-3); }
+.sc-contact-name { font: var(--text-headline-sm); color: var(--ink); }
+.sc-contact-role { font: var(--text-body-small); color: var(--ink-muted); margin-bottom: var(--space-4); }
+.sc-contact-actions { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+@media (max-width: 900px) { .sc-contact { padding: 64px 24px; } .sc-contact-inner { grid-template-columns: 1fr; gap: var(--space-4); } }
+@media (max-width: 560px) { .sc-contact { padding-left: 16px; padding-right: 16px; } .sc-contact-card { padding: var(--space-4) var(--space-3); } }

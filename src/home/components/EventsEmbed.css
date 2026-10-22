@@ -56,3 +56,8 @@
     padding: 80px 24px 90px;
   }
 }
+
+.sc-events-access { margin-top: var(--space-5); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; background: var(--brand-navy); border-radius: var(--radius-lg); padding: var(--space-5); }
+.sc-events-access h3 { font: var(--text-headline-sm); color: #fff; margin-bottom: var(--space-2); }
+.sc-events-access p { font: var(--text-body); color: rgba(255,255,255,0.8); max-width: 520px; }
+@media (max-width: 560px) { .sc-events-access { padding: var(--space-4) var(--space-3); } .sc-events-access .btn-solid { width: 100%; justify-content: center; } }

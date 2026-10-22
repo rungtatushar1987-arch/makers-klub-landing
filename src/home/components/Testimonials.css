@@ -1,0 +1,13 @@
+.sc-testi { padding: 96px 64px; }
+.sc-testi-inner, .sc-partners-inner { max-width: 1120px; margin: 0 auto; }
+.sc-testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+.sc-testi-card { background: var(--surface-raised); border-radius: var(--radius-lg); padding: var(--space-5) var(--space-4); }
+.sc-testi-card blockquote { font: var(--text-body); color: var(--ink); margin-bottom: var(--space-4); }
+.sc-testi-card figcaption strong { display: block; color: var(--ink); font: var(--text-button); }
+.sc-testi-card figcaption span { font: var(--text-body-small); color: var(--ink-muted); }
+.sc-partners { padding: 48px 64px; border-top: 1px solid var(--border-hairline); border-bottom: 1px solid var(--border-hairline); }
+.sc-partners-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
+.sc-partners-row { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+.sc-partners-row img { height: 36px; width: auto; display: block; opacity: 0.8; }
+@media (max-width: 900px) { .sc-testi { padding: 64px 24px; } .sc-testi-grid { grid-template-columns: 1fr; } .sc-partners { padding: 40px 24px; } }
+@media (max-width: 560px) { .sc-testi, .sc-partners { padding-left: 16px; padding-right: 16px; } }

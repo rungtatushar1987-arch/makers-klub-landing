@@ -1,0 +1,8 @@
+.sc-about { padding: 96px 64px; }
+.sc-about-inner { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--space-6); align-items: center; }
+.sc-about-statement { font: var(--text-headline-sm); font-size: clamp(24px, 2.6vw, 32px); margin-bottom: var(--space-4); }
+.sc-about-p { margin-bottom: var(--space-3); max-width: 560px; }
+.sc-about .link-underline { margin-top: var(--space-2); }
+.sc-about-photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius-lg); display: block; }
+@media (max-width: 900px) { .sc-about { padding: 64px 24px; } .sc-about-inner { grid-template-columns: 1fr; gap: var(--space-5); } .sc-about-photo { aspect-ratio: 16 / 10; } }
+@media (max-width: 560px) { .sc-about { padding-left: 16px; padding-right: 16px; } }

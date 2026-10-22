@@ -163,3 +163,14 @@ em {
   background: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
 }
+
+/* Anchor targets sit below the fixed 76px nav */
+#about, #how-it-works, #faq, #contact, #newsletter { scroll-margin-top: 96px; }
+
+/* Fade-up on scroll — classes are added by JS (see App.jsx), so no-JS shows everything */
+.fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-up.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fade-up { opacity: 1; transform: none; transition: none; }
+}
