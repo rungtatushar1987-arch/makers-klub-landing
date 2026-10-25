@@ -8,7 +8,7 @@ type Contact = {
   joined_at: string | null
 }
 type LumaEvent = { luma_event_id: string; name: string | null; start_at: string | null; city: string | null; period: string | null }
-type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; role: string | null; linkedin_url: string | null }
+type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; role: string | null; linkedin_url: string | null }
 
 const TIERS = ['Super-regular', 'Regular', 'One-timer', 'Registered-not-attended'] as const
 type Tier = typeof TIERS[number]
@@ -68,7 +68,7 @@ export default function CommunityDashboard() {
       const [c, e, r] = await Promise.all([
         fetchAll<Contact>(db, 'luma_contacts', 'luma_user_id,email,name,revenue_usd_cents,event_approved_count,event_checked_in_count,joined_at'),
         fetchAll<LumaEvent>(db, 'luma_events', 'luma_event_id,name,start_at,city,period'),
-        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,role,linkedin_url'),
+        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,role,linkedin_url'),
       ])
       setContacts(c); setEvents(e); setRegs(r); setError(null)
     } catch (err) {
@@ -129,7 +129,7 @@ export default function CommunityDashboard() {
     const counts = new Map<string, { registered: number; approved: number }>()
     for (const r of regs) {
       const c = counts.get(r.luma_event_id) ?? { registered: 0, approved: 0 }
-      c.registered++
+      if (r.is_registration) c.registered++
       if (r.approval_status === 'approved') c.approved++
       counts.set(r.luma_event_id, c)
     }
