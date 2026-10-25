@@ -34,7 +34,7 @@
   gap: 16px;
 }
 .sc-nav-cta {
-  background: var(--gold);
+  background: #cdb27e;
   color: var(--on-gold);
   border: none;
   border-radius: var(--radius-full);
@@ -48,7 +48,7 @@
 .sc-nav-cta:hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(187, 148, 78, 0.48);
+  box-shadow: 0 12px 26px rgba(205, 178, 126, 0.48);
 }
 
 @media (max-width: 900px) {

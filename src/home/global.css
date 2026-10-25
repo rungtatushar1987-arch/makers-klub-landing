@@ -123,7 +123,7 @@ em {
 
 /* Primary: gold fill, ink label (never white on gold) */
 .btn-solid {
-  background: var(--gold);
+  background: #cdb27e;
   color: var(--on-gold);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
@@ -140,7 +140,7 @@ em {
 .btn-solid:hover {
   filter: brightness(1.06);
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(187, 148, 78, 0.48);
+  box-shadow: 0 14px 30px rgba(205, 178, 126, 0.48);
 }
 
 /* Outline: brand-on-navy label + border, reserved for brand-navy grounds
