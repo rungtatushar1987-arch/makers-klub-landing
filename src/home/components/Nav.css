@@ -35,7 +35,7 @@
 }
 .sc-nav-cta {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--on-gold);
   border: none;
   border-radius: var(--radius-full);
   padding: 11px 26px;
@@ -78,6 +78,7 @@
 }
 .sc-nav-link {
   font: var(--text-body-small);
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink-body);
   text-decoration: none;

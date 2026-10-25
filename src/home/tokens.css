@@ -27,6 +27,7 @@
   --brand-on-navy:   #ffffff;   /* wordmark inside the badge; outline button label/border */
   --gold:            #bb944e;   /* solid fills only: Join/Become a Member/Apply buttons, ticker, membership border */
   --gold-text:       #7e6128;   /* gold set as text: eyebrows, the €50 price */
+  --on-gold:         #1c1405;   /* label on gold fills: warm near-black instead of navy */
   --tag-blue:        #145ce4;
   --tag-blue-bg:     #dee5fd;
   --tag-orange:      #ce8a13;

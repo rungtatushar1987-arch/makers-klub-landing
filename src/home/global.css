@@ -124,7 +124,7 @@ em {
 /* Primary: gold fill, ink label (never white on gold) */
 .btn-solid {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--on-gold);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
   padding: 15px 28px;

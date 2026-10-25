@@ -68,7 +68,7 @@
   align-items: center;
   gap: 10px;
   background: var(--gold);
-  color: var(--ink);
+  color: var(--on-gold);
   border-radius: var(--radius-full);
   padding: 9px 20px;
   font: var(--text-eyebrow);

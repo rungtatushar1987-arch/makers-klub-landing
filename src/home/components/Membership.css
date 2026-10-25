@@ -56,7 +56,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--gold);
-  color: var(--ink);
+  color: var(--on-gold);
   font: var(--text-tag);
   font-size: 11px;
   padding: 4px 14px;
@@ -97,7 +97,7 @@
 }
 .sc-plan-toggle-btn[data-active="true"] {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--on-gold);
 }
 .sc-plan-toggle-btn:focus-visible {
   outline: 2px solid var(--accent-blue);
