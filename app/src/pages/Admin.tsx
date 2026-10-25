@@ -3,6 +3,7 @@ import { useUser, useSession } from '@clerk/clerk-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getSupabaseClient, getInitials, type Profile, type Event, type Resource, RESOURCE_CATEGORIES, type Gig, GIG_TYPES, MK_ADMIN_USER_IDS } from '../supabase'
 import Recommendations from './Recommendations'
+import CommunityDashboard from './CommunityDashboard'
 import './Admin.css'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -25,11 +26,11 @@ export type AdminEvent = Event & {
 
 type EventAttendee = { clerk_user_id: string; profile?: Profile }
 
-type Tab = 'members' | 'events' | 'gigs' | 'analytics' | 'recommendations' | 'resources'
+type Tab = 'members' | 'community' | 'events' | 'gigs' | 'analytics' | 'recommendations' | 'resources'
 // 'events', 'resources', 'analytics' and 'recommendations' are hidden from the UI for now —
 // not in VALID_TABS, so a direct ?tab=... link to any of them falls back to 'members' too.
 // Code kept intact for later.
-const VALID_TABS: Tab[] = ['members', 'gigs']
+const VALID_TABS: Tab[] = ['members', 'community', 'gigs']
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -533,6 +534,9 @@ export default function Admin() {
             )}
           </>
         )}
+
+        {/* ══ COMMUNITY ══ */}
+        {tab === 'community' && <CommunityDashboard />}
 
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (

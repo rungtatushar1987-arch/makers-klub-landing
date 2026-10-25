@@ -72,6 +72,7 @@ export default function Sidebar() {
             <div className="mkw-nav-label" style={{ marginTop: 14 }}>Organiser</div>
             {([
               { tab: 'members',         icon: '👥', label: 'Members'     },
+              { tab: 'community',       icon: '📊', label: 'Community'   },
               { tab: 'gigs',            icon: '💼', label: 'Gigs'        },
             ] as const).map(({ tab, icon, label }) => (
               <Link
