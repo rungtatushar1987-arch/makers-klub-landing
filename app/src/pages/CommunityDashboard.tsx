@@ -7,7 +7,7 @@ type Contact = {
   joined_at: string | null
 }
 type LumaEvent = { luma_event_id: string; name: string | null; start_at: string | null; city: string | null; period: string | null }
-type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; checked_in_at: string | null; ticket_amount_cents: number | null; ticket_currency: string | null; role: string | null; linkedin_url: string | null }
+type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; checked_in_at: string | null; order_amount_cents: number | null; order_refunded_cents: number | null; role: string | null; linkedin_url: string | null }
 
 const TIERS = ['Super-regular', 'Regular', 'One-timer', 'Never registered'] as const
 type Tier = typeof TIERS[number]
@@ -22,7 +22,7 @@ function tierOf(approvedEvents: number): Tier {
 
 // One row per person: contacts that share a person_key are the same person with several emails.
 type Row = {
-  key: string; name: string | null; emails: string[]; revenue_eur_cents: number; joined_at: string | null
+  key: string; name: string | null; emails: string[]; revenue_eur_cents: number; refunded_eur_cents: number; joined_at: string | null
   approved_events: number; checked_in: number; role: string | null; linkedin: string | null; tier: Tier
 }
 type SortKey = 'name' | 'role' | 'tier' | 'approved_events' | 'revenue_eur_cents'
@@ -37,6 +37,13 @@ async function fetchAll<T>(db: ReturnType<typeof getSupabaseClient>, table: stri
     if (!data || data.length < 1000) return out
   }
 }
+
+// The Solopreneurs Club LinkedIn follower count. Update by hand; LinkedIn has no feed we can read.
+const LINKEDIN_FOLLOWERS = 407
+
+// All-time ticket sales from Luma > Payment, in EUR. Luma's API doesn't expose this total, so update by hand.
+// The per-person revenue column below sums the orders we could load (EUR 685), which is slightly lower.
+const LUMA_TICKET_REVENUE_EUR = 720
 
 const monthKey = (iso: string) => iso.slice(0, 7)
 const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0)
@@ -59,6 +66,8 @@ function Bars({ items, max }: { items: { label: string; value: number }[]; max?:
 export default function CommunityDashboard() {
   const { session } = useSession()
   const [contacts, setContacts] = useState<Contact[]>([])
+  // People on the Luma calendar's list; excludes guests who only appear on event guest lists (raw is null).
+  const [registeredPeople, setRegisteredPeople] = useState(0)
   const [events, setEvents] = useState<LumaEvent[]>([])
   const [regs, setRegs] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
@@ -72,9 +81,10 @@ export default function CommunityDashboard() {
       const [c, e, r] = await Promise.all([
         fetchAll<Contact>(db, 'luma_contacts', 'luma_user_id,email,person_key,name,joined_at'),
         fetchAll<LumaEvent>(db, 'luma_events', 'luma_event_id,name,start_at,city,period'),
-        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,checked_in_at,ticket_amount_cents,ticket_currency,role,linkedin_url'),
+        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,checked_in_at,order_amount_cents,order_refunded_cents,role,linkedin_url'),
       ])
-      setContacts(c); setEvents(e); setRegs(r); setError(null)
+      const { count } = await db.from('luma_contacts').select('luma_user_id', { count: 'exact', head: true }).not('raw', 'is', null)
+      setContacts(c); setEvents(e); setRegs(r); setRegisteredPeople(count ?? 0); setError(null)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -91,14 +101,14 @@ export default function CommunityDashboard() {
       const k = c.person_key ?? c.email
       people.set(k, [...(people.get(k) ?? []), c])
     }
-    const stats = new Map<string, { events: Set<string>; checkedIn: number; paidCents: number; roles: Map<string, number>; linkedin: string | null }>()
+    const stats = new Map<string, { events: Set<string>; checkedIn: number; paidCents: number; refundedCents: number; roles: Map<string, number>; linkedin: string | null }>()
     for (const r of regs) {
       const k = keyOf.get(r.contact_email) ?? r.contact_email
-      const st = stats.get(k) ?? { events: new Set<string>(), checkedIn: 0, paidCents: 0, roles: new Map<string, number>(), linkedin: null }
-      if (r.approval_status === 'approved') {
-        st.events.add(r.luma_event_id)
-        if (r.ticket_currency?.toLowerCase() === 'eur') st.paidCents += r.ticket_amount_cents ?? 0
-      }
+      const st = stats.get(k) ?? { events: new Set<string>(), checkedIn: 0, paidCents: 0, refundedCents: 0, roles: new Map<string, number>(), linkedin: null }
+      if (r.approval_status === 'approved') st.events.add(r.luma_event_id)
+      // Gross captured EUR orders, as Luma's Payment page counts them (includes later-refunded and declined guests).
+      st.paidCents += r.order_amount_cents ?? 0
+      st.refundedCents += r.order_refunded_cents ?? 0
       if (r.checked_in_at) st.checkedIn++
       if (r.role) st.roles.set(r.role, (st.roles.get(r.role) ?? 0) + 1)
       if (r.linkedin_url) st.linkedin = r.linkedin_url
@@ -114,6 +124,7 @@ export default function CommunityDashboard() {
         name: cs.map(c => c.name).filter((n): n is string => !!n?.trim()).sort((a, b) => b.length - a.length)[0] ?? null,
         emails: cs.map(c => c.email).sort(),
         revenue_eur_cents: st?.paidCents ?? 0,
+        refunded_eur_cents: st?.refundedCents ?? 0,
         joined_at: joined,
         approved_events: approved,
         checked_in: st?.checkedIn ?? 0,
@@ -132,8 +143,6 @@ export default function CommunityDashboard() {
       // Share of people who registered at least once that came back for a second event.
       repeat: pct(rows.filter(r => r.approved_events >= 2).length, rows.filter(r => r.approved_events >= 1).length),
       checkin: pct(checkedIn, approved),
-      revenue: rows.reduce((s, r) => s + r.revenue_eur_cents, 0) / 100,
-      linkedin: rows.filter(r => r.linkedin).length,
     }
   }, [rows])
 
@@ -189,13 +198,14 @@ export default function CommunityDashboard() {
     <div className="adm-analytics">
       <div className="mkw-stats adm-stats">
         {[
-          { lbl: 'People', num: kpis.total },
-          { lbl: 'Repeat attendance', num: `${kpis.repeat}%` },
-          { lbl: 'Check-in rate', num: `${kpis.checkin}%` },
-          { lbl: 'Ticket revenue', num: `€${kpis.revenue.toLocaleString('en', { maximumFractionDigits: 0 })}` },
-          { lbl: 'LinkedIn captured', num: kpis.linkedin },
+          { lbl: 'Active members', num: LINKEDIN_FOLLOWERS, delta: 'LinkedIn followers' },
+          { lbl: 'Registered', num: registeredPeople, delta: 'on the Luma calendar, for events and the newsletter' },
+          { lbl: 'People', num: kpis.total, delta: 'unique people in our data, duplicate emails merged' },
+          { lbl: 'Repeat attendance', num: `${kpis.repeat}%`, delta: 'of people who registered came to 2+ events' },
+          { lbl: 'Check-in rate', num: `${kpis.checkin}%`, delta: 'of approved registrations checked in' },
+          { lbl: 'Ticket revenue', num: `€${LUMA_TICKET_REVENUE_EUR.toLocaleString('en')}`, delta: 'all-time ticket sales, from Luma Payment' },
         ].map(s => (
-          <div key={s.lbl} className="mkw-stat"><div className="lbl">{s.lbl}</div><div className="num">{s.num}</div></div>
+          <div key={s.lbl} className="mkw-stat"><div className="lbl">{s.lbl}</div><div className="num">{s.num}</div><div className="delta">{s.delta}</div></div>
         ))}
       </div>
 

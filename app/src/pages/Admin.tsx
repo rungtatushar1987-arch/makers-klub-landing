@@ -48,9 +48,6 @@ function gigTypeLabel(type: Gig['type']) {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-// The Solopreneurs Club LinkedIn follower count. Update by hand; LinkedIn has no feed we can read.
-const LINKEDIN_FOLLOWERS = 407
-
 const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
 
 const AV_COLORS = [
@@ -150,8 +147,6 @@ export default function Admin() {
   const [actioningGigId, setActioningGigId] = useState<string | null>(null)
   const [deletingGigId, setDeletingGigId] = useState<string | null>(null)
 
-  const [registeredPeople, setRegisteredPeople] = useState(0)
-
   // Stats
   const [stats, setStats] = useState({
     totalMembers: 0, totalEvents: 0, totalRsvps: 0,
@@ -245,14 +240,6 @@ export default function Admin() {
     setMembersLoading(false)
   }, [session])
 
-  // People on the Luma calendar's list (event registrants and newsletter), excluding guests added from event guest lists only.
-  const loadRegisteredPeople = useCallback(async () => {
-    if (!session) return
-    const db = getSupabaseClient(await session.getToken())
-    const { count } = await db.from('luma_contacts').select('luma_user_id', { count: 'exact', head: true }).not('raw', 'is', null)
-    setRegisteredPeople(count ?? 0)
-  }, [session])
-
   const loadEvents = useCallback(async () => {
     if (!session) return
     setEventsLoading(true)
@@ -341,7 +328,7 @@ export default function Admin() {
   }, [session])
 
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadRegisteredPeople(); loadEvents(); loadResources(); loadGigs() }
+    if (isAdmin) { loadMembers(); loadEvents(); loadResources(); loadGigs() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
@@ -502,20 +489,6 @@ export default function Admin() {
       </div>
 
       <div className="mkw-main-body">
-
-        {/* Stats bar */}
-        <div className="mkw-stats adm-stats">
-          {[
-            { lbl: 'Active members', num: LINKEDIN_FOLLOWERS, delta: 'LinkedIn followers' },
-            { lbl: 'Registered',     num: registeredPeople,  delta: 'for events and the newsletter' },
-          ].map(s => (
-            <div key={s.lbl} className="mkw-stat">
-              <div className="lbl">{s.lbl}</div>
-              <div className="num">{s.num}</div>
-              <div className="delta">{s.delta}</div>
-            </div>
-          ))}
-        </div>
 
         {/* ══ MEMBERS ══ */}
         {tab === 'members' && (
