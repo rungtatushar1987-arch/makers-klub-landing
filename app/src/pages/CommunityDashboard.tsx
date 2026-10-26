@@ -8,12 +8,19 @@ type Contact = {
 }
 type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; checked_in_at: string | null; order_amount_cents: number | null; order_refunded_cents: number | null; linkedin_url: string | null }
 
+// A person is active when they attended at least ACTIVE_MIN_EVENTS events in the last ACTIVE_WINDOW_MONTHS
+// months. Attended = approved registration (check-ins are not recorded for online events).
+const ACTIVE_WINDOW_MONTHS = 3
+const ACTIVE_MIN_EVENTS = 2
+
+type LumaEvent = { luma_event_id: string; start_at: string | null }
+
 // One row per person: contacts that share a person_key are the same person with several emails.
 type Row = {
   key: string; name: string | null; emails: string[]; revenue_eur_cents: number; refunded_eur_cents: number; joined_at: string | null
-  approved_events: number; checked_in: number; linkedin: string | null
+  approved_events: number; recent_events: number; active: boolean; checked_in: number; linkedin: string | null
 }
-type SortKey = 'name' | 'approved_events' | 'revenue_eur_cents'
+type SortKey = 'name' | 'approved_events' | 'recent_events' | 'revenue_eur_cents'
 
 // PostgREST caps responses at 1000 rows, so page through.
 async function fetchAll<T>(db: ReturnType<typeof getSupabaseClient>, table: string, cols: string): Promise<T[]> {
@@ -41,6 +48,7 @@ export default function CommunityDashboard() {
   // People on the Luma calendar's list; excludes guests who only appear on event guest lists (raw is null).
   const [registeredPeople, setRegisteredPeople] = useState(0)
   const [regs, setRegs] = useState<Registration[]>([])
+  const [events, setEvents] = useState<LumaEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -49,12 +57,13 @@ export default function CommunityDashboard() {
   const load = useCallback(async () => {
     try {
       const db = getSupabaseClient(await session?.getToken())
-      const [c, r] = await Promise.all([
+      const [c, r, e] = await Promise.all([
         fetchAll<Contact>(db, 'luma_contacts', 'luma_user_id,email,person_key,name,joined_at'),
         fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,checked_in_at,order_amount_cents,order_refunded_cents,linkedin_url'),
+        fetchAll<LumaEvent>(db, 'luma_events', 'luma_event_id,start_at'),
       ])
       const { count } = await db.from('luma_contacts').select('luma_user_id', { count: 'exact', head: true }).not('raw', 'is', null)
-      setContacts(c); setRegs(r); setRegisteredPeople(count ?? 0); setError(null)
+      setContacts(c); setRegs(r); setEvents(e); setRegisteredPeople(count ?? 0); setError(null)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -64,6 +73,14 @@ export default function CommunityDashboard() {
 
   useEffect(() => { load() }, [load])
 
+  // Events held in the activity window (past events only).
+  const windowEvents = useMemo(() => {
+    const now = new Date()
+    const from = new Date(now)
+    from.setMonth(from.getMonth() - ACTIVE_WINDOW_MONTHS)
+    return new Set(events.filter(e => e.start_at && new Date(e.start_at) < now && new Date(e.start_at) >= from).map(e => e.luma_event_id))
+  }, [events])
+
   const rows: Row[] = useMemo(() => {
     const keyOf = new Map(contacts.map(c => [c.email, c.person_key ?? c.email]))
     const people = new Map<string, Contact[]>()
@@ -71,11 +88,14 @@ export default function CommunityDashboard() {
       const k = c.person_key ?? c.email
       people.set(k, [...(people.get(k) ?? []), c])
     }
-    const stats = new Map<string, { events: Set<string>; checkedIn: number; paidCents: number; refundedCents: number; linkedin: string | null }>()
+    const stats = new Map<string, { events: Set<string>; recent: Set<string>; checkedIn: number; paidCents: number; refundedCents: number; linkedin: string | null }>()
     for (const r of regs) {
       const k = keyOf.get(r.contact_email) ?? r.contact_email
-      const st = stats.get(k) ?? { events: new Set<string>(), checkedIn: 0, paidCents: 0, refundedCents: 0, linkedin: null }
-      if (r.approval_status === 'approved') st.events.add(r.luma_event_id)
+      const st = stats.get(k) ?? { events: new Set<string>(), recent: new Set<string>(), checkedIn: 0, paidCents: 0, refundedCents: 0, linkedin: null }
+      if (r.approval_status === 'approved') {
+        st.events.add(r.luma_event_id)
+        if (windowEvents.has(r.luma_event_id)) st.recent.add(r.luma_event_id)
+      }
       // Gross captured EUR orders, as Luma's Payment page counts them (includes later-refunded and declined guests).
       st.paidCents += r.order_amount_cents ?? 0
       st.refundedCents += r.order_refunded_cents ?? 0
@@ -95,11 +115,13 @@ export default function CommunityDashboard() {
         refunded_eur_cents: st?.refundedCents ?? 0,
         joined_at: joined,
         approved_events: approved,
+        recent_events: st?.recent.size ?? 0,
+        active: (st?.recent.size ?? 0) >= ACTIVE_MIN_EVENTS,
         checked_in: st?.checkedIn ?? 0,
         linkedin: st?.linkedin ?? null,
       }
     })
-  }, [contacts, regs])
+  }, [contacts, regs, windowEvents])
 
   const kpis = useMemo(() => {
     const approved = rows.reduce((s, r) => s + r.approved_events, 0)
@@ -147,11 +169,13 @@ export default function CommunityDashboard() {
         ))}
       </div>
 
+      <p className="adm-table-empty" style={{ textAlign: 'left' }}>{rows.filter(r => r.active).length} active: attended at least {ACTIVE_MIN_EVENTS} of the {windowEvents.size} events held in the last {ACTIVE_WINDOW_MONTHS} months.</p>
       <input className="adm-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search people by name or email…" />
       <div className="mkw-card adm-table-card">
         <div className="adm-thead cd-contacts-grid">
           {th('name', 'Contact')}
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'approved_events', dir: s.key === 'approved_events' ? (-s.dir as 1 | -1) : -1 }))}>Events{sort.key === 'approved_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
+          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'recent_events', dir: s.key === 'recent_events' ? (-s.dir as 1 | -1) : -1 }))}>Last {ACTIVE_WINDOW_MONTHS} months{sort.key === 'recent_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_eur_cents', dir: s.key === 'revenue_eur_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_eur_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="adm-col-center">LinkedIn</span>
         </div>
@@ -160,6 +184,7 @@ export default function CommunityDashboard() {
           <div key={r.key} className="adm-mrow cd-contacts-grid">
             <span className="adm-mrow-name-wrap"><div className="adm-mrow-name">{r.name || '(no name)'}</div><div className="adm-mrow-bio">{r.emails.join(', ')}</div></span>
             <span className="adm-col-center">{r.approved_events}</span>
+            <span className="adm-col-center">{r.recent_events} of {windowEvents.size}{r.active ? ' · Active' : ''}</span>
             <span className="adm-col-center">€{(r.revenue_eur_cents / 100).toFixed(0)}</span>
             <span className="adm-col-center">{r.linkedin ? <a href={r.linkedin} target="_blank" rel="noreferrer">↗</a> : '—'}</span>
           </div>
