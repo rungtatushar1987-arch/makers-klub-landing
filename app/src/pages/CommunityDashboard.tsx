@@ -175,7 +175,7 @@ export default function CommunityDashboard() {
         <div className="adm-thead cd-contacts-grid">
           {th('name', 'Contact')}
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'approved_events', dir: s.key === 'approved_events' ? (-s.dir as 1 | -1) : -1 }))}>Events{sort.key === 'approved_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'recent_events', dir: s.key === 'recent_events' ? (-s.dir as 1 | -1) : -1 }))}>Last {ACTIVE_WINDOW_MONTHS} months{sort.key === 'recent_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
+          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'recent_events', dir: s.key === 'recent_events' ? (-s.dir as 1 | -1) : -1 }))}>Status{sort.key === 'recent_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_eur_cents', dir: s.key === 'revenue_eur_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_eur_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="adm-col-center">LinkedIn</span>
         </div>
@@ -184,7 +184,7 @@ export default function CommunityDashboard() {
           <div key={r.key} className="adm-mrow cd-contacts-grid">
             <span className="adm-mrow-name-wrap"><div className="adm-mrow-name">{r.name || '(no name)'}</div><div className="adm-mrow-bio">{r.emails.join(', ')}</div></span>
             <span className="adm-col-center">{r.approved_events}</span>
-            <span className="adm-col-center">{r.recent_events} of {windowEvents.size}{r.active ? ' · Active' : ''}</span>
+            <span className="adm-col-center">{r.active ? 'Active' : 'Inactive'}</span>
             <span className="adm-col-center">€{(r.revenue_eur_cents / 100).toFixed(0)}</span>
             <span className="adm-col-center">{r.linkedin ? <a href={r.linkedin} target="_blank" rel="noreferrer">↗</a> : '—'}</span>
           </div>
