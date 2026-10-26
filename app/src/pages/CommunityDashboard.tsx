@@ -4,10 +4,10 @@ import { getSupabaseClient } from '../supabase'
 
 type Contact = {
   luma_user_id: string; email: string; person_key: string | null; name: string | null
-  revenue_usd_cents: number; joined_at: string | null
+  joined_at: string | null
 }
 type LumaEvent = { luma_event_id: string; name: string | null; start_at: string | null; city: string | null; period: string | null }
-type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; checked_in_at: string | null; role: string | null; linkedin_url: string | null }
+type Registration = { luma_event_id: string; contact_email: string; approval_status: string | null; is_registration: boolean; checked_in_at: string | null; ticket_amount_cents: number | null; ticket_currency: string | null; role: string | null; linkedin_url: string | null }
 
 const TIERS = ['Super-regular', 'Regular', 'One-timer', 'Never registered'] as const
 type Tier = typeof TIERS[number]
@@ -22,10 +22,10 @@ function tierOf(approvedEvents: number): Tier {
 
 // One row per person: contacts that share a person_key are the same person with several emails.
 type Row = {
-  key: string; name: string | null; emails: string[]; revenue_usd_cents: number; joined_at: string | null
+  key: string; name: string | null; emails: string[]; revenue_eur_cents: number; joined_at: string | null
   approved_events: number; checked_in: number; role: string | null; linkedin: string | null; tier: Tier
 }
-type SortKey = 'name' | 'role' | 'tier' | 'approved_events' | 'revenue_usd_cents'
+type SortKey = 'name' | 'role' | 'tier' | 'approved_events' | 'revenue_eur_cents'
 
 // PostgREST caps responses at 1000 rows, so page through.
 async function fetchAll<T>(db: ReturnType<typeof getSupabaseClient>, table: string, cols: string): Promise<T[]> {
@@ -70,9 +70,9 @@ export default function CommunityDashboard() {
     try {
       const db = getSupabaseClient(await session?.getToken())
       const [c, e, r] = await Promise.all([
-        fetchAll<Contact>(db, 'luma_contacts', 'luma_user_id,email,person_key,name,revenue_usd_cents,joined_at'),
+        fetchAll<Contact>(db, 'luma_contacts', 'luma_user_id,email,person_key,name,joined_at'),
         fetchAll<LumaEvent>(db, 'luma_events', 'luma_event_id,name,start_at,city,period'),
-        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,checked_in_at,role,linkedin_url'),
+        fetchAll<Registration>(db, 'luma_guest_registrations', 'luma_event_id,contact_email,approval_status,is_registration,checked_in_at,ticket_amount_cents,ticket_currency,role,linkedin_url'),
       ])
       setContacts(c); setEvents(e); setRegs(r); setError(null)
     } catch (err) {
@@ -91,11 +91,14 @@ export default function CommunityDashboard() {
       const k = c.person_key ?? c.email
       people.set(k, [...(people.get(k) ?? []), c])
     }
-    const stats = new Map<string, { events: Set<string>; checkedIn: number; roles: Map<string, number>; linkedin: string | null }>()
+    const stats = new Map<string, { events: Set<string>; checkedIn: number; paidCents: number; roles: Map<string, number>; linkedin: string | null }>()
     for (const r of regs) {
       const k = keyOf.get(r.contact_email) ?? r.contact_email
-      const st = stats.get(k) ?? { events: new Set<string>(), checkedIn: 0, roles: new Map<string, number>(), linkedin: null }
-      if (r.approval_status === 'approved') st.events.add(r.luma_event_id)
+      const st = stats.get(k) ?? { events: new Set<string>(), checkedIn: 0, paidCents: 0, roles: new Map<string, number>(), linkedin: null }
+      if (r.approval_status === 'approved') {
+        st.events.add(r.luma_event_id)
+        if (r.ticket_currency?.toLowerCase() === 'eur') st.paidCents += r.ticket_amount_cents ?? 0
+      }
       if (r.checked_in_at) st.checkedIn++
       if (r.role) st.roles.set(r.role, (st.roles.get(r.role) ?? 0) + 1)
       if (r.linkedin_url) st.linkedin = r.linkedin_url
@@ -110,7 +113,7 @@ export default function CommunityDashboard() {
         key,
         name: cs.map(c => c.name).filter((n): n is string => !!n?.trim()).sort((a, b) => b.length - a.length)[0] ?? null,
         emails: cs.map(c => c.email).sort(),
-        revenue_usd_cents: cs.reduce((t, c) => t + c.revenue_usd_cents, 0),
+        revenue_eur_cents: st?.paidCents ?? 0,
         joined_at: joined,
         approved_events: approved,
         checked_in: st?.checkedIn ?? 0,
@@ -126,9 +129,10 @@ export default function CommunityDashboard() {
     const checkedIn = rows.reduce((s, r) => s + r.checked_in, 0)
     return {
       total: rows.length,
-      repeat: pct(rows.filter(r => r.approved_events >= 2).length, rows.length),
+      // Share of people who registered at least once that came back for a second event.
+      repeat: pct(rows.filter(r => r.approved_events >= 2).length, rows.filter(r => r.approved_events >= 1).length),
       checkin: pct(checkedIn, approved),
-      revenue: rows.reduce((s, r) => s + r.revenue_usd_cents, 0) / 100,
+      revenue: rows.reduce((s, r) => s + r.revenue_eur_cents, 0) / 100,
       linkedin: rows.filter(r => r.linkedin).length,
     }
   }, [rows])
@@ -188,7 +192,7 @@ export default function CommunityDashboard() {
           { lbl: 'People', num: kpis.total },
           { lbl: 'Repeat attendance', num: `${kpis.repeat}%` },
           { lbl: 'Check-in rate', num: `${kpis.checkin}%` },
-          { lbl: 'Revenue (USD)', num: `$${kpis.revenue.toLocaleString('en', { maximumFractionDigits: 0 })}` },
+          { lbl: 'Ticket revenue', num: `€${kpis.revenue.toLocaleString('en', { maximumFractionDigits: 0 })}` },
           { lbl: 'LinkedIn captured', num: kpis.linkedin },
         ].map(s => (
           <div key={s.lbl} className="mkw-stat"><div className="lbl">{s.lbl}</div><div className="num">{s.num}</div></div>
@@ -220,7 +224,7 @@ export default function CommunityDashboard() {
         <div className="adm-thead cd-contacts-grid">
           {th('name', 'Contact')}{th('role', 'Role')}{th('tier', 'Tier')}
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'approved_events', dir: s.key === 'approved_events' ? (-s.dir as 1 | -1) : -1 }))}>Events{sort.key === 'approved_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_usd_cents', dir: s.key === 'revenue_usd_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_usd_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
+          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_eur_cents', dir: s.key === 'revenue_eur_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_eur_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="adm-col-center">LinkedIn</span>
         </div>
         {tableRows.length === 0 && <p className="adm-table-empty">No people found.</p>}
@@ -230,7 +234,7 @@ export default function CommunityDashboard() {
             <span>{r.role ?? '—'}</span>
             <span>{r.tier}</span>
             <span className="adm-col-center">{r.approved_events}</span>
-            <span className="adm-col-center">${(r.revenue_usd_cents / 100).toFixed(0)}</span>
+            <span className="adm-col-center">€{(r.revenue_eur_cents / 100).toFixed(0)}</span>
             <span className="adm-col-center">{r.linkedin ? <a href={r.linkedin} target="_blank" rel="noreferrer">↗</a> : '—'}</span>
           </div>
         ))}

@@ -237,8 +237,16 @@ export default function Admin() {
     })
 
     setMembers(rows)
-    setStats(s => ({ ...s, totalMembers: rows.filter(m => !m.clerk_user_id.startsWith('mock_')).length }))
     setMembersLoading(false)
+  }, [session])
+
+  // Community members = people with an approved Luma calendar membership (one count per person).
+  const loadLumaMembers = useCallback(async () => {
+    if (!session) return
+    const db = getSupabaseClient(await session.getToken())
+    const { data } = await db.from('luma_contacts').select('email,person_key').eq('membership_status', 'approved')
+    const people = new Set((data || []).map((c: any) => c.person_key ?? c.email))
+    setStats(s => ({ ...s, totalMembers: people.size }))
   }, [session])
 
   const loadEvents = useCallback(async () => {
@@ -329,7 +337,7 @@ export default function Admin() {
   }, [session])
 
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadEvents(); loadResources(); loadGigs() }
+    if (isAdmin) { loadMembers(); loadLumaMembers(); loadEvents(); loadResources(); loadGigs() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
