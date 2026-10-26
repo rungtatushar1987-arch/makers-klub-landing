@@ -15,12 +15,26 @@ const ACTIVE_MIN_EVENTS = 2
 
 type LumaEvent = { luma_event_id: string; start_at: string | null }
 
+// Engagement score, 0-100, per person:
+//   Attendance 40  = 20 for events attended (ATTEND_FULL_AT or more) + 20 for being active lately (ACTIVE_MIN_EVENTS in the window)
+//   Showing up 30  = 10 for events registered for (REGISTER_FULL_AT or more) + 20 for checking in after registering
+//   Spend 30       = net EUR spent on tickets, linear up to SPEND_FULL_AT
+// Check-ins are only recorded for some in-person events, so follow-through is judged only on events that have
+// any check-ins; someone with no such events gets half marks, and someone with no attended events gets none.
+const ATTEND_FULL_AT = 5
+const REGISTER_FULL_AT = 5
+const SPEND_FULL_AT_CENTS = 5000
+
+type Score = { total: number; attendance: number; showingUp: number; spend: number }
+const part = (value: number, fullAt: number, points: number) => Math.min(value, fullAt) / fullAt * points
+
 // One row per person: contacts that share a person_key are the same person with several emails.
 type Row = {
   key: string; name: string | null; emails: string[]; revenue_eur_cents: number; refunded_eur_cents: number; joined_at: string | null
   approved_events: number; recent_events: number; active: boolean; checked_in: number; linkedin: string | null
+  engagement: number; score: Score
 }
-type SortKey = 'name' | 'approved_events' | 'recent_events' | 'revenue_eur_cents'
+type SortKey = 'name' | 'engagement' | 'approved_events' | 'recent_events' | 'revenue_eur_cents'
 
 // PostgREST caps responses at 1000 rows, so page through.
 async function fetchAll<T>(db: ReturnType<typeof getSupabaseClient>, table: string, cols: string): Promise<T[]> {
@@ -52,7 +66,7 @@ export default function CommunityDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'approved_events', dir: -1 })
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'engagement', dir: -1 })
 
   const load = useCallback(async () => {
     try {
@@ -81,6 +95,9 @@ export default function CommunityDashboard() {
     return new Set(events.filter(e => e.start_at && new Date(e.start_at) < now && new Date(e.start_at) >= from).map(e => e.luma_event_id))
   }, [events])
 
+  // Events where check-ins were recorded at all.
+  const trackedEvents = useMemo(() => new Set(regs.filter(r => r.checked_in_at).map(r => r.luma_event_id)), [regs])
+
   const rows: Row[] = useMemo(() => {
     const keyOf = new Map(contacts.map(c => [c.email, c.person_key ?? c.email]))
     const people = new Map<string, Contact[]>()
@@ -88,10 +105,10 @@ export default function CommunityDashboard() {
       const k = c.person_key ?? c.email
       people.set(k, [...(people.get(k) ?? []), c])
     }
-    const stats = new Map<string, { events: Set<string>; recent: Set<string>; checkedIn: number; paidCents: number; refundedCents: number; linkedin: string | null }>()
+    const stats = new Map<string, { events: Set<string>; recent: Set<string>; registered: Set<string>; checkedEvents: Set<string>; checkedIn: number; paidCents: number; refundedCents: number; linkedin: string | null }>()
     for (const r of regs) {
       const k = keyOf.get(r.contact_email) ?? r.contact_email
-      const st = stats.get(k) ?? { events: new Set<string>(), recent: new Set<string>(), checkedIn: 0, paidCents: 0, refundedCents: 0, linkedin: null }
+      const st = stats.get(k) ?? { events: new Set<string>(), recent: new Set<string>(), registered: new Set<string>(), checkedEvents: new Set<string>(), checkedIn: 0, paidCents: 0, refundedCents: 0, linkedin: null }
       if (r.approval_status === 'approved') {
         st.events.add(r.luma_event_id)
         if (windowEvents.has(r.luma_event_id)) st.recent.add(r.luma_event_id)
@@ -99,13 +116,23 @@ export default function CommunityDashboard() {
       // Gross captured EUR orders, as Luma's Payment page counts them (includes later-refunded and declined guests).
       st.paidCents += r.order_amount_cents ?? 0
       st.refundedCents += r.order_refunded_cents ?? 0
-      if (r.checked_in_at) st.checkedIn++
+      if (r.is_registration) st.registered.add(r.luma_event_id)
+      if (r.checked_in_at) { st.checkedIn++; st.checkedEvents.add(r.luma_event_id) }
       if (r.linkedin_url) st.linkedin = r.linkedin_url
       stats.set(k, st)
     }
     return [...people.entries()].map(([key, cs]) => {
       const st = stats.get(key)
       const approved = st?.events.size ?? 0
+      const recent = st?.recent.size ?? 0
+      const trackedApproved = st ? [...st.events].filter(e => trackedEvents.has(e)).length : 0
+      const showedUp = st ? [...st.checkedEvents].filter(e => st.events.has(e)).length : 0
+      const followThrough = approved === 0 ? 0 : trackedApproved === 0 ? 0.5 : Math.min(showedUp / trackedApproved, 1)
+      const net = Math.max((st?.paidCents ?? 0) - (st?.refundedCents ?? 0), 0)
+      const attendance = part(approved, ATTEND_FULL_AT, 20) + part(recent, ACTIVE_MIN_EVENTS, 20)
+      const showingUp = part(st?.registered.size ?? 0, REGISTER_FULL_AT, 10) + followThrough * 20
+      const spend = part(net, SPEND_FULL_AT_CENTS, 30)
+      const score: Score = { attendance: Math.round(attendance), showingUp: Math.round(showingUp), spend: Math.round(spend), total: Math.round(attendance + showingUp + spend) }
       const joined = cs.map(c => c.joined_at).filter((d): d is string => !!d).sort()[0] ?? null
       return {
         key,
@@ -119,9 +146,11 @@ export default function CommunityDashboard() {
         active: (st?.recent.size ?? 0) >= ACTIVE_MIN_EVENTS,
         checked_in: st?.checkedIn ?? 0,
         linkedin: st?.linkedin ?? null,
+        engagement: score.total,
+        score,
       }
     })
-  }, [contacts, regs, windowEvents])
+  }, [contacts, regs, windowEvents, trackedEvents])
 
   const kpis = useMemo(() => {
     const approved = rows.reduce((s, r) => s + r.approved_events, 0)
@@ -170,10 +199,12 @@ export default function CommunityDashboard() {
       </div>
 
       <p className="adm-table-empty" style={{ textAlign: 'left' }}>{rows.filter(r => r.active).length} active: attended at least {ACTIVE_MIN_EVENTS} of the {windowEvents.size} events held in the last {ACTIVE_WINDOW_MONTHS} months.</p>
+      <p className="adm-table-empty" style={{ textAlign: 'left' }}>Engagement score (0-100): attendance 40, showing up 30, spend 30. Hover a score for the breakdown.</p>
       <input className="adm-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search people by name or email…" />
       <div className="mkw-card adm-table-card">
         <div className="adm-thead cd-contacts-grid">
           {th('name', 'Contact')}
+          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'engagement', dir: s.key === 'engagement' ? (-s.dir as 1 | -1) : -1 }))}>Engagement{sort.key === 'engagement' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'approved_events', dir: s.key === 'approved_events' ? (-s.dir as 1 | -1) : -1 }))}>Events{sort.key === 'approved_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'recent_events', dir: s.key === 'recent_events' ? (-s.dir as 1 | -1) : -1 }))}>Status{sort.key === 'recent_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
           <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_eur_cents', dir: s.key === 'revenue_eur_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_eur_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
@@ -183,6 +214,7 @@ export default function CommunityDashboard() {
         {tableRows.slice(0, 300).map(r => (
           <div key={r.key} className="adm-mrow cd-contacts-grid">
             <span className="adm-mrow-name-wrap"><div className="adm-mrow-name">{r.name || '(no name)'}</div><div className="adm-mrow-bio">{r.emails.join(', ')}</div></span>
+            <span className="adm-col-center" title={`Attendance ${r.score.attendance}/40 · Showing up ${r.score.showingUp}/30 · Spend ${r.score.spend}/30`}>{r.engagement}</span>
             <span className="adm-col-center">{r.approved_events}</span>
             <span className="adm-col-center">{r.active ? 'Active' : 'Inactive'}</span>
             <span className="adm-col-center">€{(r.revenue_eur_cents / 100).toFixed(0)}</span>

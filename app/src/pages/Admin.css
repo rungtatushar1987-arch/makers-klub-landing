@@ -734,4 +734,4 @@
 .cd-pad { padding: 16px 20px 8px; }
 .cd-sort { cursor: pointer; user-select: none; }
 .cd-events-grid   { grid-template-columns: 1fr 110px 90px 90px; }
-.cd-contacts-grid { grid-template-columns: 1fr 70px 90px 80px 70px; }
+.cd-contacts-grid { grid-template-columns: 1fr 100px 70px 90px 80px 70px; }
