@@ -48,6 +48,9 @@ function gigTypeLabel(type: Gig['type']) {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+// The Solopreneurs Club LinkedIn follower count. Update by hand; LinkedIn has no feed we can read.
+const LINKEDIN_FOLLOWERS = 407
+
 const MK_ORG = 'cf84f186-0d86-40c3-baa7-b5f33598d0fd'
 
 const AV_COLORS = [
@@ -147,6 +150,8 @@ export default function Admin() {
   const [actioningGigId, setActioningGigId] = useState<string | null>(null)
   const [deletingGigId, setDeletingGigId] = useState<string | null>(null)
 
+  const [registeredPeople, setRegisteredPeople] = useState(0)
+
   // Stats
   const [stats, setStats] = useState({
     totalMembers: 0, totalEvents: 0, totalRsvps: 0,
@@ -240,13 +245,12 @@ export default function Admin() {
     setMembersLoading(false)
   }, [session])
 
-  // Community members = people with an approved Luma calendar membership (one count per person).
-  const loadLumaMembers = useCallback(async () => {
+  // People on the Luma calendar's list (event registrants and newsletter), excluding guests added from event guest lists only.
+  const loadRegisteredPeople = useCallback(async () => {
     if (!session) return
     const db = getSupabaseClient(await session.getToken())
-    const { data } = await db.from('luma_contacts').select('email,person_key').eq('membership_status', 'approved')
-    const people = new Set((data || []).map((c: any) => c.person_key ?? c.email))
-    setStats(s => ({ ...s, totalMembers: people.size }))
+    const { count } = await db.from('luma_contacts').select('luma_user_id', { count: 'exact', head: true }).not('raw', 'is', null)
+    setRegisteredPeople(count ?? 0)
   }, [session])
 
   const loadEvents = useCallback(async () => {
@@ -337,7 +341,7 @@ export default function Admin() {
   }, [session])
 
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadLumaMembers(); loadEvents(); loadResources(); loadGigs() }
+    if (isAdmin) { loadMembers(); loadRegisteredPeople(); loadEvents(); loadResources(); loadGigs() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
@@ -502,8 +506,8 @@ export default function Admin() {
         {/* Stats bar */}
         <div className="mkw-stats adm-stats">
           {[
-            { lbl: 'Members',   num: stats.totalMembers,  delta: 'In your community' },
-            { lbl: 'RSVP rate', num: `${engagementPct}%`, delta: 'members typically rsvp for your events' },
+            { lbl: 'Active members', num: LINKEDIN_FOLLOWERS, delta: 'LinkedIn followers' },
+            { lbl: 'Registered',     num: registeredPeople,  delta: 'for events and the newsletter' },
           ].map(s => (
             <div key={s.lbl} className="mkw-stat">
               <div className="lbl">{s.lbl}</div>
