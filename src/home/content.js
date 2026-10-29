@@ -58,7 +58,8 @@ export const TIERS = [
   },
 ]
 export const BUSINESS_TIER = {
-  name: 'For Founders & Businesses',
+  eyebrow: 'WORK WITH US',
+  name: 'Work with us',
   tagline: 'Host with us, or learn to build your own community',
   included: [
     'Host an event with The Solopreneurs Club to promote your product or service',
@@ -70,6 +71,8 @@ export const BUSINESS_TIER = {
   email: 'contact@tusharrungta.com',
   ctaUrl: 'mailto:contact@tusharrungta.com?subject=Hosting%20or%20coaching%20for%20my%20business',
   note: 'Custom pricing, based on what you need.',
+  image: '/founder.jpg',
+  imageAlt: 'Tushar Rungta, founder of The Solopreneurs Club',
 }
 export const TIERS_FINE_PRINT = '*Subject to demand, slot availability, and members’ community engagement.'
 
