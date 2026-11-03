@@ -103,26 +103,6 @@ export type Connection = {
   direction?: 'outgoing' | 'incoming'
 }
 
-export type GigType = 'collab' | 'freelance' | 'hire'
-
-export type Gig = {
-  id: string
-  clerk_user_id: string
-  title: string
-  description: string
-  type: GigType
-  budget: string | null
-  timeline: string | null
-  status: 'pending' | 'approved'
-  created_at: string
-}
-
-export const GIG_TYPES: { value: GigType; label: string; desc: string }[] = [
-  { value: 'collab', label: 'Collab', desc: 'Working together on a project' },
-  { value: 'freelance', label: 'Freelance', desc: 'Paid short-term work' },
-  { value: 'hire', label: 'Hire', desc: 'Looking for someone long-term' },
-]
-
 export type Resource = {
   id: string
   title: string
@@ -136,7 +116,7 @@ export type Resource = {
 export const RESOURCE_CATEGORIES = ['Templates', 'Guides', 'Tools', 'Legal & Tax', 'Funding', 'Community', 'Other']
 
 // Clerk user IDs treated as org admins/owners — matches the hardcoded
-// checks baked into RLS (e.g. rls_gigs_admin) and the PWA's own
+// checks baked into RLS and the PWA's own
 // Admin.tsx, since org_members-based gating was retired.
 export const MK_ADMIN_USER_IDS = ['user_3E5D484FC0PzCZpEVqBeKCYOnbM', 'user_3HsXKj9IGkxDr41ZuZndhdJYqxi']
 

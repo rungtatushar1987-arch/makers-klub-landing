@@ -5,7 +5,6 @@ import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import Events from './pages/Events'
 import Members from './pages/Members'
-import Gigs from './pages/Gigs'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
@@ -57,7 +56,6 @@ export default function App() {
             <Route path="/home"    element={<Dashboard />} />
             <Route path="/events"  element={<Events />} />
             <Route path="/network" element={<Members />} />
-            <Route path="/gigs"    element={<Gigs />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin"   element={<Admin />} />

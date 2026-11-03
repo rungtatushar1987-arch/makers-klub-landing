@@ -52,9 +52,6 @@ export default function Sidebar() {
             <NavLink to="/network" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
               <span className="nav-ic">♡</span> Network
             </NavLink>
-            <NavLink to="/gigs" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
-              <span className="nav-ic">💼</span> Gigs
-            </NavLink>
             <NavLink to="/resources" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
               <span className="nav-ic">📚</span> Resources
             </NavLink>
@@ -73,7 +70,6 @@ export default function Sidebar() {
             {([
               { tab: 'members',         icon: '👥', label: 'Members'     },
               { tab: 'community',       icon: '📊', label: 'Community'   },
-              { tab: 'gigs',            icon: '💼', label: 'Gigs'        },
             ] as const).map(({ tab, icon, label }) => (
               <Link
                 key={tab}
