@@ -77,6 +77,16 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
     setProfile(ownProfile)
 
+    // Link this member's past Luma attendance to their account (matched server-side on the
+    // verified email in the session token). Returns null until that claim is configured.
+    try {
+      const claimKey = `mk_luma_claim_${user.id}`
+      if (!sessionStorage.getItem(claimKey)) {
+        const { data: claimed } = await db.rpc('claim_luma_attendance')
+        if (claimed !== null && claimed !== undefined) sessionStorage.setItem(claimKey, '1')
+      }
+    } catch { /* attendance linking is best-effort */ }
+
     const [
       { data: outgoingData },
       { data: incomingData },
