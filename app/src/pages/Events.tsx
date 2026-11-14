@@ -15,6 +15,7 @@ const AV_COLORS = [
 const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
 type Attendee = { clerk_user_id: string; profile?: Profile; connected: boolean }
+type LumaAttendance = { total: number; names: { name: string }[] | null; names_visible: boolean }
 type PendingConn = { action_tags: string[]; notes: string; remind_followup: boolean }
 
 export default function Events() {
@@ -25,6 +26,7 @@ export default function Events() {
   const [tab, setTab]                         = useState<'upcoming' | 'mine'>('upcoming')
   const [modalEvent, setModalEvent]           = useState<Event | null>(null)
   const [attendees, setAttendees]             = useState<Record<string, Attendee[]>>({})
+  const [lumaInfo, setLumaInfo]         = useState<Record<string, LumaAttendance>>({})
   const [expandedPast, setExpandedPast]       = useState<string | null>(null)
   const [loadingPast, setLoadingPast]         = useState<string | null>(null)
   const [connectingUser, setConnectingUser]   = useState<string | null>(null)
@@ -45,6 +47,8 @@ export default function Events() {
     setLoadingPast(event.id)
     const token = await session?.getToken()
     const db = getSupabaseClient(token)
+    const { data: lumaData } = await db.rpc('luma_event_attendance', { p_event_id: event.id })
+    if (lumaData) setLumaInfo(prev => ({ ...prev, [event.id]: lumaData as LumaAttendance }))
     const { data: rsvpData } = await db
       .from('event_rsvps').select('clerk_user_id').eq('event_id', event.id).eq('status', 'going')
     if (rsvpData) {
@@ -239,8 +243,17 @@ export default function Events() {
 
                         {isExpanded && (
                           <div className="ev-attendees-body">
+                            {lumaInfo[event.id] && (
+                              <p style={{ fontSize: 12, color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontWeight: 600, margin: '0 0 10px' }}>
+                                {lumaInfo[event.id].total} attended{eventAttendees.length > 0 ? ` · ${eventAttendees.length} on Makers Klub` : ''}
+                              </p>
+                            )}
                             {eventAttendees.length === 0 ? (
-                              <p style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>No other attendees found.</p>
+                              <p style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>
+                                {lumaInfo[event.id]?.total
+                                  ? "None of them have joined Makers Klub yet. They'll show up here once they do."
+                                  : 'No other attendees found.'}
+                              </p>
                             ) : (
                               <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 {eventAttendees.map((attendee, j) => {
@@ -315,6 +328,22 @@ export default function Events() {
                                     </div>
                                   )
                                 })}
+                              </div>
+                            )}
+                            {(lumaInfo[event.id]?.names?.length ?? 0) > 0 && (
+                              <div style={{ marginTop: 12 }}>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Also there (from Luma)</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                  {lumaInfo[event.id].names!.map((g, k) => {
+                                    const c = av(k + 2)
+                                    return (
+                                      <div key={`${g.name}-${k}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <div className="mkw-row-av" style={{ background: c.bg, color: c.fg, width: 26, height: 26, borderRadius: '50%', fontSize: 10 }}>{getInitials(g.name)}</div>
+                                        <span style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--ink-1)' }}>{g.name}</span>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>

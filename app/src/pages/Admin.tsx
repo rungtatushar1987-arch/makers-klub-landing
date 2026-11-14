@@ -129,6 +129,11 @@ export default function Admin() {
   const [attendees, setAttendees] = useState<Record<string, EventAttendee[]>>({})
   const [attendeesLoading, setAttendeesLoading] = useState<string | null>(null)
 
+  // Luma guest visibility switch (members see non-member Luma guest names only when on)
+  const [showLumaNames, setShowLumaNames] = useState(false)
+  const [savingLumaNames, setSavingLumaNames] = useState(false)
+  const [lumaGuests, setLumaGuests] = useState<Record<string, { total: number; names: { name: string }[] | null }>>({})
+
   // Resources tab
   const [resources, setResources] = useState<Resource[]>([])
   const [resourcesLoading, setResourcesLoading] = useState(true)
@@ -286,6 +291,31 @@ export default function Admin() {
     setAttendeesLoading(null)
   }, [session, attendees, attendeesLoading])
 
+  const loadLumaSetting = useCallback(async () => {
+    if (!session) return
+    const token = await session.getToken()
+    const { data } = await getSupabaseClient(token).from('app_settings').select('value').eq('key', 'show_luma_attendees').maybeSingle()
+    setShowLumaNames(data?.value === true)
+  }, [session])
+
+  async function toggleLumaNames() {
+    setSavingLumaNames(true)
+    const next = !showLumaNames
+    const token = await session?.getToken()
+    const { error } = await getSupabaseClient(token)
+      .from('app_settings')
+      .upsert({ key: 'show_luma_attendees', value: next, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    if (!error) setShowLumaNames(next)
+    setSavingLumaNames(false)
+  }
+
+  async function loadLumaGuests(eventId: string) {
+    if (lumaGuests[eventId]) return
+    const token = await session?.getToken()
+    const { data } = await getSupabaseClient(token).rpc('luma_event_attendance', { p_event_id: eventId })
+    if (data) setLumaGuests(prev => ({ ...prev, [eventId]: data }))
+  }
+
   const loadResources = useCallback(async () => {
     if (!session) return
     setResourcesLoading(true)
@@ -297,7 +327,7 @@ export default function Admin() {
   }, [session])
 
   useEffect(() => {
-    if (isAdmin) { loadMembers(); loadEvents(); loadResources() }
+    if (isAdmin) { loadMembers(); loadEvents(); loadResources(); loadLumaSetting() }
   }, [isAdmin])
 
   // ── Toggle is_paying ────────────────────────────────────────────────────────
@@ -467,6 +497,26 @@ export default function Admin() {
         {/* ══ EVENTS ══ */}
         {tab === 'events' && (
           <>
+            <div className="mkw-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 18px', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--ink-1)' }}>Show Luma guest names to members</div>
+                <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', marginTop: 2 }}>
+                  {showLumaNames
+                    ? 'On: members see past attendees who are not on Makers Klub yet, by name.'
+                    : 'Off: members see attendee counts and app members only. Turn on once guests have consented.'}
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`adm-btn adm-btn-md ${showLumaNames ? 'adm-btn-navy' : 'adm-btn-ghost'}`}
+                onClick={toggleLumaNames}
+                disabled={savingLumaNames}
+                style={{ flexShrink: 0, opacity: savingLumaNames ? 0.6 : 1 }}
+              >
+                {savingLumaNames ? '…' : showLumaNames ? 'On' : 'Off'}
+              </button>
+            </div>
+
             {/* Sub-tabs + Add event on same row */}
             <div className="adm-sub-tabs">
               {(['upcoming', 'past'] as const).map(t => {
@@ -505,7 +555,7 @@ export default function Admin() {
                   return shown.map(e => (
                     <EventRow
                       key={e.id} event={e}
-                      onClick={() => { setSelectedEvent(e); loadAttendees(e.id) }}
+                      onClick={() => { setSelectedEvent(e); loadAttendees(e.id); loadLumaGuests(e.id) }}
                     />
                   ))
                 })()}
@@ -516,6 +566,7 @@ export default function Admin() {
                 event={selectedEvent}
                 deleting={!!selectedEvent && deletingEventId === selectedEvent.id}
                 attendees={selectedEvent ? (attendees[selectedEvent.id] ?? null) : null}
+                lumaGuests={selectedEvent ? (lumaGuests[selectedEvent.id] ?? null) : null}
                 attendeesLoading={!!selectedEvent && attendeesLoading === selectedEvent.id}
                 onSave={(fields) => selectedEvent ? updateEvent(selectedEvent.id, fields) : createEvent(fields)}
                 onDelete={selectedEvent ? () => deleteEvent(selectedEvent.id) : undefined}
@@ -767,10 +818,11 @@ function toLocalDatetime(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, onDelete, onClose }: {
+function EventFormModal({ event, deleting, attendees, lumaGuests, attendeesLoading, onSave, onDelete, onClose }: {
   event: AdminEvent | null
   deleting: boolean
   attendees: EventAttendee[] | null
+  lumaGuests: { total: number; names: { name: string }[] | null } | null
   attendeesLoading: boolean
   onSave: (fields: EventFormFields) => Promise<void>
   onDelete?: () => void
@@ -944,6 +996,17 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
               </div>
             )}
           </div>
+
+          {/* Luma guests (admins always see names) */}
+          {lumaGuests && lumaGuests.total > 0 && (
+            <div className="adm-view-desc-wrap">
+              <div className="adm-view-desc-label">Luma attendance</div>
+              <p className="adm-attendees-empty" style={{ marginBottom: 8 }}>{lumaGuests.total} attended on Luma</p>
+              {lumaGuests.names && lumaGuests.names.length > 0 && (
+                <p className="adm-view-desc">Not on Makers Klub yet: {lumaGuests.names.map(g => g.name).join(', ')}</p>
+              )}
+            </div>
+          )}
 
           {/* Luma link */}
           {event!.luma_url && (
