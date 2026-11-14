@@ -442,7 +442,7 @@ function EventModal({ event, onClose }: { event: Event; onClose: () => void }) {
         {event.description && (
           <div style={{ marginBottom: 24 }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.6, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 10 }}>About this event</div>
-            <p style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>{event.description}</p>
+            <p style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.7, fontFamily: 'var(--font-body)', whiteSpace: 'pre-line' }}>{event.description}</p>
           </div>
         )}
 
