@@ -65,6 +65,7 @@
   transition: box-shadow 0.15s, transform 0.12s;
 }
 
+.ev-card:focus-visible { outline: 2px solid var(--mk-violet); outline-offset: 2px; }
 .ev-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 32px rgba(10,19,64,0.12), var(--glass-hi);
@@ -138,10 +139,15 @@
 }
 
 .ev-card-meta {
-  font-size: 12px;
-  color: var(--ink-3);
+  font-size: 13px;
+  color: var(--ink-2);
   font-family: var(--font-body);
 }
+.ev-card-meta b { font-weight: 600; color: var(--mk-yellow-deep); }
+.ev-card-meta b.ev-low { color: var(--danger); }
+
+.ev-card-thumb { width: 72px; height: 54px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+@media (max-width: 560px) { .ev-card-thumb { display: none; } }
 
 .ev-card-chevron {
   color: var(--ink-3);
@@ -210,3 +216,16 @@
   font-family: var(--font-body);
   font-weight: 500;
 }
+
+/* Past events */
+.ev-muted { font-size: 13px; color: var(--ink-2); }
+.ev-past-row { opacity: 0.8; }
+.ev-past-date {
+  width: 40px; height: 44px; border-radius: 8px; flex-shrink: 0; background: rgba(12,19,48,0.06);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-display);
+}
+.ev-past-date b { font-weight: 800; font-size: 15px; line-height: 1; color: var(--ink-2); }
+.ev-past-date span { font-size: 9px; letter-spacing: 1.2px; font-weight: 700; color: var(--ink-3); margin-top: 2px; }
+.ev-past-name { font-size: 13px; }
+.ev-past-toggle { padding-bottom: 8px; }
+.ev-past-btn { width: 100%; justify-content: center; }

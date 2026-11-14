@@ -1,95 +1,51 @@
-/* ── Resources page — Aurora Glass ── */
+/* Resources — search, category pills, link cards */
 
-.res-tabs {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--hairline);
-  margin-bottom: 20px;
-}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-.res-tab {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  color: var(--ink-3);
-  padding: 10px 16px;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color 0.15s;
-}
+.res { max-width: 1120px; }
 
-.res-tab.active {
-  color: var(--ink-1);
-  border-bottom-color: var(--mk-navy);
-}
+.res-bar { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
 
-.res-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
+.res-search {
+  width: 100%; max-width: 420px; padding: 11px 16px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--hairline-strong); background: var(--surface); color: var(--ink-1);
+  font-size: 14px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
 }
+.res-search:focus { border-color: var(--mk-violet); box-shadow: 0 0 0 3px rgba(59,109,217,0.12); }
+
+.res-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.res-pill {
+  padding: 7px 14px; border-radius: var(--r-pill); cursor: pointer;
+  border: 1px solid var(--hairline-strong); background: var(--surface); color: var(--ink-2);
+  font-family: var(--font-display); font-size: 12px; font-weight: 600; transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.res-pill span { margin-left: 4px; color: var(--ink-3); font-weight: 500; }
+.res-pill:hover { border-color: var(--mk-violet-soft); }
+.res-pill.active { background: var(--mk-navy); border-color: var(--mk-navy); color: #fff; }
+.res-pill.active span { color: rgba(255,255,255,0.65); }
+
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
 .res-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), var(--glass-hi);
-  border-radius: var(--r-sm);
-  padding: 18px 20px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.12s;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-sm);
+  box-shadow: var(--glass-shadow); padding: 20px 22px;
+  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
 }
-
-.res-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 32px rgba(10,19,64,0.12), var(--glass-hi);
-}
-
-.res-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.res-card-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--ink-1);
-}
+.res-card:hover { transform: translateY(-2px); border-color: var(--mk-yellow); box-shadow: 0 8px 28px rgba(10,19,64,0.12); }
 
 .res-category-chip {
-  flex-shrink: 0;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: rgba(197,160,89,0.20);
-  color: var(--mk-yellow-deep);
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 700;
-  white-space: nowrap;
+  padding: 3px 10px; border-radius: var(--r-pill); background: rgba(197,160,89,0.2); color: var(--mk-yellow-deep);
+  font-family: var(--font-display); font-size: 11px; font-weight: 700; white-space: nowrap;
 }
-
-.res-card-desc {
-  font-size: 12.5px;
-  color: var(--ink-2);
-  font-family: var(--font-body);
-  line-height: 1.5;
-  flex: 1;
-}
-
+.res-card-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.3; color: var(--ink-1); }
+.res-card-desc { font-size: 13px; color: var(--ink-2); line-height: 1.55; flex: 1; }
 .res-card-link {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--mk-violet);
+  margin-top: 6px; display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--mk-violet);
 }
+
+.res-empty { text-align: center; padding: 56px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.res-empty b { font-family: var(--font-display); font-size: 16px; color: var(--ink-1); }
+.res-empty p { font-size: 14px; color: var(--ink-2); max-width: 380px; }
+.res-empty .mk-btn { margin-top: 8px; }
