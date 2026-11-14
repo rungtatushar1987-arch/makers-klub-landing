@@ -132,7 +132,7 @@ export default function Admin() {
   // Luma guest visibility switch (members see non-member Luma guest names only when on)
   const [showLumaNames, setShowLumaNames] = useState(false)
   const [savingLumaNames, setSavingLumaNames] = useState(false)
-  const [lumaGuests, setLumaGuests] = useState<Record<string, { total: number; names: { name: string }[] | null }>>({})
+  const [lumaGuests, setLumaGuests] = useState<Record<string, { total: number; registered?: number; checked_in?: number; names: { name: string }[] | null }>>({})
 
   // Resources tab
   const [resources, setResources] = useState<Resource[]>([])
@@ -822,7 +822,7 @@ function EventFormModal({ event, deleting, attendees, lumaGuests, attendeesLoadi
   event: AdminEvent | null
   deleting: boolean
   attendees: EventAttendee[] | null
-  lumaGuests: { total: number; names: { name: string }[] | null } | null
+  lumaGuests: { total: number; registered?: number; checked_in?: number; names: { name: string }[] | null } | null
   attendeesLoading: boolean
   onSave: (fields: EventFormFields) => Promise<void>
   onDelete?: () => void
@@ -1001,7 +1001,7 @@ function EventFormModal({ event, deleting, attendees, lumaGuests, attendeesLoadi
           {lumaGuests && lumaGuests.total > 0 && (
             <div className="adm-view-desc-wrap">
               <div className="adm-view-desc-label">Luma attendance</div>
-              <p className="adm-attendees-empty" style={{ marginBottom: 8 }}>{lumaGuests.total} attended on Luma</p>
+              <p className="adm-attendees-empty" style={{ marginBottom: 8 }}>{lumaGuests.registered ?? lumaGuests.total} registered on Luma{lumaGuests.checked_in ? ` · ${lumaGuests.checked_in} checked in` : ''}</p>
               {lumaGuests.names && lumaGuests.names.length > 0 && (
                 <p className="adm-view-desc">Not on Makers Klub yet: {lumaGuests.names.map(g => g.name).join(', ')}</p>
               )}

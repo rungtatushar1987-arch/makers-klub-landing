@@ -15,7 +15,7 @@ const AV_COLORS = [
 const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
 type Attendee = { clerk_user_id: string; profile?: Profile; connected: boolean }
-type LumaAttendance = { total: number; names: { name: string }[] | null; names_visible: boolean }
+type LumaAttendance = { total: number; registered: number; checked_in: number; names: { name: string }[] | null; names_visible: boolean }
 type PendingConn = { action_tags: string[]; notes: string; remind_followup: boolean }
 
 export default function Events() {
@@ -245,12 +245,12 @@ export default function Events() {
                           <div className="ev-attendees-body">
                             {lumaInfo[event.id] && (
                               <p style={{ fontSize: 12, color: 'var(--ink-2)', fontFamily: 'var(--font-display)', fontWeight: 600, margin: '0 0 10px' }}>
-                                {lumaInfo[event.id].total} attended{eventAttendees.length > 0 ? ` · ${eventAttendees.length} on Makers Klub` : ''}
+                                {lumaInfo[event.id].registered} registered{lumaInfo[event.id].checked_in > 0 ? ` · ${lumaInfo[event.id].checked_in} checked in` : ''}{eventAttendees.length > 0 ? ` · ${eventAttendees.length} on Makers Klub` : ''}
                               </p>
                             )}
                             {eventAttendees.length === 0 ? (
                               <p style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>
-                                {lumaInfo[event.id]?.total
+                                {lumaInfo[event.id]?.registered
                                   ? "None of them have joined Makers Klub yet. They'll show up here once they do."
                                   : 'No other attendees found.'}
                               </p>
@@ -332,7 +332,7 @@ export default function Events() {
                             )}
                             {(lumaInfo[event.id]?.names?.length ?? 0) > 0 && (
                               <div style={{ marginTop: 12 }}>
-                                <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Also there (from Luma)</div>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 8 }}>Also on Luma</div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                   {lumaInfo[event.id].names!.map((g, k) => {
                                     const c = av(k + 2)
