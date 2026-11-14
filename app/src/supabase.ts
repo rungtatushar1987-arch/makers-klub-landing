@@ -85,6 +85,8 @@ export type Event = {
   cover_color: string
   is_free: boolean
   ticket_price: number | null
+  capacity: number | null
+  registration_mode: 'in_app' | 'external'
 }
 
 export type ConnectionStatus = 'pending' | 'accepted' | 'declined'

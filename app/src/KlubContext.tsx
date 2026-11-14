@@ -6,14 +6,16 @@ type KlubContextType = {
   connections: Connection[]           // accepted only (both directions)
   incomingRequests: Connection[]      // pending incoming — shown as Accept/Deny
   events: Event[]
-  rsvpd: Set<string>
-  allRsvps: { clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]
+  rsvpd: Set<string>                  // events the user is going to (confirmed spot)
+  myRsvps: Record<string, RsvpStatus> // event_id -> going | waitlist | interested
+  allRsvps: Rsvp[]
   allProfiles: Profile[]
   totalMembers: number
   profile: Profile | null
   loading: boolean
   isOnboarding: boolean
-  toggleRsvp: (event: Event) => Promise<void>
+  registerForEvent: (event: Event) => Promise<RsvpStatus | null>
+  cancelRegistration: (event: Event) => Promise<boolean>
   updateConnection: (id: string, patch: Partial<Connection>) => void
   saveConnection: (conn: Connection) => Promise<void>
   clearTag: (conn: Connection, tag: string) => Promise<void>
@@ -23,6 +25,9 @@ type KlubContextType = {
   refresh: () => Promise<void>
 }
 
+export type RsvpStatus = 'going' | 'waitlist' | 'interested'
+export type Rsvp = { clerk_user_id: string; event_id: string; status: RsvpStatus; created_at: string; profile?: Profile }
+
 const KlubContext = createContext<KlubContextType | null>(null)
 
 export function KlubProvider({ children }: { children: React.ReactNode }) {
@@ -31,8 +36,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
   const [connections, setConnections] = useState<Connection[]>([])
   const [incomingRequests, setIncomingRequests] = useState<Connection[]>([])
   const [events, setEvents] = useState<Event[]>([])
-  const [rsvpd, setRsvpd] = useState<Set<string>>(new Set())
-  const [allRsvps, setAllRsvps] = useState<{ clerk_user_id: string; event_id: string; created_at: string; profile?: Profile }[]>([])
+  const [allRsvps, setAllRsvps] = useState<Rsvp[]>([])
   const [allProfiles, setAllProfiles] = useState<Profile[]>([])
   const [totalMembers, setTotalMembers] = useState(0)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -77,7 +81,6 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       { data: outgoingData },
       { data: incomingData },
       { data: eventsData },
-      { data: rsvpData },
       { data: allRsvpData },
       { data: profilesAllData },
       { count: profilesCount },
@@ -87,8 +90,7 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
       // Incoming: rows where this user is the target, not declined
       db.from('connections').select('*').eq('connected_clerk_user_id', user.id).neq('status', 'declined').order('created_at', { ascending: false }),
       db.from('events').select('*').order('date'),
-      db.from('event_rsvps').select('event_id').eq('clerk_user_id', user.id),
-      db.from('event_rsvps').select('clerk_user_id, event_id, created_at').order('created_at', { ascending: false }),
+      db.from('event_rsvps').select('clerk_user_id, event_id, status, created_at').order('created_at', { ascending: true }),
       db.from('profiles').select('*').neq('clerk_user_id', user.id).order('created_at', { ascending: false }).limit(20),
       // Exact total row count, uncapped — the real "how many members" number
       db.from('profiles').select('*', { count: 'exact', head: true }),
@@ -96,7 +98,6 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
 
     if (eventsData) setEvents(eventsData)
     setTotalMembers(profilesCount ?? 0)
-    if (rsvpData) setRsvpd(new Set(rsvpData.map((r: { event_id: string }) => r.event_id)))
     if (profilesAllData) setAllProfiles(profilesAllData as Profile[])
     if (allRsvpData && profilesAllData) {
       const profileMap = new Map((profilesAllData as Profile[]).map(p => [p.clerk_user_id, p]))
@@ -204,19 +205,39 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval)
   }, [user?.id, session, refreshConnections])
 
-  async function toggleRsvp(event: Event) {
-    if (event.luma_url) { window.open(event.luma_url, '_blank'); return }
+  // Capacity and waitlist are decided by a database trigger, so the status is read back from the insert.
+  async function registerForEvent(event: Event): Promise<RsvpStatus | null> {
+    if (!user) return null
     const token = await session?.getToken()
     const db = getSupabaseClient(token)
-    const going = rsvpd.has(event.id)
-    if (going) {
-      await db.from('event_rsvps').delete().eq('clerk_user_id', user?.id).eq('event_id', event.id)
-      setRsvpd(prev => { const s = new Set(prev); s.delete(event.id); return s })
-    } else {
-      await db.from('event_rsvps').insert({ clerk_user_id: user?.id, event_id: event.id, status: 'going' })
-      setRsvpd(prev => new Set([...prev, event.id]))
-    }
+    const { data, error } = await db
+      .from('event_rsvps')
+      .insert({ clerk_user_id: user.id, event_id: event.id, status: 'going' })
+      .select('clerk_user_id, event_id, status, created_at')
+      .single()
+    if (error || !data) { console.error('registerForEvent error:', error); return null }
+    setAllRsvps(prev => [...prev.filter(r => !(r.clerk_user_id === user.id && r.event_id === event.id)), { ...(data as Rsvp), profile: profile ?? undefined }])
+    return (data as Rsvp).status
   }
+
+  async function cancelRegistration(event: Event): Promise<boolean> {
+    if (!user) return false
+    const token = await session?.getToken()
+    const db = getSupabaseClient(token)
+    const { error } = await db.from('event_rsvps').delete().eq('clerk_user_id', user.id).eq('event_id', event.id)
+    if (error) { console.error('cancelRegistration error:', error); return false }
+    await refreshRsvps()
+    return true
+  }
+
+  // Someone leaving can promote people off the waitlist, so re-read everyone's status.
+  const refreshRsvps = useCallback(async () => {
+    if (!user || !session) return
+    const token = await session.getToken()
+    const db = getSupabaseClient(token)
+    const { data } = await db.from('event_rsvps').select('clerk_user_id, event_id, status, created_at').order('created_at', { ascending: true })
+    if (data) setAllRsvps(data as Rsvp[])
+  }, [user, session])
 
   function updateConnection(id: string, patch: Partial<Connection>) {
     setConnections(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c))
@@ -260,11 +281,19 @@ export function KlubProvider({ children }: { children: React.ReactNode }) {
     setIncomingRequests(prev => prev.filter(c => c.id !== conn.id))
   }
 
+  const myRsvps: Record<string, RsvpStatus> = {}
+  const rsvpd = new Set<string>()
+  for (const r of allRsvps) {
+    if (r.clerk_user_id !== user?.id) continue
+    myRsvps[r.event_id] = r.status
+    if (r.status === 'going') rsvpd.add(r.event_id)
+  }
+
   return (
     <KlubContext.Provider value={{
-      connections, incomingRequests, events, rsvpd, allRsvps, allProfiles, totalMembers, profile, loading,
+      connections, incomingRequests, events, rsvpd, myRsvps, allRsvps, allProfiles, totalMembers, profile, loading,
       isOnboarding: !calcProfileProgress(profile).isComplete,
-      toggleRsvp, updateConnection, saveConnection, clearTag, addConnection,
+      registerForEvent, cancelRegistration, updateConnection, saveConnection, clearTag, addConnection,
       acceptRequest, declineRequest,
       refresh: load,
     }}>

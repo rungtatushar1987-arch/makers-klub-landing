@@ -39,8 +39,8 @@ export default function Onboarding() {
     const upcomingIds = new Set(events.filter(e => new Date(e.date).getTime() > now).map(e => e.id))
     const eventMap: Record<string, string> = {}
     events.forEach(e => { eventMap[e.id] = e.title })
-    return allRsvps
-      .filter(r => r.profile && r.clerk_user_id !== user?.id && upcomingIds.has(r.event_id))
+    return [...allRsvps].reverse()
+      .filter(r => r.status === 'going' && r.profile && r.clerk_user_id !== user?.id && upcomingIds.has(r.event_id))
       .slice(0, 5)
       .map(r => ({ profile: r.profile!, eventTitle: eventMap[r.event_id] || 'an event', createdAt: r.created_at }))
   }, [allRsvps, events, user?.id])

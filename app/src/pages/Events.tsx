@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { useKlub } from '../KlubContext'
+import { useKlub, type RsvpStatus } from '../KlubContext'
 import { getSupabaseClient, type Event, type Profile, ACTION_TAGS, getInitials } from '../supabase'
 import './Events.css'
 
@@ -20,9 +20,9 @@ type PendingConn = { action_tags: string[]; notes: string; remind_followup: bool
 export default function Events() {
   const { user } = useUser()
   const { session } = useSession()
-  const { events, rsvpd, connections, addConnection, loading } = useKlub()
+  const { events, myRsvps, allRsvps, connections, addConnection, loading } = useKlub()
 
-  const [tab, setTab]                         = useState<'upcoming' | 'recommended'>('upcoming')
+  const [tab, setTab]                         = useState<'upcoming' | 'mine'>('upcoming')
   const [modalEvent, setModalEvent]           = useState<Event | null>(null)
   const [attendees, setAttendees]             = useState<Record<string, Attendee[]>>({})
   const [expandedPast, setExpandedPast]       = useState<string | null>(null)
@@ -35,8 +35,9 @@ export default function Events() {
   const now = new Date()
   const upcoming    = events.filter(e => new Date(e.date) >= now)
   const past        = events.filter(e => new Date(e.date) < now).reverse()
-  const recommended = upcoming.filter(e => !rsvpd.has(e.id))
-  const shown       = tab === 'upcoming' ? upcoming : recommended
+  const mine        = upcoming.filter(e => myRsvps[e.id] === 'going' || myRsvps[e.id] === 'waitlist')
+  const shown       = tab === 'upcoming' ? upcoming : mine
+  const goingCount  = (eventId: string) => allRsvps.filter(r => r.event_id === eventId && r.status === 'going').length
 
   async function togglePastAttendees(event: Event) {
     if (expandedPast === event.id) { setExpandedPast(null); return }
@@ -128,7 +129,7 @@ export default function Events() {
 
           <div className="ev-col-left">
             <div className="ev-tabs">
-              {(['upcoming', 'recommended'] as const).map(t => (
+              {(['upcoming', 'mine'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
@@ -136,20 +137,24 @@ export default function Events() {
                 >
                   {t === 'upcoming'
                     ? `Upcoming (${upcoming.length})`
-                    : `Recommended (${recommended.length})`}
+                    : `My events (${mine.length})`}
                 </button>
               ))}
             </div>
 
             {shown.length === 0 && (
               <div className="mkw-empty">
-                {tab === 'upcoming' ? 'No upcoming events.' : 'No recommended events.'}
+                {tab === 'upcoming'
+                  ? 'No upcoming events right now. New events are announced here first.'
+                  : "You haven't registered for anything yet."}
               </div>
             )}
 
             <div className="ev-card-list">
               {shown.map((event) => {
-                const going   = rsvpd.has(event.id)
+                const status  = myRsvps[event.id] as RsvpStatus | undefined
+                const taken   = goingCount(event.id)
+                const spotsLeft = event.capacity ? Math.max(event.capacity - taken, 0) : null
                 const day     = new Date(event.date).getDate()
                 const mon     = new Date(event.date).toLocaleString('en', { month: 'short' }).toUpperCase()
                 const time    = new Date(event.date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })
@@ -169,11 +174,14 @@ export default function Events() {
                       <div className="ev-card-info">
                         <div className="ev-card-title-row">
                           <span className="ev-card-title">{event.title}</span>
-                          {going && <span className="mkw-chip-tag green">Going</span>}
+                          {status === 'going' && <span className="mkw-chip-tag green">Going</span>}
+                          {status === 'waitlist' && <span className="mkw-chip-tag">Waitlist</span>}
+                          {!status && spotsLeft === 0 && <span className="mkw-chip-tag">Full</span>}
                           {event.type && <span className="ev-type-badge">{event.type}</span>}
                         </div>
                         <div className="ev-card-meta">
                           {event.location} · {dateStr} · {time}
+                          {spotsLeft !== null && spotsLeft > 0 && ` · ${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left`}
                         </div>
                       </div>
                       <span className="ev-card-chevron">›</span>
@@ -323,20 +331,64 @@ export default function Events() {
       </div>
 
       {modalEvent && (
-        <EventModal
-          event={modalEvent}
-          going={rsvpd.has(modalEvent.id)}
-          onClose={() => setModalEvent(null)}
-        />
+        <EventModal event={modalEvent} onClose={() => setModalEvent(null)} />
       )}
     </>
   )
 }
 
-function EventModal({ event, going, onClose }: { event: Event; going: boolean; onClose: () => void }) {
+function EventModal({ event, onClose }: { event: Event; onClose: () => void }) {
+  const { user } = useUser()
+  const { session } = useSession()
+  const { myRsvps, allRsvps, registerForEvent, cancelRegistration } = useKlub()
+  const [busy, setBusy]         = useState(false)
+  const [notice, setNotice]     = useState<string | null>(null)
+  const [people, setPeople]     = useState<Record<string, Profile>>({})
+
+  const status    = myRsvps[event.id] as RsvpStatus | undefined
+  const rows      = allRsvps.filter(r => r.event_id === event.id)
+  const going     = rows.filter(r => r.status === 'going')
+  const waitlist  = rows.filter(r => r.status === 'waitlist')
+  const full      = !!event.capacity && going.length >= event.capacity
+  const isPast    = new Date(event.end_date || event.date) < new Date()
+  const external  = event.registration_mode === 'external'
+  const waitPos   = status === 'waitlist' ? waitlist.findIndex(r => r.clerk_user_id === user?.id) + 1 : 0
+
   const dateStr = new Date(event.date).toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const time    = new Date(event.date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })
   const endTime = event.end_date ? new Date(event.end_date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false }) : null
+
+  const goingKey = going.map(r => r.clerk_user_id).sort().join(',')
+  useEffect(() => {
+    const ids = going.map(r => r.clerk_user_id).filter(id => id !== user?.id && !people[id])
+    if (ids.length === 0) return
+    let cancelled = false
+    ;(async () => {
+      const token = await session?.getToken()
+      const { data } = await getSupabaseClient(token).from('profiles').select('*').in('clerk_user_id', ids)
+      if (!cancelled && data) setPeople(prev => ({ ...prev, ...Object.fromEntries((data as Profile[]).map(p => [p.clerk_user_id, p])) }))
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goingKey])
+
+  async function handleRegister() {
+    setBusy(true); setNotice(null)
+    const result = await registerForEvent(event)
+    if (result === 'going') setNotice("You're in. See you there!")
+    else if (result === 'waitlist') setNotice("This event is full. You're on the waitlist and will move up if a spot opens.")
+    else setNotice('Something went wrong. Please try again.')
+    setBusy(false)
+  }
+
+  async function handleCancel() {
+    setBusy(true); setNotice(null)
+    const ok = await cancelRegistration(event)
+    setNotice(ok ? (status === 'waitlist' ? 'You left the waitlist.' : 'Your registration is cancelled.') : 'Something went wrong. Please try again.')
+    setBusy(false)
+  }
+
+  const attendeeNames = going.filter(r => r.clerk_user_id !== user?.id)
 
   return (
     <>
@@ -353,12 +405,12 @@ function EventModal({ event, going, onClose }: { event: Event; going: boolean; o
         padding: 32,
       }}>
         <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, width: 32, height: 32, borderRadius: '50%', background: 'rgba(12,19,48,0.08)', border: 'none', cursor: 'pointer', fontSize: 16, color: 'var(--ink-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-body)' }}>×</button>
-        {event.type && (
-          <div style={{ marginBottom: 12 }}>
-            <span className="ev-type-badge">{event.type}</span>
-            {going && <span className="mkw-chip-tag green" style={{ marginLeft: 8 }}>Going</span>}
-          </div>
-        )}
+        <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          {event.type && <span className="ev-type-badge">{event.type}</span>}
+          {status === 'going' && <span className="mkw-chip-tag green">Going</span>}
+          {status === 'waitlist' && <span className="mkw-chip-tag">Waitlist{waitPos ? ` #${waitPos}` : ''}</span>}
+          {event.is_free === false && event.ticket_price != null && <span className="ev-type-badge">€{Number(event.ticket_price).toFixed(2)}</span>}
+        </div>
         <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 24, letterSpacing: '-0.4px', lineHeight: 1.2, color: 'var(--ink-1)', marginBottom: 20 }}>{event.title}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -377,14 +429,71 @@ function EventModal({ event, going, onClose }: { event: Event; going: boolean; o
               </div>
             </div>
           )}
+          {!external && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(52,210,123,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>👥</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>
+                {going.length} going{event.capacity ? ` · ${Math.max(event.capacity - going.length, 0)} of ${event.capacity} spots left` : ''}
+                {waitlist.length > 0 && <span style={{ color: 'var(--ink-3)', fontWeight: 500 }}> · {waitlist.length} on waitlist</span>}
+              </div>
+            </div>
+          )}
         </div>
         {event.description && (
-          <div style={{ marginBottom: 28 }}>
+          <div style={{ marginBottom: 24 }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.6, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 10 }}>About this event</div>
             <p style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}>{event.description}</p>
           </div>
         )}
-        <a href={event.luma_url || 'https://luma.com/calendar/cal-GBRc6zCvxA5bqnz'} target="_blank" rel="noreferrer" className="mk-btn mk-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Book on Luma →</a>
+
+        {!external && attendeeNames.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 1.6, textTransform: 'uppercase', color: 'var(--ink-3)', marginBottom: 10 }}>Who's going</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {attendeeNames.slice(0, 8).map((r, i) => {
+                const p = people[r.clerk_user_id]
+                const c = av(i)
+                return (
+                  <div key={r.clerk_user_id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: c.bg, color: c.fg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 10, flexShrink: 0 }}>
+                      {getInitials(p?.full_name)}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>
+                      {p?.full_name || 'Member'}
+                      {p?.role_category && <span style={{ color: 'var(--ink-3)', fontWeight: 500 }}> · {p.role_category.charAt(0).toUpperCase() + p.role_category.slice(1)}</span>}
+                    </div>
+                  </div>
+                )
+              })}
+              {attendeeNames.length > 8 && (
+                <div style={{ fontSize: 12, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>and {attendeeNames.length - 8} more</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {notice && (
+          <div style={{ marginBottom: 14, padding: '10px 14px', borderRadius: 10, background: 'rgba(59,109,217,0.08)', fontSize: 13, color: 'var(--ink-2)', fontFamily: 'var(--font-body)' }}>{notice}</div>
+        )}
+
+        {isPast ? (
+          <div style={{ fontSize: 13, color: 'var(--ink-3)', fontFamily: 'var(--font-body)', textAlign: 'center' }}>This event has ended.</div>
+        ) : external ? (
+          <a href={event.luma_url || 'https://luma.com/calendar/cal-GBRc6zCvxA5bqnz'} target="_blank" rel="noreferrer" className="mk-btn mk-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>Register on Luma →</a>
+        ) : status === 'going' || status === 'waitlist' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ textAlign: 'center', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 14, color: 'var(--ink-1)' }}>
+              {status === 'going' ? "You're registered ✓" : `You're on the waitlist${waitPos ? ` (#${waitPos})` : ''}`}
+            </div>
+            <button className="mk-btn mk-btn-ghost" style={{ width: '100%', justifyContent: 'center' }} onClick={handleCancel} disabled={busy}>
+              {busy ? '…' : status === 'going' ? 'Cancel registration' : 'Leave waitlist'}
+            </button>
+          </div>
+        ) : (
+          <button className="mk-btn mk-btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={handleRegister} disabled={busy}>
+            {busy ? '…' : full ? 'Join waitlist' : 'Register →'}
+          </button>
+        )}
       </div>
     </>
   )

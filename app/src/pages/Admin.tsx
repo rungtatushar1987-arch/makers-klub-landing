@@ -24,13 +24,13 @@ export type AdminEvent = Event & {
   rsvp_count: number
 }
 
-type EventAttendee = { clerk_user_id: string; profile?: Profile }
+type EventAttendee = { clerk_user_id: string; status?: string; profile?: Profile }
 
 type Tab = 'members' | 'community' | 'events' | 'analytics' | 'recommendations' | 'resources'
-// 'events', 'resources', 'analytics' and 'recommendations' are hidden from the UI for now —
+// 'resources', 'analytics' and 'recommendations' are hidden from the UI for now —
 // not in VALID_TABS, so a direct ?tab=... link to any of them falls back to 'members' too.
 // Code kept intact for later.
-const VALID_TABS: Tab[] = ['members', 'community']
+const VALID_TABS: Tab[] = ['members', 'community', 'events']
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -200,7 +200,7 @@ export default function Admin() {
     const [{ data: profiles }, { data: rsvpData }, { data: pastEvents }, { data: connData }] = await Promise.all([
       db.from('profiles').select('*').in('clerk_user_id', ids),
       db.from('event_rsvps').select('clerk_user_id, event_id, created_at').in('clerk_user_id', ids),
-      db.from('events').select('id, date').eq('org_id', MK_ORG).lt('date', new Date().toISOString()),
+      db.from('events').select('id, date').lt('date', new Date().toISOString()),
       db.from('connections').select('clerk_user_id').eq('status', 'accepted').in('clerk_user_id', ids),
     ])
 
@@ -270,16 +270,17 @@ export default function Admin() {
     const token = await session?.getToken()
     const db = getSupabaseClient(token)
     const { data: rsvpData } = await db
-      .from('event_rsvps').select('clerk_user_id').eq('event_id', eventId)
+      .from('event_rsvps').select('clerk_user_id, status').eq('event_id', eventId).order('created_at')
     if (rsvpData) {
-      const ids = (rsvpData as any[]).map(r => r.clerk_user_id)
+      const rows = rsvpData as { clerk_user_id: string; status: string }[]
+      const ids = rows.map(r => r.clerk_user_id)
       const { data: profilesData } = ids.length > 0
         ? await db.from('profiles').select('*').in('clerk_user_id', ids)
         : { data: [] }
       const profileMap = new Map((profilesData || []).map((p: any) => [p.clerk_user_id, p]))
       setAttendees(prev => ({
         ...prev,
-        [eventId]: ids.map(id => ({ clerk_user_id: id, profile: profileMap.get(id) }))
+        [eventId]: rows.map(r => ({ clerk_user_id: r.clerk_user_id, status: r.status, profile: profileMap.get(r.clerk_user_id) }))
       }))
     }
     setAttendeesLoading(null)
@@ -317,8 +318,8 @@ export default function Admin() {
     const db = getSupabaseClient(token)
     const { data, error } = await db.from('events').insert({
       ...fields,
-      org_id: MK_ORG,
       ticket_price: fields.is_free ? null : (fields.ticket_price ? parseFloat(fields.ticket_price) : null),
+      capacity: fields.capacity ? parseInt(fields.capacity, 10) : null,
     }).select().single()
     if (!error && data) {
       const newEv: AdminEvent = { ...data, rsvp_count: 0 }
@@ -334,6 +335,7 @@ export default function Admin() {
     const { data, error } = await db.from('events').update({
       ...fields,
       ticket_price: fields.is_free ? null : (fields.ticket_price ? parseFloat(fields.ticket_price) : null),
+      capacity: fields.capacity ? parseInt(fields.capacity, 10) : null,
     }).eq('id', id).select().single()
     if (!error && data) {
       setEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e))
@@ -746,12 +748,14 @@ type EventFormFields = {
   luma_url: string
   is_free: boolean
   ticket_price: string
+  capacity: string
+  registration_mode: 'in_app' | 'external'
 }
 
 const BLANK_FORM: EventFormFields = {
   title: '', date: '', end_date: '', location: '', address: '',
   type: 'Networking', description: '', luma_url: '',
-  is_free: true, ticket_price: '',
+  is_free: true, ticket_price: '', capacity: '', registration_mode: 'in_app',
 }
 
 const EVENT_TYPES = ['Networking', 'Workshop', 'Social', 'Panel', 'Fireside', 'Hackathon', 'Other']
@@ -786,6 +790,8 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
     luma_url: event.luma_url || '',
     is_free: event.is_free ?? true,
     ticket_price: event.ticket_price != null ? String(event.ticket_price) : '',
+    capacity: event.capacity != null ? String(event.capacity) : '',
+    registration_mode: event.registration_mode ?? 'in_app',
   } : BLANK_FORM)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Partial<EventFormFields>>({})
@@ -810,6 +816,8 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
       luma_url: event!.luma_url || '',
       is_free: event!.is_free ?? true,
       ticket_price: event!.ticket_price != null ? String(event!.ticket_price) : '',
+      capacity: event!.capacity != null ? String(event!.capacity) : '',
+      registration_mode: event!.registration_mode ?? 'in_app',
     })
   }
 
@@ -889,7 +897,9 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
               <div className="adm-view-meta-row">
                 <div className="adm-view-icon adm-view-icon--green">👥</div>
                 <div>
-                  <div className="adm-view-meta-primary">{event!.rsvp_count} RSVPs</div>
+                  <div className="adm-view-meta-primary">
+                    {event!.rsvp_count} registered{event!.capacity ? ` · capacity ${event!.capacity}` : ''}
+                  </div>
                 </div>
               </div>
             )}
@@ -920,7 +930,10 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
                         {getInitials(a.profile?.full_name)}
                       </div>
                       <div className="adm-attendee-info">
-                        <div className="adm-attendee-name">{a.profile?.full_name || 'Member'}</div>
+                        <div className="adm-attendee-name">
+                          {a.profile?.full_name || 'Member'}
+                          {a.status === 'waitlist' && <span className="adm-event-type" style={{ marginLeft: 8 }}>Waitlist</span>}
+                        </div>
                         {a.profile?.role_category && (
                           <div className="adm-attendee-role">{a.profile.role_category}</div>
                         )}
@@ -1106,6 +1119,31 @@ function EventFormModal({ event, deleting, attendees, attendeesLoading, onSave, 
                 />
               </div>
             )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label className="adm-modal-label">Registration</label>
+              <select
+                className={inputCls()}
+                value={form.registration_mode}
+                onChange={e => setField('registration_mode', e.target.value)}
+              >
+                <option value="in_app">Register in the app</option>
+                <option value="external">External (Luma link only)</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="adm-modal-label">Capacity</label>
+              <input
+                className={inputCls()}
+                type="number" min={1}
+                value={form.capacity}
+                onChange={e => setField('capacity', e.target.value)}
+                placeholder="Unlimited"
+                disabled={form.registration_mode === 'external'}
+              />
+            </div>
           </div>
 
           <div>

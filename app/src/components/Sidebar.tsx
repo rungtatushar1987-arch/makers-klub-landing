@@ -49,6 +49,9 @@ export default function Sidebar() {
 
         {!isOnboarding && (
           <>
+            <NavLink to="/events" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
+              <span className="nav-ic">◈</span> Events
+            </NavLink>
             <NavLink to="/network" className={({ isActive }) => `mkw-nav-item${isActive ? ' active' : ''}`}>
               <span className="nav-ic">♡</span> Network
             </NavLink>
@@ -69,6 +72,7 @@ export default function Sidebar() {
             <div className="mkw-nav-label" style={{ marginTop: 14 }}>Organiser</div>
             {([
               { tab: 'members',         icon: '👥', label: 'Members'     },
+              { tab: 'events',          icon: '📅', label: 'Events'      },
               { tab: 'community',       icon: '📊', label: 'Community'   },
             ] as const).map(({ tab, icon, label }) => (
               <Link
