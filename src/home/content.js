@@ -236,7 +236,7 @@ export const NEWSLETTER = {
   invalid: 'That confirmation link is invalid or has expired. Please sign up again.',
   eyebrow: 'STAY IN THE LOOP',
   title: 'Get new sessions and resources by email',
-  body: 'Join 350+ freelancers and founders. Upcoming sessions, new resources and what we are learning, straight to your inbox.',
+  body: 'Join 450+ freelancers and founders. Upcoming sessions, new resources and what we are learning, straight to your inbox.',
   consent: 'I agree to receive The Solopreneurs Club newsletter by email and can unsubscribe at any time.',
 }
 
