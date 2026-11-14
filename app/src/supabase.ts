@@ -88,6 +88,7 @@ export type Event = {
   luma_event_id: string | null
   capacity: number | null
   registration_mode: 'in_app' | 'external'
+  image_url?: string | null
 }
 
 export type ConnectionStatus = 'pending' | 'accepted' | 'declined'

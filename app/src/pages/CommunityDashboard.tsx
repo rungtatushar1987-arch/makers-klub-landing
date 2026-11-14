@@ -177,17 +177,25 @@ export default function CommunityDashboard() {
   if (error) return <p className="adm-tab-loading">Couldn't load community data: {error}</p>
   if (!contacts.length) return <p className="adm-tab-loading">No Luma data yet — ask Claude to load it from Luma.</p>
 
-  const th = (key: SortKey, label: string) => (
-    <span className="cd-sort" onClick={() => setSort(s => ({ key, dir: s.key === key ? (-s.dir as 1 | -1) : 1 }))}>
-      {label}{sort.key === key ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}
-    </span>
-  )
+  // Sortable column header: a real button so it works with keyboard and screen readers.
+  const th = (key: SortKey, label: string, firstDir: 1 | -1, center = true) => {
+    const active = sort.key === key
+    return (
+      <button
+        type="button"
+        className={`cd-sort${center ? ' adm-col-center' : ''}`}
+        onClick={() => setSort(s => ({ key, dir: s.key === key ? (-s.dir as 1 | -1) : firstDir }))}
+      >
+        {label}{active ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}
+      </button>
+    )
+  }
 
   return (
     <div className="adm-analytics">
       <div className="mkw-stats adm-stats">
         {[
-          { lbl: 'Active members', num: LINKEDIN_FOLLOWERS, delta: 'LinkedIn followers' },
+          { lbl: 'LinkedIn followers', num: LINKEDIN_FOLLOWERS, delta: 'on the Solopreneurs Club page' },
           { lbl: 'Registered', num: registeredPeople, delta: 'on the Luma calendar, for events and the newsletter' },
           { lbl: 'People', num: kpis.total, delta: 'unique people in our data, duplicate emails merged' },
           { lbl: 'Repeat attendance', num: `${kpis.repeat}%`, delta: 'of people who registered came to 2+ events' },
@@ -203,11 +211,11 @@ export default function CommunityDashboard() {
       <input className="adm-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search people by name or email…" />
       <div className="mkw-card adm-table-card">
         <div className="adm-thead cd-contacts-grid">
-          {th('name', 'Contact')}
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'engagement', dir: s.key === 'engagement' ? (-s.dir as 1 | -1) : -1 }))}>Engagement{sort.key === 'engagement' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'approved_events', dir: s.key === 'approved_events' ? (-s.dir as 1 | -1) : -1 }))}>Events{sort.key === 'approved_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'recent_events', dir: s.key === 'recent_events' ? (-s.dir as 1 | -1) : -1 }))}>Status{sort.key === 'recent_events' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
-          <span className="cd-sort adm-col-center" onClick={() => setSort(s => ({ key: 'revenue_eur_cents', dir: s.key === 'revenue_eur_cents' ? (-s.dir as 1 | -1) : -1 }))}>Revenue{sort.key === 'revenue_eur_cents' ? (sort.dir === 1 ? ' ↑' : ' ↓') : ''}</span>
+          {th('name', 'Contact', 1, false)}
+          {th('engagement', 'Engagement', -1)}
+          {th('approved_events', 'Events', -1)}
+          {th('recent_events', 'Status', -1)}
+          {th('revenue_eur_cents', 'Revenue', -1)}
           <span className="adm-col-center">LinkedIn</span>
         </div>
         {tableRows.length === 0 && <p className="adm-table-empty">No people found.</p>}

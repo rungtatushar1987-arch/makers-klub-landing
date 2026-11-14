@@ -697,6 +697,11 @@
 /* ── Community tab ── */
 .cd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 .cd-pad { padding: 16px 20px 8px; }
-.cd-sort { cursor: pointer; user-select: none; }
+.cd-sort {
+  cursor: pointer; user-select: none; background: none; border: 0; padding: 0;
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; text-align: left;
+}
+.cd-sort.adm-col-center { text-align: center; }
+.cd-sort:hover { color: var(--ink-1); }
 .cd-events-grid   { grid-template-columns: 1fr 110px 90px 90px; }
 .cd-contacts-grid { grid-template-columns: 1fr 100px 70px 90px 80px 70px; }
