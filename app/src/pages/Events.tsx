@@ -15,7 +15,8 @@ const AV_COLORS = [
 const av = (i: number) => AV_COLORS[i % AV_COLORS.length]
 
 type Attendee = { clerk_user_id: string; profile?: Profile; connected: boolean }
-type LumaAttendance = { total: number; registered: number; checked_in: number; names: { name: string }[] | null; names_visible: boolean }
+type LumaGuest = { name: string; role?: string | null; link?: string | null }
+type LumaAttendance = { total: number; registered: number; checked_in: number; names: LumaGuest[] | null; names_visible: boolean }
 type PendingConn = { action_tags: string[]; notes: string; remind_followup: boolean }
 
 export default function Events() {
@@ -339,7 +340,15 @@ export default function Events() {
                                     return (
                                       <div key={`${g.name}-${k}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <div className="mkw-row-av" style={{ background: c.bg, color: c.fg, width: 26, height: 26, borderRadius: '50%', fontSize: 10 }}>{getInitials(g.name)}</div>
-                                        <span style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--ink-1)' }}>{g.name}</span>
+                                        <span style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--ink-1)', flex: 1, minWidth: 0 }}>
+                                          {g.name}
+                                          {g.role && <span style={{ color: 'var(--ink-3)', fontWeight: 500 }}> · {g.role}</span>}
+                                        </span>
+                                        {g.link && (
+                                          <a href={g.link} target="_blank" rel="noreferrer" style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, color: 'var(--mk-violet)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                                            {/linkedin\.com/i.test(g.link) ? 'LinkedIn ↗' : 'Website ↗'}
+                                          </a>
+                                        )}
                                       </div>
                                     )
                                   })}

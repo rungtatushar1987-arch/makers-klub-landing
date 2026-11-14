@@ -24,6 +24,7 @@ export type AdminEvent = Event & {
   rsvp_count: number
 }
 
+type LumaGuest = { name: string; role?: string | null; link?: string | null }
 type EventAttendee = { clerk_user_id: string; status?: string; profile?: Profile }
 
 type Tab = 'members' | 'community' | 'events' | 'analytics' | 'recommendations' | 'resources'
@@ -132,7 +133,7 @@ export default function Admin() {
   // Luma guest visibility switch (members see non-member Luma guest names only when on)
   const [showLumaNames, setShowLumaNames] = useState(false)
   const [savingLumaNames, setSavingLumaNames] = useState(false)
-  const [lumaGuests, setLumaGuests] = useState<Record<string, { total: number; registered?: number; checked_in?: number; names: { name: string }[] | null }>>({})
+  const [lumaGuests, setLumaGuests] = useState<Record<string, { total: number; registered?: number; checked_in?: number; names: LumaGuest[] | null }>>({})
 
   // Resources tab
   const [resources, setResources] = useState<Resource[]>([])
@@ -822,7 +823,7 @@ function EventFormModal({ event, deleting, attendees, lumaGuests, attendeesLoadi
   event: AdminEvent | null
   deleting: boolean
   attendees: EventAttendee[] | null
-  lumaGuests: { total: number; registered?: number; checked_in?: number; names: { name: string }[] | null } | null
+  lumaGuests: { total: number; registered?: number; checked_in?: number; names: LumaGuest[] | null } | null
   attendeesLoading: boolean
   onSave: (fields: EventFormFields) => Promise<void>
   onDelete?: () => void
@@ -1003,7 +1004,21 @@ function EventFormModal({ event, deleting, attendees, lumaGuests, attendeesLoadi
               <div className="adm-view-desc-label">Luma attendance</div>
               <p className="adm-attendees-empty" style={{ marginBottom: 8 }}>{lumaGuests.registered ?? lumaGuests.total} registered on Luma{lumaGuests.checked_in ? ` · ${lumaGuests.checked_in} checked in` : ''}</p>
               {lumaGuests.names && lumaGuests.names.length > 0 && (
-                <p className="adm-view-desc">Not on Makers Klub yet: {lumaGuests.names.map(g => g.name).join(', ')}</p>
+                <div className="adm-attendees-list">
+                  {lumaGuests.names.map((g, i) => (
+                    <div key={`${g.name}-${i}`} className="adm-attendee-row">
+                      <div className="adm-attendee-info">
+                        <div className="adm-attendee-name">{g.name}</div>
+                        {g.role && <div className="adm-attendee-role">{g.role}</div>}
+                      </div>
+                      {g.link && (
+                        <a href={g.link} target="_blank" rel="noreferrer" className="adm-view-luma-btn" style={{ width: 'auto', padding: '4px 12px', fontSize: 11 }}>
+                          {/linkedin\.com/i.test(g.link) ? 'LinkedIn ↗' : 'Website ↗'}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           )}
