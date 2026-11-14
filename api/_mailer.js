@@ -36,7 +36,14 @@ export function confirmEmail(link) {
     html: wrap(`
     <h1 style="color: #0a1129; font-size: 24px; margin: 0 0 16px;">Confirm your email</h1>
     <p style="color: #39405e; font-size: 16px; line-height: 1.5;">Thanks for signing up to The Solopreneurs Club newsletter. Please confirm your email address to start receiving new sessions and resources.</p>
-    <p style="margin: 28px 0;"><a href="${link}" style="background: #cdb27e; color: #1c1405; text-decoration: none; font-weight: 700; padding: 14px 28px; border-radius: 999px; display: inline-block;">Confirm my email</a></p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 28px 0;">
+      <tr>
+        <td align="center" bgcolor="#cdb27e" style="border-radius: 999px;">
+          <a href="${link}" target="_blank" style="display: block; padding: 16px 32px; font-size: 16px; font-weight: 700; line-height: 20px; color: #1c1405; text-decoration: none; border-radius: 999px;">Confirm my email</a>
+        </td>
+      </tr>
+    </table>
+    <p style="color: #39405e; font-size: 14px; line-height: 1.5; margin: 0 0 20px;">Button not working? Copy and paste this link into your browser:<br><a href="${link}" target="_blank" style="color: #3361d4; word-break: break-all;">${link}</a></p>
     <p style="color: #767d9b; font-size: 13px; line-height: 1.5;">If you did not sign up, you can ignore this email and nothing will happen.</p>`),
   }
 }
