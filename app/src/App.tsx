@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Admin from './pages/Admin'
+import EventRoom from './pages/EventRoom'
 import OnboardingWizard from './pages/OnboardingWizard'
 
 function AppShell() {
@@ -55,6 +56,7 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/home"    element={<Dashboard />} />
             <Route path="/events"  element={<Events />} />
+            <Route path="/events/:eventId/room" element={<EventRoom />} />
             <Route path="/network" element={<Members />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/profile" element={<Profile />} />

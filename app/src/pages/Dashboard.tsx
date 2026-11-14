@@ -114,9 +114,14 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <Link to={`/events?event=${next.id}`} className="mk-btn mk-btn-primary hm-next-cta">
-                {isMine(next) ? 'View event' : 'See details and register'}
-              </Link>
+              <div className="hm-next-actions">
+                <Link to={`/events?event=${next.id}`} className="mk-btn mk-btn-primary hm-next-cta">
+                  {isMine(next) ? 'View event' : 'See details and register'}
+                </Link>
+                {isMine(next) && (
+                  <Link to={`/events/${next.id}/room`} className="mk-btn hm-room-link">Open event room</Link>
+                )}
+              </div>
             </div>
 
             {next.image_url && <img className="hm-next-img" src={next.image_url} alt="" />}
