@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useKlub, type RsvpStatus } from '../KlubContext'
 import { getSupabaseClient, type Event, type Profile, ACTION_TAGS, getInitials } from '../supabase'
@@ -24,8 +25,9 @@ export default function Events() {
   const { session } = useSession()
   const { events, myRsvps, allRsvps, connections, addConnection, loading } = useKlub()
 
+  const [searchParams, setSearchParams] = useSearchParams()
   const [tab, setTab]                         = useState<'upcoming' | 'mine'>('upcoming')
-  const [modalEvent, setModalEvent]           = useState<Event | null>(null)
+  const [modalEventId, setModalEventId]       = useState<string | null>(searchParams.get('event'))
   const [attendees, setAttendees]             = useState<Record<string, Attendee[]>>({})
   const [lumaInfo, setLumaInfo]         = useState<Record<string, LumaAttendance>>({})
   const [expandedPast, setExpandedPast]       = useState<string | null>(null)
@@ -34,6 +36,7 @@ export default function Events() {
   const [editingAttendee, setEditingAttendee] = useState<string | null>(null)
   const [pendingConn, setPendingConn]         = useState<PendingConn>({ action_tags: [], notes: '', remind_followup: false })
 
+  const modalEvent = events.find(e => e.id === modalEventId) ?? null
   const myConnectionIds = new Set(connections.map(c => c.connected_clerk_user_id))
   const now = new Date()
   const upcoming    = events.filter(e => new Date(e.date) >= now)
@@ -169,7 +172,7 @@ export default function Events() {
                   <div
                     key={event.id}
                     className="ev-card"
-                    onClick={() => setModalEvent(event)}
+                    onClick={() => setModalEventId(event.id)}
                   >
                     <div className="ev-card-inner">
                       <div className="ev-date-block">
@@ -369,7 +372,13 @@ export default function Events() {
       </div>
 
       {modalEvent && (
-        <EventModal event={modalEvent} onClose={() => setModalEvent(null)} />
+        <EventModal
+          event={modalEvent}
+          onClose={() => {
+            setModalEventId(null)
+            if (searchParams.has('event')) setSearchParams({}, { replace: true })
+          }}
+        />
       )}
     </>
   )

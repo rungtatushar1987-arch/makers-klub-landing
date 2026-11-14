@@ -1,33 +1,37 @@
+import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
-import { getInitials, getAvatarColor, AVATAR_COLORS } from '../supabase'
-import { CommunityStatsCard, RecommendedPeopleCard } from '../components/CommunitySidebarCards'
 import Onboarding from './Onboarding'
 
-// Avatar color map from design tokens — cycles through brand palette
-const AV_COLORS = [
-  { bg: '#c5a059', fg: '#0a1340' },  // yellow
-  { bg: '#3b6dd9', fg: '#ffffff' },  // violet
-  { bg: '#3b6dd9', fg: '#ffffff' },  // blue
-  { bg: '#0a1340', fg: '#ffffff' },  // navy
-  { bg: '#7ba0e8', fg: '#0a1340' },  // soft violet
-]
-function avColor(i: number) { return AV_COLORS[i % AV_COLORS.length] }
+function eventDuration(start: string, end?: string | null) {
+  if (!end) return ''
+  const mins = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000)
+  if (mins <= 0) return ''
+  if (mins < 120) return `${mins} min`
+  const h = mins / 60
+  return `${Number.isInteger(h) ? h : h.toFixed(1)} hrs`
+}
 
 export default function Dashboard() {
   const { user } = useUser()
-  const { connections, events, loading, clearTag, isOnboarding, allProfiles, totalMembers } = useKlub()
+  const upcomingTrack = useRef<HTMLDivElement>(null)
+  const { connections, events, loading, isOnboarding } = useKlub()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
   const firstName = user?.firstName || 'there'
   const now = new Date()
 
-  const eventsAttended = new Set(connections.map(c => c.event_name).filter(Boolean)).size
-  const eventsRun = events.filter(e => new Date(e.date) < now).length
-  const pendingConnections = connections.filter(c => c.action_tags?.length > 0)
+  const upcomingEvents = events.filter(e => new Date(e.date) >= now).sort((a, b) => a.date.localeCompare(b.date))
+  const scrollUpcoming = (dir: number) => {
+    const t = upcomingTrack.current
+    if (!t) return
+    const card = t.querySelector('.mkw-upcoming-card') as HTMLElement | null
+    t.scrollBy({ left: dir * ((card ? card.offsetWidth : 260) + 18), behavior: 'smooth' })
+  }
+
   const followUpCount = connections.filter(c => c.remind_followup).length
-  const recommendedPeople = allProfiles.filter(p => p.clerk_user_id !== user?.id).slice(0, 8)
 
   if (loading) return (
     <div className="mkw-loading" style={{ color: 'var(--ink-3)', fontFamily: 'var(--font-display)' }}>
@@ -58,13 +62,10 @@ export default function Dashboard() {
 
       {/* ── Main body ── */}
       <div className="mkw-main-body">
-        <div className="mkw-home-grid">
-
-          {/* ── LEFT COLUMN ── */}
-          <div className="mkw-home-left">
+        <div className="mkw-home-left">
 
             {/* Stats */}
-            <div className="mkw-stats">
+            <div className="mkw-stats mkw-stats--home">
               <div className="mkw-stat">
                 <div className="lbl">Connections</div>
                 <div className="num">{connections.length}</div>
@@ -78,112 +79,49 @@ export default function Dashboard() {
                 <div className="delta">{followUpCount > 0 ? 'Waiting' : 'All clear'}</div>
               </div>
             </div>
-          </div>
 
-          {/* ── RIGHT RAIL ── */}
-          <div className="mkw-home-right">
-
-            <CommunityStatsCard totalMembers={totalMembers} eventsRun={eventsRun} />
-
-            {/* Recent connections */}
-            <div className="mkw-card">
-              <div className="mkw-h3">
-                <span>Recent connections</span>
-                <a href="/network">See all →</a>
-              </div>
-              {connections.length === 0 ? (
-                <div style={{ padding: '16px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>
-                    No connections yet.
-                  </p>
+            {/* Upcoming events */}
+            {upcomingEvents.length > 0 && (
+              <div>
+                <div className="mkw-upcoming-head">
+                  <div className="mkw-h3" style={{ marginBottom: 0, flex: 1 }}>
+                    <span>Upcoming events</span>
+                    <Link to="/events">All events →</Link>
+                  </div>
+                  <div className="mkw-upcoming-arrows">
+                    <button type="button" aria-label="Previous" onClick={() => scrollUpcoming(-1)}>←</button>
+                    <button type="button" aria-label="Next" onClick={() => scrollUpcoming(1)}>→</button>
+                  </div>
                 </div>
-              ) : (
-                <div className="mkw-rows">
-                  {connections.slice(0, 5).map((conn, i) => {
-                    const av = avColor(i)
+                <div className="mkw-upcoming-track" ref={upcomingTrack} tabIndex={0} aria-label="Upcoming events">
+                  {upcomingEvents.map(ev => {
+                    const d = new Date(ev.date)
+                    const dur = eventDuration(ev.date, ev.end_date)
                     return (
-                      <div key={conn.id} className="mkw-row">
-                        <div className="mkw-row-av" style={{ background: av.bg, color: av.fg }}>
-                          {getInitials(conn.profile?.full_name)}
+                      <Link key={ev.id} to={`/events?event=${ev.id}`} className="mkw-upcoming-card">
+                        <div className="mkw-upcoming-thumb">
+                          {ev.image_url && <img src={ev.image_url} alt="" loading="lazy" />}
+                          {ev.type && <span className="mkw-upcoming-kind" data-kind={ev.type}>{ev.type}</span>}
+                          <span className="mkw-upcoming-date">
+                            <b>{d.getDate()}</b>
+                            <span>{d.toLocaleString('en', { month: 'short' }).toUpperCase()}</span>
+                          </span>
                         </div>
-                        <div className="mkw-row-main">
-                          <div className="mkw-row-name">{conn.profile?.full_name || 'Member'}</div>
-                          <div className="mkw-row-meta">
-                            {conn.profile?.role_category
-                              ? conn.profile.role_category.charAt(0).toUpperCase() + conn.profile.role_category.slice(1)
-                              : ''}
-                            {conn.event_name ? ` · ${conn.event_name}` : ''}
-                          </div>
+                        <div className="mkw-upcoming-body">
+                          <h3 className="mkw-upcoming-name">{ev.title}</h3>
+                          {ev.location && <p className="mkw-upcoming-meta">{ev.location}</p>}
+                          <p className="mkw-upcoming-meta">
+                            {d.toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                            {dur ? ` · ${dur}` : ''}
+                          </p>
+                          <span className="mkw-upcoming-link">View details →</span>
                         </div>
-                        <span style={{ fontSize: 11, color: 'var(--ink-3)', flexShrink: 0, fontFamily: 'var(--font-body)' }}>
-                          {new Date(conn.created_at).toLocaleDateString('en', { day: 'numeric', month: 'short' })}
-                        </span>
-                      </div>
+                      </Link>
                     )
                   })}
                 </div>
-              )}
-            </div>
-
-            {/* Follow-ups */}
-            <div className="mkw-card">
-              <div className="mkw-h3">
-                <span>Follow-ups</span>
-                {pendingConnections.length > 0 && (
-                  <span style={{ fontSize: 11, color: 'var(--mk-yellow-deep)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-                    {pendingConnections.length} waiting
-                  </span>
-                )}
               </div>
-              {pendingConnections.length === 0 ? (
-                <div style={{ padding: '16px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>
-                    No pending follow-ups — you're all caught up.
-                  </p>
-                </div>
-              ) : (
-                <div className="mkw-rows">
-                  {pendingConnections.map((conn, i) => {
-                    const av = avColor(i)
-                    return (
-                      <div key={conn.id} className="mkw-row">
-                        <div className="mkw-row-av" style={{ background: av.bg, color: av.fg }}>
-                          {getInitials(conn.profile?.full_name)}
-                        </div>
-                        <div className="mkw-row-main">
-                          <div className="mkw-row-name">{conn.profile?.full_name || 'Member'}</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 5 }}>
-                            {conn.action_tags.map(tag => (
-                              <span key={tag} style={{
-                                display: 'inline-flex', alignItems: 'center', gap: 4,
-                                background: 'rgba(197,160,89,0.18)', color: 'var(--mk-yellow-deep)',
-                                fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-                                padding: '3px 10px', borderRadius: 999,
-                              }}>
-                                {tag}
-                                <button
-                                  onClick={() => clearTag(conn, tag)}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mk-yellow-deep)', fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}
-                                >×</button>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        {conn.profile?.linkedin_url && (
-                          <a href={conn.profile.linkedin_url} target="_blank" rel="noreferrer" className="mkw-row-action">
-                            LinkedIn
-                          </a>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            <RecommendedPeopleCard members={recommendedPeople} />
-
-          </div>
+            )}
 
         </div>
       </div>
