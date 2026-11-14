@@ -9,3 +9,6 @@
 .sc-news-consent input { margin-top: 4px; }
 @media (max-width: 900px) { .sc-news { padding: 64px 24px; } .sc-news-inner { grid-template-columns: 1fr; gap: var(--space-4); } }
 @media (max-width: 560px) { .sc-news { padding-left: 16px; padding-right: 16px; } .sc-news-row { flex-direction: column; } }
+.sc-news-notice { margin-top: var(--space-3); font: var(--text-body-small); font-weight: 700; color: var(--ink); }
+.sc-news-notice[data-kind="error"] { color: #b3261e; }
+.sc-news-row .btn-solid:disabled { opacity: 0.7; cursor: progress; transform: none; }
