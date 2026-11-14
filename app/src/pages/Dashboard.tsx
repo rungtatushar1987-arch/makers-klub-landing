@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { useKlub } from '../KlubContext'
 import Onboarding from './Onboarding'
+import './Dashboard.css'
 
 function eventDuration(start: string, end?: string | null) {
   if (!end) return ''
