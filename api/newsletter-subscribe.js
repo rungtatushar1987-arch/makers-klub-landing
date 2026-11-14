@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { mailerConfigured, sendMail, confirmEmail } from './_mailer.js'
 
-const SITE_URL = process.env.SITE_URL || 'https://www.makersklub.com'
+const SITE_URL = process.env.SITE_URL || 'https://www.thesoloprenuers.club'
 const RESEND_COOLDOWN_MS = 60 * 1000
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
