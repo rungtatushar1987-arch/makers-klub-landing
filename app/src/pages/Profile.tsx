@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { getSupabaseClient, calcProfileProgress, type Profile } from '../supabase'
+import { getSupabaseClient, calcProfileProgress, getInitials, type Profile } from '../supabase'
 import { useKlub } from '../KlubContext'
 import { INTERESTS, LOOKING_FOR_OPTIONS } from '../profileOptions'
 import MultiSelectDropdown from '../components/MultiSelectDropdown'
@@ -96,7 +96,7 @@ export default function Profile() {
       </div>
 
       <div className="mkw-main-body">
-        {saved && <div className="prof-saved-toast">✓ Profile saved</div>}
+        {saved && <div className="prof-saved-toast" role="status">Profile saved</div>}
 
         <div className="prof-layout">
           <div className="prof-left">
@@ -116,20 +116,21 @@ export default function Profile() {
             <div className="prof-section">
               <div className="prof-section-label">Personal</div>
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Full name *</label>
-                <input className="mkw-form-input" value={profile.full_name || ''} onChange={e => update('full_name', e.target.value)} placeholder="Your name" />
+                <label className="mkw-form-label" htmlFor="pf-name">Full name *</label>
+                <input id="pf-name" className="mkw-form-input" value={profile.full_name || ''} onChange={e => update('full_name', e.target.value)} placeholder="Your name" />
               </div>
               <div className="mkw-form-group">
-                <label className="mkw-form-label">One-line bio *</label>
-                <textarea className="mkw-form-textarea" value={profile.bio || ''} onChange={e => update('bio', e.target.value)} placeholder="What you do + what you're working on right now" />
+                <label className="mkw-form-label" htmlFor="pf-bio">One-line bio *</label>
+                <textarea id="pf-bio" className="mkw-form-textarea" value={profile.bio || ''} onChange={e => update('bio', e.target.value)} placeholder="What you do + what you're working on right now" />
               </div>
             </div>
 
             <div className="prof-section">
               <div className="prof-section-label">About you</div>
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Role *</label>
+                <label className="mkw-form-label" htmlFor="pf-role">Role *</label>
                 <input
+                  id="pf-role"
                   className="mkw-form-input"
                   value={profile.role_category || ''}
                   onChange={e => update('role_category', e.target.value)}
@@ -167,20 +168,20 @@ export default function Profile() {
               <div className="prof-section-label">Social links</div>
               {!isProfileUnlocked && (
                 <div className={socialError ? 'prof-social-error' : 'prof-social-req'}>
-                  {socialError ? '⚠ Add at least one link to unlock your QR code' : 'At least one link required to unlock your QR code'}
+                  {socialError ? 'Add at least one link to unlock your QR code.' : 'Add at least one link to unlock your QR code.'}
                 </div>
               )}
               <div className="mkw-form-group">
-                <label className="mkw-form-label">LinkedIn</label>
-                <input className="mkw-form-input" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
+                <label className="mkw-form-label" htmlFor="pf-li">LinkedIn</label>
+                <input id="pf-li" className="mkw-form-input" value={profile.linkedin_url || ''} onChange={e => update('linkedin_url', e.target.value)} placeholder="https://linkedin.com/in/yourname" />
               </div>
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Instagram</label>
-                <input className="mkw-form-input" value={profile.instagram_url || ''} onChange={e => update('instagram_url', e.target.value)} placeholder="https://instagram.com/yourhandle" />
+                <label className="mkw-form-label" htmlFor="pf-ig">Instagram</label>
+                <input id="pf-ig" className="mkw-form-input" value={profile.instagram_url || ''} onChange={e => update('instagram_url', e.target.value)} placeholder="https://instagram.com/yourhandle" />
               </div>
               <div className="mkw-form-group">
-                <label className="mkw-form-label">Website</label>
-                <input className="mkw-form-input" value={profile.website_url || ''} onChange={e => update('website_url', e.target.value)} placeholder="https://yourwebsite.com" />
+                <label className="mkw-form-label" htmlFor="pf-web">Website</label>
+                <input id="pf-web" className="mkw-form-input" value={profile.website_url || ''} onChange={e => update('website_url', e.target.value)} placeholder="https://yourwebsite.com" />
               </div>
             </div>
 
@@ -194,6 +195,31 @@ export default function Profile() {
           </div>
 
           <div className="prof-right">
+            <div className="prof-preview" aria-label="How other members see you">
+              <div className="prof-preview-label">How members see you</div>
+              <div className="prof-preview-head">
+                <span className="prof-preview-av">{getInitials(profile.full_name) || '?'}</span>
+                <div>
+                  <b>{profile.full_name?.trim() || 'Your name'}</b>
+                  <span>{profile.role_category?.trim() || 'Your role'}</span>
+                </div>
+              </div>
+              <p className={profile.bio?.trim() ? '' : 'prof-preview-empty'}>{profile.bio?.trim() || 'Your one-line bio shows here.'}</p>
+              {(profile.industries?.length ?? 0) > 0 && (
+                <div className="prof-preview-tags">
+                  {profile.industries!.slice(0, 4).map(i => <span key={i}>{i}</span>)}
+                  {profile.industries!.length > 4 && <span>+{profile.industries!.length - 4}</span>}
+                </div>
+              )}
+              {hasSocial && (
+                <div className="prof-preview-links">
+                  {profile.linkedin_url?.trim() && <span>LinkedIn</span>}
+                  {profile.instagram_url?.trim() && <span>Instagram</span>}
+                  {profile.website_url?.trim() && <span>Website</span>}
+                </div>
+              )}
+            </div>
+
             <div className="prof-qr-card">
               <div className="prof-qr-pwa-icon">
                 <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -231,7 +257,7 @@ export default function Profile() {
                 <div className="prof-tip-card">
                   <div className="prof-tip-label">Complete your profile</div>
                   {nudges.map((msg, i) => (
-                    <div key={i} className="prof-tip-nudge">↑ {msg}</div>
+                    <div key={i} className="prof-tip-nudge">{msg}</div>
                   ))}
                 </div>
               )

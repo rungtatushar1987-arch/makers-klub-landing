@@ -141,6 +141,7 @@ export default function Events() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
+                  aria-pressed={tab === t}
                   className={`ev-tab${tab === t ? ' active' : ''}`}
                 >
                   {t === 'upcoming'
@@ -172,7 +173,10 @@ export default function Events() {
                   <div
                     key={event.id}
                     className="ev-card"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setModalEventId(event.id)}
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setModalEventId(event.id) } }}
                   >
                     <div className="ev-card-inner">
                       <div className="ev-date-block">
@@ -189,10 +193,11 @@ export default function Events() {
                         </div>
                         <div className="ev-card-meta">
                           {event.location} · {dateStr} · {time}
-                          {spotsLeft !== null && spotsLeft > 0 && ` · ${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left`}
+                          {spotsLeft !== null && spotsLeft > 0 && <> · <b className={spotsLeft <= 5 ? 'ev-low' : ''}>{spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left</b></>}
                         </div>
                       </div>
-                      <span className="ev-card-chevron">›</span>
+                      {event.image_url && <img className="ev-card-thumb" src={event.image_url} alt="" loading="lazy" />}
+                      <span className="ev-card-chevron" aria-hidden="true">›</span>
                     </div>
                   </div>
                 )
@@ -207,7 +212,7 @@ export default function Events() {
               </div>
 
               {past.length === 0 ? (
-                <p style={{ fontSize: 13, color: 'var(--ink-3)', fontFamily: 'var(--font-body)' }}>No past events yet.</p>
+                <p className="ev-muted">No past events yet.</p>
               ) : (
                 <div className="mkw-rows">
                   {past.map((event) => {
@@ -220,28 +225,25 @@ export default function Events() {
 
                     return (
                       <div key={event.id}>
-                        <div className="mkw-row" style={{ opacity: 0.65 }}>
-                          <div style={{
-                            width: 40, height: 44, borderRadius: 8, flexShrink: 0,
-                            background: 'rgba(12,19,48,0.06)',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                          }}>
-                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, lineHeight: 1, color: 'var(--ink-3)' }}>{day}</div>
-                            <div style={{ fontSize: 7, letterSpacing: 1.2, fontWeight: 700, color: 'var(--ink-3)', marginTop: 2 }}>{mon}</div>
+                        <div className="mkw-row ev-past-row">
+                          <div className="ev-past-date">
+                            <b>{day}</b>
+                            <span>{mon}</span>
                           </div>
                           <div className="mkw-row-main">
-                            <div className="mkw-row-name" style={{ fontSize: 13 }}>{event.title}</div>
+                            <div className="mkw-row-name ev-past-name">{event.title}</div>
                             <div className="mkw-row-meta">{dateStr}</div>
                           </div>
                         </div>
 
-                        <div style={{ paddingBottom: 4 }}>
+                        <div className="ev-past-toggle">
                           <button
+                            type="button"
+                            aria-expanded={isExpanded}
                             onClick={() => togglePastAttendees(event)}
-                            className="mk-btn mk-btn-navy mk-btn-sm"
-                            style={{ width: '100%', justifyContent: 'center' }}
+                            className="mk-btn mk-btn-ghost mk-btn-sm ev-past-btn"
                           >
-                            {isLoading ? 'Loading…' : isExpanded ? '▲ Hide attendees' : '👥 People who attended'}
+                            {isLoading ? 'Loading…' : isExpanded ? 'Hide attendees' : 'See who attended'}
                           </button>
                         </div>
 
