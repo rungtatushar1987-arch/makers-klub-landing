@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useUser, useSession } from '@clerk/clerk-react'
 import { useKlub, type RsvpStatus } from '../KlubContext'
 import { getSupabaseClient, type Event, type Profile, ACTION_TAGS, getInitials } from '../supabase'
@@ -196,6 +196,9 @@ export default function Events() {
                           {spotsLeft !== null && spotsLeft > 0 && <> · <b className={spotsLeft <= 5 ? 'ev-low' : ''}>{spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left</b></>}
                         </div>
                       </div>
+                      {(status === 'going' || status === 'waitlist') && (
+                        <Link to={`/events/${event.id}/room`} className="ev-room-link" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>Room</Link>
+                      )}
                       {event.image_url && <img className="ev-card-thumb" src={event.image_url} alt="" loading="lazy" />}
                       <span className="ev-card-chevron" aria-hidden="true">›</span>
                     </div>

@@ -129,3 +129,9 @@
   .hm-next-main { padding: 20px; }
   .hm-next h2 { font-size: 24px; }
 }
+
+.hm-next-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.hm-next-actions .hm-next-cta { margin-top: 0; }
+.hm-room-link { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.3); }
+.hm-room-link:hover { background: rgba(255,255,255,0.2); }
+.hm-next .hm-room-link:focus-visible { outline-color: #fff; }

@@ -229,3 +229,9 @@
 .ev-past-name { font-size: 13px; }
 .ev-past-toggle { padding-bottom: 8px; }
 .ev-past-btn { width: 100%; justify-content: center; }
+
+.ev-room-link {
+  padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--hairline-strong); background: var(--surface);
+  font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--mk-violet); flex-shrink: 0;
+}
+.ev-room-link:hover { border-color: var(--mk-violet-soft); background: rgba(59,109,217,0.06); }

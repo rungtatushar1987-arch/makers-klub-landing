@@ -23,6 +23,8 @@ em { font-style: normal; color: var(--mk-violet); }
 :focus-visible { outline: 2px solid var(--mk-violet); outline-offset: 2px; }
 input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
 
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 /* ── App shell ── */
 .mkw {
   display: grid;
