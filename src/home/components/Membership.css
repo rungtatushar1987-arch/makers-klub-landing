@@ -192,7 +192,7 @@
   display: block;
 }
 .sc-business-title {
-  font: var(--text-headline-xl, 700 44px/1.1 inherit);
+  font: var(--text-headline-lg);
   font-size: clamp(32px, 4vw, 48px);
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -215,7 +215,7 @@
 .sc-business-list li {
   display: flex;
   gap: var(--space-2);
-  font: var(--text-body-small);
+  font: var(--text-body);
   color: var(--ink-body);
 }
 .sc-business-name { font: var(--text-body-large, 600 16px/1.4 inherit); font-weight: 600; color: var(--ink); }
