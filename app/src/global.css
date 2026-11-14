@@ -19,6 +19,10 @@ input, textarea, select { font-size: 16px; font-family: var(--font-body); }
 
 em { font-style: normal; color: var(--mk-violet); }
 
+/* Visible keyboard focus everywhere */
+:focus-visible { outline: 2px solid var(--mk-violet); outline-offset: 2px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
+
 /* ── App shell ── */
 .mkw {
   display: grid;
@@ -58,17 +62,6 @@ em { font-style: normal; color: var(--mk-violet); }
 .mkw-brand-name {
   font-family: var(--font-display); font-weight: 700;
   font-size: 15px; letter-spacing: -0.3px; color: var(--ink-1);
-}
-
-.mkw-brand-sub {
-  font-size: 10px; font-weight: 600; letter-spacing: 1.6px;
-  text-transform: uppercase; color: var(--ink-3);
-}
-
-.mkw-brand-greeting-name {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: 13px; color: var(--ink-2);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
 .mkw-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; padding: 0 12px; }
@@ -156,15 +149,6 @@ em { font-style: normal; color: var(--mk-violet); }
 .mkw-main-body--onboarding { overflow: visible; }
 .mkw-main:has(.mkw-main-body--onboarding) { height: auto; min-height: 100vh; overflow: visible; }
 
-/* Right col sticky */
-.mkw-home-right {
-  position: sticky;
-  top: calc(var(--pagehead-h, 0px));
-  align-self: start;
-  max-height: calc(100vh - var(--pagehead-h, 81px) - 56px);
-  overflow-y: auto;
-}
-
 /* ── Page head bar ── */
 .mkw-pagehead {
   display: flex; justify-content: space-between; align-items: center;
@@ -174,8 +158,6 @@ em { font-style: normal; color: var(--mk-violet); }
   background: var(--glass-bg-strong);
   box-shadow: 0 4px 24px rgba(38,40,90,0.06);
   position: sticky; top: 0; z-index: 40;
-  /* Expose height as a custom property for right-rail offset */
-  --pagehead-h: 81px;
 }
 
 .mkw-pagehead .eyebrow {
@@ -333,10 +315,6 @@ em { font-style: normal; color: var(--mk-violet); }
 
 .mk-btn-sm { padding: 8px 16px; font-size: 12px; }
 .mk-btn-lg { padding: 15px 28px; font-size: 15px; }
-
-/* ── Home grid ── */
-.mkw-home-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
-.mkw-home-left, .mkw-home-right { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Memory quote ── */
 .mkw-memory-quote {
@@ -527,6 +505,5 @@ em { font-style: normal; color: var(--mk-violet); }
   .mkw-side { display: none; }
   .mkw-main-body { padding: 20px 20px 64px; }
   .mkw-pagehead { padding: 14px 20px; }
-  .mkw-home-grid { grid-template-columns: 1fr; }
   .mkw-stats { grid-template-columns: repeat(3, 1fr); }
 }
