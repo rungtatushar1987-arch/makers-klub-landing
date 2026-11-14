@@ -1,19 +1,9 @@
 import { Fragment } from 'react'
 import './Marquee.css'
-
-const WORDS = [
-  'Marketers',
-  'Designers',
-  'Brand strategists',
-  'GTM consultants',
-  'UX designers',
-  'Content creators',
-  'International freelancers in Germany',
-  'Going full-time soon',
-]
+import { MARQUEE_NEWS } from '../content'
 
 export default function Marquee() {
-  const words = [...WORDS, ...WORDS]
+  const words = Array.from({ length: 8 }, () => MARQUEE_NEWS).flat()
   return (
     <div className="sc-marquee">
       <div className="sc-marquee-track">

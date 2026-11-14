@@ -4,6 +4,7 @@ import Hero from './components/Hero'
 import Marquee from './components/Marquee'
 import FitCheck from './components/FitCheck'
 import EventsEmbed from './components/EventsEmbed'
+import Replays from './components/Replays'
 import Membership from './components/Membership'
 import Footer from './components/Footer'
 import Stats from './components/Stats'
@@ -78,6 +79,7 @@ export default function App() {
       <About />
       <Marquee />
       <EventsEmbed />
+      <Replays />
       <Membership />
       <FitCheck />
       <Newsletter />

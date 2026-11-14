@@ -45,12 +45,13 @@ export default function EventsEmbed() {
           </a>
         </p>
 
-        <div className="sc-events-access">
-          <div>
+        <div className="sc-events-access" style={{ backgroundImage: `url(${EVENTS_ACCESS.image})` }}>
+          <div className="sc-events-access-copy">
+            <div className="sc-events-access-eyebrow">{EVENTS_ACCESS.eyebrow}</div>
             <h3>{EVENTS_ACCESS.title}</h3>
             <p>{EVENTS_ACCESS.body}</p>
+            <a href={EVENTS_ACCESS.href} target="_blank" rel="noopener noreferrer" className="btn-solid">{EVENTS_ACCESS.cta} →</a>
           </div>
-          <a href={EVENTS_ACCESS.href} className="btn-solid">{EVENTS_ACCESS.cta} →</a>
         </div>
       </div>
     </section>

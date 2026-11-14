@@ -9,7 +9,7 @@
 }
 .sc-marquee-track {
   display: inline-flex;
-  animation: sc-scroll-left 28s linear infinite;
+  animation: sc-scroll-left 90s linear infinite;
 }
 .sc-marquee-track span {
   font-family: var(--font-sans);

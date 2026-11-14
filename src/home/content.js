@@ -165,44 +165,79 @@ export const NAV_LINKS = [
 ]
 
 export const HERO_SUBHEAD =
-  'Foundation first. Then daily coaching, expert AMAs and a Berlin network that vouches for you.'
+  'A growth community for freelancers, solopreneurs and anybody building a business alone.'
 
-// 350+ members is counted by newsletter subscribers. Months running and events
-// hosted are not in the repo: add them here when known.
+// Member count comes from the Luma calendar.
 export const STATS = [
-  { value: '350+', label: 'Members across the community' },
-  { value: '24h', label: 'Coach answers in Slack, on weekdays' },
-  { value: '2×', label: 'Expert AMAs every month' },
-  { value: '1×', label: 'Live session every month' },
+  { value: '450+', label: 'Members in the community' },
+  { value: '40+', label: 'Events hosted' },
+  { value: '20+', label: 'Weekly freelance opportunities' },
+  { value: '10+', label: 'Tools and resources' },
+  { value: '1', label: 'Slack channel' },
 ]
 
 export const ABOUT = {
   eyebrow: 'ABOUT THE CLUB',
-  statement: MANIFESTO,
+  statement: 'More than a community. Built for people building alone.',
   paragraphs: [
-    'A members-only club for freelancers in Germany past their first year. Fix your foundation first, then get daily coaching on real client work, a live session every month, expert AMAs and a Berlin network that recommends you when it counts.',
-    "Tax advisors, lawyers, sales coaches and senior freelancers run our AMAs and answer member questions. We work with startups and companies across Berlin, and they ask us for freelancers. We can't promise you clients. We can put your name in front of people who hire, once you've done the work.",
+    'The Solopreneurs Club is for people building alone who don’t want to work alone.',
+    'Freelancers, solopreneurs, and founders come here for expert webinars and workshops that sharpen the actual skills their business needs, co-working days that get real work done next to real people, and connections that turn into clients, collaborators, and friends.',
+    'No office. No cofounder. No problem.',
+    'Founder-led, Berlin-based and globally connected, the community is designed to make building a business alone feel less isolating and more supported.',
   ],
   image: '/hero.jpg', // reuses the hero photo: no separate About photo exists yet
   imageAlt: 'Members at a Solopreneurs Club event in Berlin',
 }
 
 export const EVENTS_ACCESS = {
-  title: 'Want access to everything?',
-  body: 'Members get priority on every event, discounts on paid workshops and the full Slack community.',
-  cta: 'See membership',
-  href: '#membership',
+  eyebrow: 'Community',
+  title: 'Join The Solopreneurs Club',
+  body: 'Connect with a community of freelancers, solopreneurs and founders through expert webinars, workshops, co-working days and meaningful connections.',
+  cta: 'Apply to Join',
+  href: CTA_URL,
+  image: '/hero.jpg',
 }
 
-// Newsletter runs on Substack. Set SUBSTACK_URL to the publication, e.g.
-// 'https://yourname.substack.com'. The section stays hidden until it is set.
-export const SUBSTACK_URL = 'https://thesolopreneursclub.substack.com'
+// Past workshops & webinars. Watching a recording is gated: the click opens a
+// "apply for membership" prompt. Pulled from the Luma calendar (past events).
+// Recording links are deliberately NOT stored here: this file ships to the browser. kind: 'Workshop' | 'Webinar'. An empty array hides the section.
+export const REPLAYS = {
+  eyebrow: 'FROM THE ARCHIVE',
+  title: 'Workshops & webinars we have run',
+  note: 'Recordings are for members. Apply to unlock the full library.',
+  gate: {
+    title: 'Recordings are for members',
+    body: 'Apply for membership to watch this session and the rest of the library. Applications are reviewed by hand.',
+    cta: 'Apply for membership',
+    secondary: 'See membership options',
+  },
+  items: [
+    { kind: 'Webinar', title: 'LinkedIn Outreach That Feels Human: A Practical System for Freelancers', where: 'Online', date: '10 Nov 2026', duration: '60 min', image: 'https://images.lumacdn.com/uploads/9k/7b36447a-88b5-420e-b1be-003239c9bc4d.png' },
+    { kind: 'Webinar', title: 'Sustainable LinkedIn Networking: How to Pitch Yourself Without Being Ghosted', where: 'Online', date: '5 Nov 2026', duration: '60 min', image: 'https://images.lumacdn.com/uploads/1x/7a758d8e-eebe-449a-8c16-0c4614e97af9.png' },
+    { kind: 'Workshop', title: 'Grow on LinkedIn without Hating Your Life', where: 'Futura House, Berlin', date: '23 Oct 2026', duration: '3 hrs', image: 'https://images.lumacdn.com/uploads/b1/b40e2c8b-6e7f-4820-a69a-66f9b8603878.png' },
+    { kind: 'Workshop', title: 'The Other Side of the Table: How Clients Actually Pick Freelancers', where: 'Nomad Day Bar, Berlin', date: '22 Oct 2026', duration: '60 min', image: 'https://images.lumacdn.com/uploads/wg/b2effb4e-d64b-4c93-a605-b80b08381dc6.png' },
+    { kind: 'Webinar', title: 'How to Use AI for Market Research and Find Actionable Leads', where: 'Online', date: '15 Oct 2026', duration: '60 min', image: 'https://images.lumacdn.com/uploads/ac/02d9c428-2d48-4241-96fe-0a739078c2db.png' },
+    { kind: 'Webinar', title: 'Create a Marketing Engine with Claude (That Runs While You Work)', where: 'Online', date: '14 Oct 2026', duration: '2 hrs', image: 'https://images.lumacdn.com/uploads/05/eb70569f-d758-4217-ad24-7609d6c4cc68.png' },
+    { kind: 'Workshop', title: 'Non-Devs & AI: Design & Launch Your Website with Claude', where: 'Denizen, Berlin', date: '25 Jun 2026', duration: '3 hrs', image: 'https://images.lumacdn.com/uploads/78/a4f6f678-7459-455b-ad14-0c7831cb8315.png' },
+  ], // [{ kind, title, where, date, duration, image? }]
+}
+
+// Running text bar under the About section: the next events. Dates come from
+// the Luma calendar, so update these as events pass.
+export const MARQUEE_NEWS = [
+  'Next events: 3rd Dec - Sustainable Networking Workshop',
+  '14th Jan - How to Self Organize and Manage Daily Tasks',
+]
+
+// Newsletter signups are stored in Supabase and confirmed by email: see api/newsletter-subscribe.js.
 export const NEWSLETTER = {
-  action: SUBSTACK_URL ? `${SUBSTACK_URL}/api/v1/free?nojs=true` : null,
+  confirmationSent: 'Check your inbox. We sent you an email to confirm your address.',
+  confirmed: 'Thanks, your email is confirmed. You are on the list.',
+  invalid: 'That confirmation link is invalid or has expired. Please sign up again.',
   eyebrow: 'STAY IN THE LOOP',
   title: 'Get new sessions and resources by email',
   body: 'Join 350+ freelancers and founders. Upcoming sessions, new resources and what we are learning, straight to your inbox.',
-  consent: 'I agree to receive The Solopreneurs Club newsletter by email via Substack and can unsubscribe at any time.',
+  consent: 'I agree to receive The Solopreneurs Club newsletter by email and can unsubscribe at any time.',
 }
 
 export const TESTIMONIALS = [] // [{ quote, name, role }]
