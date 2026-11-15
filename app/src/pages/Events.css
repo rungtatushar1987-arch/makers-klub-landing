@@ -1,6 +1,6 @@
 /* Events — list on the left, details of the selected row on the right */
 
-.ev-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; max-width: 1180px; }
+.ev-grid { display: grid; grid-template-columns: minmax(380px, 560px) minmax(0, 1fr); gap: 28px; align-items: start; }
 .ev-col-left, .ev-col-right { min-width: 0; }
 .ev-col-right { position: sticky; top: 96px; align-self: start; }
 
@@ -54,9 +54,9 @@
 .ev-detail-chips { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .ev-type-badge { padding: 3px 10px; border-radius: var(--r-pill); background: rgba(59,109,217,0.12); color: var(--mk-violet); font-family: var(--font-display); font-size: 11px; font-weight: 700; }
 .ev-type-badge--grey { background: rgba(12,19,48,0.08); color: var(--ink-2); }
-.ev-detail-title { font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; line-height: 1.15; color: var(--ink-1); text-wrap: balance; }
+.ev-detail-title { max-width: 40ch; font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; line-height: 1.15; color: var(--ink-1); text-wrap: balance; }
 
-.ev-facts { display: flex; flex-direction: column; gap: 12px; }
+.ev-facts { display: flex; flex-direction: column; gap: 12px; max-width: 72ch; }
 .ev-facts div { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: baseline; }
 .ev-facts dt { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-3); }
 .ev-facts dd { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink-1); }
@@ -64,14 +64,15 @@
 
 .ev-block h3, .ev-sub { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
 .ev-sub { margin-top: 18px; }
-.ev-about { font-size: 14px; color: var(--ink-2); line-height: 1.7; white-space: pre-line; }
+.ev-about { max-width: 72ch; font-size: 14px; color: var(--ink-2); line-height: 1.7; white-space: pre-line; }
 .ev-notice { padding: 10px 14px; border-radius: var(--r-xs); background: rgba(59,109,217,0.08); font-size: 13px; color: var(--ink-2); }
 .ev-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .ev-muted { font-size: 13px; color: var(--ink-2); }
 .ev-stats { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 10px; }
 
 /* people */
-.ev-people { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+/* two or more columns when the panel is wide, one when it is narrow */
+.ev-people { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px 28px; align-items: start; }
 .ev-people li { display: flex; flex-direction: column; }
 .ev-people li.ev-person-row, .ev-person-row { display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .ev-av { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 11px; font-weight: 700; }
