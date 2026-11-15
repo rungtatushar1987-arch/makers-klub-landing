@@ -2,7 +2,7 @@
    One job: show the member what to do next. A ticket-stub "next event" leads,
    people to follow up with and the events after it sit underneath. */
 
-.hm { display: flex; flex-direction: column; gap: 24px; max-width: 1120px; }
+.hm { display: flex; flex-direction: column; gap: 24px; }
 /* .mkw-main-body is a height-limited flex item; without this the ticket (overflow:hidden) shrinks to a sliver */
 .hm > * { flex-shrink: 0; }
 

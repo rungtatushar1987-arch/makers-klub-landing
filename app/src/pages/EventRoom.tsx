@@ -48,7 +48,7 @@ export default function EventRoom() {
   const { eventId } = useParams()
   const { user } = useUser()
   const { session } = useSession()
-  const { events, myRsvps, allProfiles, profile, loading } = useKlub()
+  const { events, myRsvps, allRsvps, allProfiles, profile, loading } = useKlub()
 
   const [posts, setPosts] = useState<Post[]>([])
   const [fetching, setFetching] = useState(true)
@@ -154,6 +154,8 @@ export default function EventRoom() {
     ? 'Introduce yourself and ask what you want covered.'
     : phase === 'live' ? 'Post questions as they come up.' : 'Follow up with people you met and share what you took away.'
 
+  const goingN = allRsvps.filter(r => r.event_id === event.id && r.status === 'going').length
+  const waitN = allRsvps.filter(r => r.event_id === event.id && r.status === 'waitlist').length
   const tops = posts.filter(p => !p.parent_id)
   const repliesOf = (id: string) => posts.filter(p => p.parent_id === id)
   const shown = tops
@@ -190,7 +192,8 @@ export default function EventRoom() {
             <Link to={`/events?event=${event.id}`} className="mk-btn mk-btn-primary mk-btn-sm">See details and register</Link>
           </div>
         ) : (
-          <>
+          <div className="room-layout">
+          <div className="room-main">
             {/* ── Composer ── */}
             <section className="room-compose" aria-label="Write a post">
               <div className="room-kinds" role="group" aria-label="Post type">
@@ -295,7 +298,26 @@ export default function EventRoom() {
                 )
               })}
             </ul>
-          </>
+          </div>
+
+          <aside className="room-rail" aria-label="About this room">
+            <section className="room-card">
+              <h2>The event</h2>
+              <b>{event.title}</b>
+              <p>{start.toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'long' })}, {start.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })}{event.location ? ` · ${event.location}` : ''}</p>
+              <p>{goingN} going{waitN > 0 ? ` · ${waitN} on the waitlist` : ''}</p>
+              <Link to={`/events?event=${event.id}`} className="room-more">Event details →</Link>
+            </section>
+            <section className="room-card">
+              <h2>How this room works</h2>
+              <ul>
+                <li>Only people registered for this event, and the organisers, can read and post.</li>
+                <li>Ask questions, introduce yourself and share links. Your LinkedIn or website goes on any post.</li>
+                <li>The room stays open after the event, so you can follow up with the people you met.</li>
+              </ul>
+            </section>
+          </aside>
+          </div>
         )}
       </div>
     </>
