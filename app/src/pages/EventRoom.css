@@ -1,5 +1,15 @@
 /* Event room — composer, filters, feed */
-.room { max-width: 760px; display: flex; flex-direction: column; gap: 18px; }
+.room { display: flex; flex-direction: column; gap: 18px; }
+.room-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+.room-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.room-rail { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 16px; }
+.room-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-sm); box-shadow: var(--glass-shadow); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.room-card h2 { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-3); }
+.room-card b { font-family: var(--font-display); font-size: 15px; color: var(--ink-1); }
+.room-card p, .room-card li { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+.room-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.room-card a.room-more { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: var(--mk-violet); }
+.room-card a.room-more:hover { text-decoration: underline; }
 .mkw-pagehead .eyebrow a:hover { text-decoration: underline; }
 
 .room-phase {
@@ -45,7 +55,7 @@
 .room-kindtag--intro { background: rgba(197,160,89,0.2); color: var(--mk-yellow-deep); }
 .room-kindtag--link { background: rgba(52,210,123,0.18); color: #1e7a3f; }
 .room-pin { background: var(--mk-yellow); color: var(--mk-navy); }
-.room-body { font-size: 14px; line-height: 1.6; color: var(--ink-1); white-space: pre-wrap; overflow-wrap: anywhere; }
+.room-body { max-width: 75ch; font-size: 14px; line-height: 1.6; color: var(--ink-1); white-space: pre-wrap; overflow-wrap: anywhere; }
 .room-link {
   align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r-pill);
   border: 1px solid var(--hairline-strong); font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--mk-violet);
@@ -70,4 +80,5 @@
 .room-gate p, .room-empty p { font-size: 14px; color: var(--ink-2); max-width: 420px; }
 .room-gate .mk-btn { margin-top: 8px; }
 
+@media (max-width: 1100px) { .room-layout { grid-template-columns: 1fr; } .room-rail { position: static; order: -1; } }
 @media (max-width: 560px) { .room-compose-foot > .mk-btn { width: 100%; justify-content: center; } }

@@ -1,6 +1,5 @@
 /* Resources — search, category pills, link cards */
 
-.res { max-width: 1120px; }
 
 .res-bar { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
 

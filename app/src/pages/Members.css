@@ -1,5 +1,5 @@
 /* Network — requests, search/filters, connection cards */
-.net { max-width: 920px; display: flex; flex-direction: column; gap: 20px; }
+.net { display: flex; flex-direction: column; gap: 20px; }
 
 .net-av {
   width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
@@ -42,7 +42,7 @@
 .net-count { font-size: 12px; color: var(--ink-2); }
 
 /* cards */
-.net-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.net-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); gap: 12px; align-items: start; }
 .net-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--r-sm); box-shadow: var(--glass-shadow); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
 .net-card.editing { border-color: var(--mk-violet); box-shadow: 0 0 0 3px rgba(59,109,217,0.12); }
 .net-card-row { display: flex; align-items: flex-start; gap: 16px; padding: 18px 20px; }
